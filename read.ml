@@ -10,12 +10,17 @@ type context =
     | Auteur of string
     | Grille of string list
     | Lyrics of string list
+    | Mp3 of string
 
 type document = context list 
 
 
 let print_title (pf : ('a, unit, string, unit) format4 -> 'a) title = (
   pf "<h1>%s</h1>" title
+) ;;
+
+let print_mp3 (pf : ('a, unit, string, unit) format4 -> 'a) title = (
+  pf "<a href=%s>./%s</a>" title title
 ) ;;
 
 let read_array_until_empty_line fin = (
@@ -75,6 +80,7 @@ let read filename : document = (
       | "\\auteur" -> r ((Auteur (read_string_until_empty_line fin))::acc)
       | "\\grille" -> r ((Grille (read_array_until_empty_line fin))::acc)
       | "\\lyrics" -> r ((Lyrics (read_array_until_empty_line fin))::acc)
+      | "\\mp3" -> r ((Mp3 (read_string_until_empty_line fin))::acc)
       | "" -> r acc
       | s -> r ((Normal s)::acc)
     with
@@ -119,6 +125,7 @@ let manage filename fileout = (
       | Auteur _ -> ()
       | Grille g -> print_grille pf (g:string list)
       | Lyrics l -> print_lyrics pf l
+      | Mp3 l -> print_mp3 pf l
     ) data
     ;
     fprintf fout "</body></html>" ;
