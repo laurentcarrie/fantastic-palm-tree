@@ -1,6 +1,7 @@
 open ExtString
 open Printf
 
+let (//) = Filename.concat
 
 type context =
     | Normal of string
@@ -63,7 +64,7 @@ let print_lyrics  (pf : ('a, unit, string, unit) format4 -> 'a) l = (
   pf "%s" "</div>\n" ; 
 ) 
 
-let read filename : document = 
+let read filename : document = (
   let fin = open_in filename in
   let rec r acc  = 
     try
@@ -83,11 +84,11 @@ let read filename : document =
   in
   let data = r []   in
   data
-    
+) ;;
 
-let _ =
+let manage filename = (
   try
-    let data = read Sys.argv.(1) in
+    let data = read filename in
     let title = List.fold_left ( fun acc d -> match d with | Titre s -> s | _ -> acc ) "???" data in
     let auteur = List.fold_left ( fun acc d -> match d with | Auteur s -> s | _ -> acc ) "???" data in
     let fout = open_out (Sys.argv.(2)) in
@@ -119,6 +120,27 @@ let _ =
     fprintf fout "</body></html>" ;
     close_out fout
   with
-    | e -> printf "ERREUR : %s\n" (Printexc.to_string e) ; exit 1
+    | e -> printf "ERREUR : %s\n" (Printexc.to_string e) 
+) ;;
 
 
+let rec walk dirname = (
+  printf "enter directory %s\n" dirname ; flush stdout ;
+  let entries = Sys.readdir dirname in
+  let entries = Array.to_list entries in
+  List.iter ( fun e ->
+    if Sys.is_directory e then walk (dirname // e) 
+    else (
+      if Filename.check_suffix e ".song" then 
+	try 
+	  manage (dirname//e)
+	with
+	| e -> printf "%s\n" (Printexc.to_string e)
+      else
+	()
+    )
+  ) entries
+)
+  
+
+let _ = walk Sys.argv.(1)
