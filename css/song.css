@@ -30,3 +30,16 @@ div.auteur {
     font-size:2cm;
     background: #aaffff ;
 }
+
+span.index-titre {
+    font-family: "Times New Roman", Times, serif;
+/*    font-size:2cm; */
+    background: #aaffff ;
+}
+span.index-auteur {
+    font-family: "Times New Roman", Times, serif;
+/*    font-size:2cm;
+    background: #aaffff ;
+*/
+}
+

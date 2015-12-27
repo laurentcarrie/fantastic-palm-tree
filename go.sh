@@ -3,16 +3,17 @@
 set -e
 set -x 
 
-rm -f song-to-html
-ocamlfind ocamlopt -warn-error all  -o song-to-html read.ml -linkpkg -package extlib,str
+rm -rf bin
+mkdir -p bin
+ocamlfind ocamlopt -warn-error all  -o bin/song-to-html read.ml -linkpkg -package extlib,str
 
 songs=perfect-day
 
 mkdir -p install
+cp css/song.css install/.
 
-cp song.css install/.
-cp song.css ~/Dropbox/zik/partoches/.
-cp index.html ~/Dropbox/zik/partoches/.
+./bin/song-to-html $PWD/songs $PWD/install
 
-./song-to-html $PWD
+zip -r partoches.zip install
+cp $PWD/partoches.zip  ~/Dropbox/partoches.zip
 

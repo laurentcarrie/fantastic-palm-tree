@@ -86,12 +86,13 @@ let read filename : document = (
   data
 ) ;;
 
-let manage filename = (
+let manage filename fileout = (
   try
     let data = read filename in
     let title = List.fold_left ( fun acc d -> match d with | Titre s -> s | _ -> acc ) "???" data in
     let auteur = List.fold_left ( fun acc d -> match d with | Auteur s -> s | _ -> acc ) "???" data in
-    let fout = open_out (Sys.argv.(2)) in
+    let () = printf "open %s\n" fileout ; flush stdout ; in
+    let fout = open_out fileout in
     let pf fs = ksprintf ( fun s -> fprintf fout "%s" s) fs in
 
     let _ = pf  "<!DOCTYPE html>
@@ -118,29 +119,56 @@ let manage filename = (
     ) data
     ;
     fprintf fout "</body></html>" ;
-    close_out fout
+    close_out fout ;
+    fileout,title,auteur
   with
-    | e -> printf "ERREUR : %s\n" (Printexc.to_string e) 
+    | e -> failwith (sprintf "ERREUR : %s\n" (Printexc.to_string e) )
 ) ;;
 
 
-let rec walk dirname = (
+let rec walk (count,outdata) dirname dirout = (
   printf "enter directory %s\n" dirname ; flush stdout ;
   let entries = Sys.readdir dirname in
   let entries = Array.to_list entries in
-  List.iter ( fun e ->
-    if Sys.is_directory e then walk (dirname // e) 
+  let (count,outdata) = List.fold_left ( fun (count,outdata) e ->
+    if Sys.is_directory (dirname//e) then walk (count,outdata) (dirname // e) dirout
     else (
-      if Filename.check_suffix e ".song" then 
+      if Filename.check_suffix (dirname//e) ".song" then 
 	try 
-	  manage (dirname//e)
+	  let fileout = dirout // (sprintf "song-%d.html" count) in
+	  let info = manage (dirname//e) fileout  in
+	  count+1,info::outdata
 	with
-	| e -> printf "%s\n" (Printexc.to_string e)
+	| e -> printf "%s\n" (Printexc.to_string e) ; count+1,outdata
       else
-	()
+	count,outdata
     )
-  ) entries
+  ) (count,outdata) entries in
+  count,outdata
 )
   
 
-let _ = walk Sys.argv.(1)
+let _ = 
+  assert(Array.length Sys.argv > 2) ;
+
+  let (_,songs) = walk (0,[]) Sys.argv.(1) Sys.argv.(2) in
+
+  let write_index songs = 
+    let fout = open_out (Sys.argv.(2) // "index.html") in
+    let pf fs = ksprintf ( fun s -> fprintf fout "%s" s) fs in
+    let _ = pf "%s"  "<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv=\"Content-Type\" content=\"text/html\"; charset=\"UTF-8\">
+<link href=\"song.css\" type=\"text/css\" rel=\"stylesheet\"/>
+<title>index des chansons</title>
+</head>
+<body>
+"  in
+    List.iter ( fun (html,titre,auteur) ->
+      let html = String.slice ~first:(String.length Sys.argv.(2)) html in
+      pf "<div class=\"index-entry\"><a href=\".%s\"><span class=\"index-titre\">%s</span> <span class=\"index-auteur\">%s</span></a></div>\n" html titre auteur ;
+    ) songs
+  in
+
+  write_index songs
