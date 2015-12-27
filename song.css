@@ -1,10 +1,32 @@
-table, th, td {
+td.grille {
     border: 1px solid black;
     border-collapse: collapse;
     text-align: center ;
+    height:2.5cm ;
+    background: #eebbee ;
+#	background: linear-gradient(to right bottom, #ffffff 0%,#ffffff 49.9%,#000000 50%,#000000 51%,#ffffff 51.1%,#ffffff 100%);    width:3.5cm ;
+    font-family: "Times New Roman", Times, serif;
+    font-size:1cm;
 }
-table{
+table.grille{
     width: 100%;
     table-layout:fixed ;
     empty-cells:hide ;
 } 
+
+div.lyrics {
+    font-family: "Times New Roman", Times, serif;
+    font-size:1cm;
+    background: #ffffff ;
+}
+
+div.titre {
+    font-family: "Times New Roman", Times, serif;
+    font-size:2cm;
+    background: #aaffff ;
+}
+div.auteur {
+    font-family: "Times New Roman", Times, serif;
+    font-size:2cm;
+    background: #aaffff ;
+}

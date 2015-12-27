@@ -3,9 +3,11 @@ open Printf
 
 
 type context =
-    | Normal
+    | Normal of string
     | Titre of string
+    | Auteur of string
     | Grille of string list
+    | Lyrics of string list
 
 type document = context list 
 
@@ -31,16 +33,35 @@ let read_string_until_empty_line fin = (
   String.join "\n" a
 ) ;;
 
+let html_of_chord c = (
+  List.fold_left ( fun c (sub,by) ->
+    let reg = Str.regexp (Str.quote sub) in
+    Str.global_replace reg by c
+  ) c  [
+    "#","&#x266f;" ;
+    "b","&#x266d;" ;
+    "m","<sub>m</sub>" ;
+  ]
+)
 let print_grille  (pf : ('a, unit, string, unit) format4 -> 'a) (g:string list) = (
   pf "%s" "\n<table>\n" ;
   List.iter ( fun line ->
     pf "%s" "<tr>"  ;
     let a = String.nsplit line ":" in
-    List.iter ( fun a -> pf "<td>%s</td>" a ) a ;
+    List.iter ( fun a -> pf "<td class=\"grille\">%s</td>" (html_of_chord a) ) a ;
     pf "%s" "</tr>\n"  ;
   ) g ;
   pf "%s" "</table>\n" 
 ) ;;
+
+let print_lyrics  (pf : ('a, unit, string, unit) format4 -> 'a) l = (
+  pf "%s""<div class=\"lyrics\">\n" ;
+  let l = List.map ( fun line -> if line="\\" then "" else line) l in
+  List.iter ( fun line ->
+    pf "%s<br/>\n" line
+  ) l ;
+  pf "%s" "</div>\n" ; 
+) 
 
 let read filename : document = 
   let fin = open_in filename in
@@ -49,22 +70,26 @@ let read filename : document =
       let line = String.strip (input_line fin) in
       match line with
       | "\\titre" -> r ((Titre (read_string_until_empty_line fin))::acc)
+      | "\\auteur" -> r ((Auteur (read_string_until_empty_line fin))::acc)
       | "\\grille" -> r ((Grille (read_array_until_empty_line fin))::acc)
-      | s -> failwith ("bad string : '" ^ s ^ "'")
+      | "\\lyrics" -> r ((Lyrics (read_array_until_empty_line fin))::acc)
+      | "" -> r acc
+      | s -> r ((Normal s)::acc)
     with
     | End_of_file -> (
       close_in fin ;
       List.rev acc
     )
   in
-  let data = r []  in
+  let data = r []   in
   data
     
 
 let _ =
   try
     let data = read Sys.argv.(1) in
-    let title = List.fold_left ( fun acc d -> match d with | Titre s -> s | _ -> acc ) "" data in
+    let title = List.fold_left ( fun acc d -> match d with | Titre s -> s | _ -> acc ) "???" data in
+    let auteur = List.fold_left ( fun acc d -> match d with | Auteur s -> s | _ -> acc ) "???" data in
     let fout = open_out (Sys.argv.(2)) in
     let pf fs = ksprintf ( fun s -> fprintf fout "%s" s) fs in
 
@@ -76,18 +101,24 @@ let _ =
 <title>%s</title>
 </head>
 <body>
+<a href=\"index.html\">index</a>
 " title  in
+
+    pf "<div class=\"titre\">%s</div>\n" title ;
+    pf "<div class=\"auteur\">%s</div>\n" auteur ;
 
     List.iter ( fun c ->
       match c with 
-      | Normal -> ()
-      | Titre s -> print_title pf s
+      | Normal s -> pf "%s<br/>" s
+      | Titre _ 
+      | Auteur _ -> ()
       | Grille g -> print_grille pf (g:string list)
+      | Lyrics l -> print_lyrics pf l
     ) data
     ;
     fprintf fout "</body></html>" ;
     close_out fout
   with
-    | e -> printf "ERREUR : %s\n" (Printexc.to_string e)
+    | e -> printf "ERREUR : %s\n" (Printexc.to_string e) ; exit 1
 
 
