@@ -1,3 +1,4 @@
+open ExtList
 open ExtString
 open Printf
 
@@ -103,11 +104,13 @@ let manage filename fileout = (
 <title>%s</title>
 </head>
 <body>
-<a href=\"index.html\">index</a>
 " title  in
 
+
+    pf "<a href=\"index.html\">\n" ;
     pf "<div class=\"titre\">%s</div>\n" title ;
     pf "<div class=\"auteur\">%s</div>\n" auteur ;
+    pf "</a>\n" ;
 
     List.iter ( fun c ->
       match c with 
@@ -165,6 +168,11 @@ let _ =
 </head>
 <body>
 "  in
+    let songs = List.sort ~cmp:(fun (_,titre1,auteur1) (_,titre2,auteur2) ->
+      match String.compare titre2 titre2 with
+      | 0 -> String.compare auteur1 auteur2
+      | n -> n
+    ) songs in
     List.iter ( fun (html,titre,auteur) ->
       let html = String.slice ~first:(String.length Sys.argv.(2)) html in
       pf "<div class=\"index-entry\"><a href=\".%s\"><span class=\"index-titre\">%s</span> <span class=\"index-auteur\">%s</span></a></div>\n" html titre auteur ;

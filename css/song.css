@@ -1,3 +1,7 @@
+div.ref-index {
+
+}
+
 td.grille {
     border: 1px solid black;
     border-collapse: collapse;
@@ -33,13 +37,13 @@ div.auteur {
 
 span.index-titre {
     font-family: "Times New Roman", Times, serif;
-/*    font-size:2cm; */
+    font-size:2cm; 
     background: #aaffff ;
 }
 span.index-auteur {
     font-family: "Times New Roman", Times, serif;
-/*    font-size:2cm;
-    background: #aaffff ;
-*/
+    font-size:2cm;
+    background: #ffffaa ;
+
 }
 
