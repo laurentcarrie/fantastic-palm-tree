@@ -20,7 +20,7 @@ let print_title (pf : ('a, unit, string, unit) format4 -> 'a) title = (
 ) ;;
 
 let print_mp3 (pf : ('a, unit, string, unit) format4 -> 'a) title = (
-  pf "<a href=%s>./%s</a>" title title
+  pf "<div class=\"mp3\"><a href=%s>./%s</a></div>" title title
 ) ;;
 
 let read_array_until_empty_line fin = (
@@ -65,6 +65,8 @@ let print_lyrics  (pf : ('a, unit, string, unit) format4 -> 'a) l = (
   pf "%s""<div class=\"lyrics\">\n" ;
   let l = List.map ( fun line -> if line="\\" then "" else line) l in
   List.iter ( fun line ->
+    let reg = Str.regexp "{\\(.*\\)}" in
+    let line = Str.global_replace reg "<span class=\"remarque\">\\1</span>" line in
     pf "%s<br/>\n" line
   ) l ;
   pf "%s" "</div>\n" ; 
@@ -176,13 +178,15 @@ let _ =
 <body>
 "  in
     let songs = List.sort ~cmp:(fun (_,titre1,auteur1) (_,titre2,auteur2) ->
-      match String.compare titre2 titre2 with
+      match String.compare titre1 titre2 with
       | 0 -> String.compare auteur1 auteur2
       | n -> n
     ) songs in
-    List.iter ( fun (html,titre,auteur) ->
+    List.iteri ( fun index (html,titre,auteur) ->
       let html = String.slice ~first:(String.length Sys.argv.(2)) html in
-      pf "<div class=\"index-entry\"><a href=\".%s\"><span class=\"index-titre\">%s</span> <span class=\"index-auteur\">%s</span></a></div>\n" html titre auteur ;
+      let d = index mod 2 in
+      pf "<div class=\"index-entry-%d\"><a href=\".%s\"><span class=\"index-titre-%d\">%s</span> <span class=\"index-auteur-%d\">(%s)</span></a></div>\n" 
+	d html d titre d auteur ;
     ) songs
   in
 

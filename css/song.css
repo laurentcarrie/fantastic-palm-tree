@@ -35,15 +35,49 @@ div.auteur {
     background: #aaffff ;
 }
 
-span.index-titre {
+a:link {
+    text-decoration: none;
+}
+a:hover {
+    text-decoration: underline;
+    color:hotpink ;
+}
+
+span.index-titre-0 {
     font-family: "Times New Roman", Times, serif;
     font-size:2cm; 
-    background: #aaffff ;
+    background: azure ;
 }
-span.index-auteur {
+span.index-auteur-0 {
     font-family: "Times New Roman", Times, serif;
-    font-size:2cm;
-    background: #ffffaa ;
+    font-size:1cm;
+    background: azure ;
 
 }
 
+span.index-titre-1 {
+    font-family: "Times New Roman", Times, serif;
+    font-size:2cm; 
+    background: PeachPuff;
+}
+span.index-auteur-1 {
+    font-family: "Times New Roman", Times, serif;
+    font-size:1cm;
+    background:PeachPuff ;
+
+}
+
+span.remarque {
+    font-family: "Times New Roman", Times, serif;
+    background:plum ;
+    foreground:black ;
+    font-style:italic ;
+}
+
+div.index-entry-0 {
+    text-align: left ;
+}
+
+div.index-entry-1 {
+    text-align: left ;
+}
