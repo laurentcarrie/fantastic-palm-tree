@@ -165,6 +165,36 @@ let _ =
 
   let (_,songs) = walk (0,[]) Sys.argv.(1) Sys.argv.(2) in
 
+  let letters : char list  = 
+    let c0 = Char.code 'A' in
+      Array.to_list ( Array.init 26 ( fun i -> Char.chr (i+c0) ) )
+  in
+
+  let write_index_letters () = ( 
+    let fout = open_out (Sys.argv.(2) // "index-letters.html") in
+    let pf fs = ksprintf ( fun s -> fprintf fout "%s" s) fs in
+    let _ = pf "%s"  "<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv=\"Content-Type\" content=\"text/html\"; charset=\"UTF-8\">
+<link href=\"song.css\" type=\"text/css\" rel=\"stylesheet\"/>
+<title>index des chansons</title>
+</head>
+<body>
+"  in
+      List.iter ( fun l ->
+	let songs = List.filter ( fun (_,titre,_) ->
+	  let i = String.get (String.uppercase titre) 0 in
+	    l = i
+	) songs in
+	let count = List.length songs in
+	pf "<a href=\"./index-letter-%c.html\">%c <span class=\"letter-count\">(%d chansons)</span></a><br/>\n" l l count
+      ) letters ;
+      close_out fout
+  )
+  in
+
+
   let write_index songs = 
     let fout = open_out (Sys.argv.(2) // "index.html") in
     let pf fs = ksprintf ( fun s -> fprintf fout "%s" s) fs in
@@ -177,17 +207,50 @@ let _ =
 </head>
 <body>
 "  in
+    let () = pf "%s" "<a href=\"./index-letters.html\">lettres</a>" in
     let songs = List.sort ~cmp:(fun (_,titre1,auteur1) (_,titre2,auteur2) ->
       match String.compare titre1 titre2 with
       | 0 -> String.compare auteur1 auteur2
       | n -> n
+    ) songs in
+
+    List.iteri ( fun index (html,titre,auteur) ->
+      let html = String.slice ~first:(String.length Sys.argv.(2)) html in
+      let d = index mod 2 in
+      pf "<div class=\"index-entry-%d\"><a href=\".%s\"><span class=\"index-titre-%d\">%s</span> <span class=\"index-auteur-%d\">(%s)</span></a></div>\n" 
+	d html d titre d auteur ;
+    ) songs ;
+      close_out fout
+  in (* write index *)
+
+  let write_index_one_letter songs l = (
+    let fout = open_out (Sys.argv.(2) // (sprintf "index-letter-%c.html" l)) in
+    let pf fs = ksprintf ( fun s -> fprintf fout "%s" s) fs in
+    let _ = pf "<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv=\"Content-Type\" content=\"text/html\"; charset=\"UTF-8\">
+<link href=\"song.css\" type=\"text/css\" rel=\"stylesheet\"/>
+<title>index des chansons, lettre %c</title>
+</head>
+<body>
+"  l in
+    let () = pf "Index lettre %c</br>" l in
+    let songs = List.filter ( fun (_,titre,_) ->
+      let i = String.get (String.uppercase titre) 0 in
+	l = i
     ) songs in
     List.iteri ( fun index (html,titre,auteur) ->
       let html = String.slice ~first:(String.length Sys.argv.(2)) html in
       let d = index mod 2 in
       pf "<div class=\"index-entry-%d\"><a href=\".%s\"><span class=\"index-titre-%d\">%s</span> <span class=\"index-auteur-%d\">(%s)</span></a></div>\n" 
 	d html d titre d auteur ;
-    ) songs
-  in
+    ) songs ;
+      close_out fout
 
-  write_index songs
+    
+  ) in
+
+    write_index_letters () ;
+    write_index songs ;
+    List.iter ( fun l -> write_index_one_letter songs l ) letters
