@@ -11,6 +11,7 @@ songs=perfect-day
 
 mkdir -p install
 cp css/song.css install/.
+cp css/song-print.css install/.
 
 ./bin/song-to-html $PWD/songs $PWD/install
 

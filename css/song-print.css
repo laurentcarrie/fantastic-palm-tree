@@ -1,0 +1,52 @@
+
+#page { /* Modifications : suppression de la bordure - marges */
+  margin :0;
+  border :none;
+}
+
+#banner, #menuright, #footer { /* Les éléments qui ne seront pas affichés  */
+  display :none;
+}
+
+
+div.lyrics {
+    -webkit-column-count: 2; /* Chrome, Safari, Opera */
+    -moz-column-count: 2; /* Firefox */
+    column-count: 2;
+    font-family: "Times New Roman", Times, serif;
+    font-size:0.3cm;
+    background: #ffffff ;
+}
+
+td.grille {
+    border: 1px solid black;
+    border-collapse: collapse;
+    text-align: center ;
+    height:0.5cm ;
+    background: #eebbee ;
+#	background: linear-gradient(to right bottom, #ffffff 0%,#ffffff 49.9%,#000000 50%,#000000 51%,#ffffff 51.1%,#ffffff 100%);    width:2cm ;
+    font-family: "Times New Roman", Times, serif;
+    font-size:0.3cm ;
+}
+table.grille{
+    width: 100%;
+    table-layout:fixed ;
+    empty-cells:hide ;
+} 
+
+
+div.titre {
+    font-family: "Times New Roman", Times, serif;
+    font-size:1cm;
+    background: #aaffff ;
+}
+div.auteur {
+    font-family: "Times New Roman", Times, serif;
+    font-size:1cm;
+    background: #aaffff ;
+}
+
+a:link {
+    text-decoration: none;
+}
+

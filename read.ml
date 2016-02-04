@@ -108,7 +108,8 @@ let manage filename fileout = (
 <html>
 <head>
 <meta http-equiv=\"Content-Type\" content=\"text/html\"; charset=\"UTF-8\">
-<link href=\"song.css\" type=\"text/css\" rel=\"stylesheet\"/>
+<link href=\"song.css\" type=\"text/css\" rel=\"stylesheet\" media=\"screen\"/>
+<link href=\"song-print.css\" type=\"text/css\" rel=\"stylesheet\" media=\"print\"/>
 <title>%s</title>
 </head>
 <body>
