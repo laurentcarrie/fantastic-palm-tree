@@ -215,12 +215,22 @@ let _ =
       | n -> n
     ) songs in
 
-    List.iteri ( fun index (html,titre,auteur) ->
+    let _ = List.fold_left ( fun (initiale,index) (html,titre,auteur) ->
       let html = String.slice ~first:(String.length Sys.argv.(2)) html in
-      let d = index mod 2 in
-      pf "<div class=\"index-entry-%d\"><a href=\".%s\"><span class=\"index-titre-%d\">%s</span> <span class=\"index-auteur-%d\">(%s)</span></a></div>\n" 
-	d html d titre d auteur ;
-    ) songs ;
+      let current = String.get (String.uppercase titre) 0 in
+      let initiale = if current<>initiale then (
+	pf "<div class=\"nouvelle-initiale\">--- %c ---</div>\n" current ;
+	current
+      )
+	  else (
+	    initiale 
+	  )
+      in
+      let d = index mod 2 in 
+	pf "<div class=\"index-entry-%d\"><a href=\".%s\"><span class=\"index-titre-%d\">%s</span> <span class=\"index-auteur-%d\">(%s)</span></a></div>\n" 
+	  d html d titre d auteur ;
+	initiale,index+1
+    ) (' ',0) songs in
       close_out fout
   in (* write index *)
 
@@ -241,12 +251,22 @@ let _ =
       let i = String.get (String.uppercase titre) 0 in
 	l = i
     ) songs in
-    List.iteri ( fun index (html,titre,auteur) ->
+    let _ = List.fold_left ( fun (initiale,index) (html,titre,auteur) ->
       let html = String.slice ~first:(String.length Sys.argv.(2)) html in
-      let d = index mod 2 in
-      pf "<div class=\"index-entry-%d\"><a href=\".%s\"><span class=\"index-titre-%d\">%s</span> <span class=\"index-auteur-%d\">(%s)</span></a></div>\n" 
-	d html d titre d auteur ;
-    ) songs ;
+      let current = String.get (String.uppercase titre) 0 in
+	let initiale = if current<>initiale then (
+	  pf "<div class=\"nouvelle-initiale\">--- %c ---</div>\n" current ;
+	  current
+	)
+	  else (
+	    initiale 
+	  )
+	in
+	let d = index mod 2 in
+	  pf "<div class=\"index-entry-%d\"><a href=\".%s\"><span class=\"index-titre-%d\">%s</span> <span class=\"index-auteur-%d\">(xxxxxxxxxxxxxxxxxx%s)</span></a></div>\n" 
+	    d html d titre d auteur ;
+	  (initiale,index+1)
+    ) (' ',0) songs in
       close_out fout
 
     

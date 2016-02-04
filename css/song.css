@@ -81,3 +81,10 @@ div.index-entry-0 {
 div.index-entry-1 {
     text-align: left ;
 }
+
+div.nouvelle-initiale {
+    foreground: blue ;
+    font-family: "Times New Roman", Times, serif;
+    font-size:3cm;
+    background:white ;
+}
