@@ -17,3 +17,5 @@ cp css/song.css install/.
 zip -r partoches.zip install
 cp $PWD/partoches.zip  ~/Dropbox/partoches.zip
 
+auto-ftp --hostname pixies --port 1024 --user laurent  < ftp-commands.txt || echo failed
+
