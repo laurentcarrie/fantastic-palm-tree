@@ -88,3 +88,14 @@ div.nouvelle-initiale {
     font-size:3cm;
     background:white ;
 }
+
+div.index-letters {
+    font-family: "Times New Roman", Times, serif;
+    font-size:1cm;
+    background:PeachPuff ;
+}
+div.index-books {
+    font-family: "Times New Roman", Times, serif;
+    font-size:1cm;
+    background:PeachPuff ;
+}

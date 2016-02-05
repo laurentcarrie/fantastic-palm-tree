@@ -7,4 +7,7 @@
 *.swp
 install
 bin
-
+OMakefile.omc
+OMakeroot.omc
+.omakedb
+.omakedb.lock

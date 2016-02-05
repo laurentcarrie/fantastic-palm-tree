@@ -1,4 +1,4 @@
-.PHONY: build clean install doc toto
+.PHONY: build clean install doc toto distant
 
 .DEFAULT: build
 
@@ -75,3 +75,6 @@ foreach(f,$(css))
 
 clean :
 	rm $(filter-proper-targets $(ls R, .))
+
+distant : build
+	auto-ftp --hostname $(host) --port $(port) --user laurent --script script.txt
