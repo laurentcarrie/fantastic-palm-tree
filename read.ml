@@ -380,8 +380,9 @@ let _ =
       List.iteri ( fun index b ->
 	pf "%s</br>" b ;
 	let () = try
-	  let song = List.find ( fun s -> s.Song.titre = b ) songs in
-	    print_song fout song
+		   let song = List.find ( fun s -> s.Song.titre = b ) songs in
+		   print_song fout song ;
+		   pf "<p style=\"page-break-after:always;\"></p>\n" ;
 	  with
 	    | Not_found -> printf "song %s not found\n" b
 	in
