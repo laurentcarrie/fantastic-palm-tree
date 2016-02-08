@@ -25,6 +25,8 @@ div.lyrics {
 }
 
 div.titre {
+    text-align: center ;
+    border: 3px ;
     font-family: "Times New Roman", Times, serif;
     font-size:2cm;
     background: #aaffff ;
@@ -32,7 +34,7 @@ div.titre {
 div.auteur {
     font-family: "Times New Roman", Times, serif;
     font-size:2cm;
-    background: #aaffff ;
+    background: #aaffaa ;
 }
 
 a:link {

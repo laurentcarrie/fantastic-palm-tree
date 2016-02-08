@@ -34,6 +34,9 @@ module Book = struct
   }
 end
 
+let uppercase_compare s1 s2 =
+  String.compare (String.uppercase s1) (String.uppercase s2)
+
 let print_title (pf : ('a, unit, string, unit) format4 -> 'a) title = (
   pf "<h1>%s</h1>" title
 ) ;;
@@ -266,8 +269,8 @@ let _ =
     let () = pf "%s" "<div class=\"index-letters\"><a href=\"./index-letters.html\">lettres</a></div>" in
     let () = pf "%s" "<div class=\"index-books\"><a href=\"./index-books.html\">livres</a></div>" in
     let songs = List.sort ~cmp:(fun t1 t2 ->
-      match String.compare t1.Song.titre t2.Song.titre with
-      | 0 -> String.compare t1.Song.auteur t2.Song.auteur
+      match uppercase_compare t1.Song.titre t2.Song.titre with
+      | 0 -> uppercase_compare t1.Song.auteur t2.Song.auteur
       | n -> n
     ) songs in
 

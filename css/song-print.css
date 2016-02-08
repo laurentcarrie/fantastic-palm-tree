@@ -28,9 +28,9 @@ div.mp3 {
 }
 
 div.lyrics {
-    -webkit-column-count: 1; /* Chrome, Safari, Opera */
-    -moz-column-count: 1; /* Firefox */
-    column-count: 1;
+    -webkit-column-count: 2; /* Chrome, Safari, Opera */
+    -moz-column-count: 2; /* Firefox */
+    column-count: 2;
     font-family: "Times New Roman", Times, serif;
     font-size:0.3cm;
     background: #ffffff ;
@@ -64,7 +64,7 @@ div.titre {
 div.auteur {
     font-family: "Times New Roman", Times, serif;
     font-size:1cm;
-    background: #aaffff ;
+    background: #aaffaa ;
 }
 
 a:link {
