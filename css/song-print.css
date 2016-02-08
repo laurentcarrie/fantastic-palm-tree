@@ -58,6 +58,8 @@ table.grille{
 
 div.titre {
     font-family: "Times New Roman", Times, serif;
+    border: 1px dotted black ;
+    text-align:center ;
     font-size:1cm;
     background: #aaffff ;
 }
