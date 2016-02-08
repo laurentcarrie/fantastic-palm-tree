@@ -2,48 +2,10 @@ open ExtList
 open ExtString
 open Printf
 
+open Datamodel
+
 let (//) = Filename.concat
 
-type context =
-    | Normal of string
-    | Titre of string
-    | Auteur of string
-    | Grille of string list
-    | Lyrics of string list
-    | Mp3 of string
-
-type document = context list 
-
-module Song = struct
-  type t = {
-    filename:string ;
-    titre:string ;
-    auteur:string ;
-    id:string ;
-    data:context list ;
-  }
-end
-
-module Book = struct
-  type t = {
-    filename:string ;
-    titre:string ;
-    auteur:string ;
-    id:string ;
-    songs:string list ;
-  }
-end
-
-let uppercase_compare s1 s2 =
-  String.compare (String.uppercase s1) (String.uppercase s2)
-
-let print_title (pf : ('a, unit, string, unit) format4 -> 'a) title = (
-  pf "<h1>%s</h1>" title
-) ;;
-
-let print_mp3 (pf : ('a, unit, string, unit) format4 -> 'a) title = (
-  pf "<div class=\"mp3\"><a href=%s>./%s</a></div>" title title
-) ;;
 
 let read_array_until_empty_line fin = (
   let rec r acc =
@@ -61,38 +23,6 @@ let read_string_until_empty_line fin = (
   let a = read_array_until_empty_line fin in
   String.join "\n" a
 ) ;;
-
-let html_of_chord c = (
-  List.fold_left ( fun c (sub,by) ->
-    let reg = Str.regexp (Str.quote sub) in
-    Str.global_replace reg by c
-  ) c  [
-    "#","&#x266f;" ;
-    "b","&#x266d;" ;
-    "m","<sub>m</sub>" ;
-  ]
-)
-let print_grille  (pf : ('a, unit, string, unit) format4 -> 'a) (g:string list) = (
-  pf "%s" "\n<table>\n" ;
-  List.iter ( fun line ->
-    pf "%s" "<tr>"  ;
-    let a = String.nsplit line ":" in
-    List.iter ( fun a -> pf "<td class=\"grille\">%s</td>" (html_of_chord a) ) a ;
-    pf "%s" "</tr>\n"  ;
-  ) g ;
-  pf "%s" "</table>\n" 
-) ;;
-
-let print_lyrics  (pf : ('a, unit, string, unit) format4 -> 'a) l = (
-  pf "%s""<div class=\"lyrics\">\n" ;
-  let l = List.map ( fun line -> if line="\\" then "" else line) l in
-  List.iter ( fun line ->
-    let reg = Str.regexp "{\\(.*\\)}" in
-    let line = Str.global_replace reg "<span class=\"remarque\">\\1</span>" line in
-    pf "%s<br/>\n" line
-  ) l ;
-  pf "%s" "</div>\n" ; 
-) 
 
 let read_song filename : document = (
   let fin = open_in filename in
@@ -132,39 +62,6 @@ let manage_book filename fileout book_id = (
     {Book.filename=fileout;titre=book_id;auteur="book";id=book_id;songs=songs}
 )
 
-let print_song fout song = (
-
-  let pf fs = ksprintf ( fun s -> fprintf fout "%s" s) fs in
-    
-  let _ = pf  "<!DOCTYPE html>
-<html>
-<head>
-<meta http-equiv=\"Content-Type\" content=\"text/html\"; charset=\"UTF-8\">
-<link href=\"song.css\" type=\"text/css\" rel=\"stylesheet\" media=\"screen\"/>
-<link href=\"song-print.css\" type=\"text/css\" rel=\"stylesheet\" media=\"print\"/>
-<title>%s</title>
-</head>
-<body>
-" song.Song.titre  in
-
-
-    pf "<a href=\"index.html#%s\">\n" song.Song.id ;
-    pf "<div class=\"titre\">%s</div>\n" song.Song.titre ;
-    pf "<div class=\"auteur\">%s</div>\n" song.Song.auteur ;
-    pf "</a>\n" ;
-
-    List.iter ( fun c ->
-      match c with 
-      | Normal s -> pf "%s<br/>" s
-      | Titre _ 
-      | Auteur _ -> ()
-      | Grille g -> print_grille pf (g:string list)
-      | Lyrics l -> print_lyrics pf l
-      | Mp3 l -> print_mp3 pf l
-    ) song.Song.data
-    ;
-    fprintf fout "</body></html>" ;
-)
 
 let manage_song filename fileout song_id = (
   try
@@ -175,7 +72,7 @@ let manage_song filename fileout song_id = (
 
     let () = printf "open %s\n" fileout ; flush stdout ; in
     let fout = open_out fileout in
-    let () = print_song fout song in
+    let () = Write_song.write fout song in
     close_out fout ;
       song
   with
@@ -253,50 +150,6 @@ let _ =
   )
   in
 
-
-  let write_index songs = 
-    let fout = open_out (Sys.argv.(2) // "index.html") in
-    let pf fs = ksprintf ( fun s -> fprintf fout "%s" s) fs in
-    let _ = pf "%s"  "<!DOCTYPE html>
-<html>
-<head>
-<meta http-equiv=\"Content-Type\" content=\"text/html\"; charset=\"UTF-8\">
-<link href=\"song.css\" type=\"text/css\" rel=\"stylesheet\"/>
-<title>index des chansons</title>
-</head>
-<body>
-"  in
-    let () = pf "%s" "<div class=\"index-letters\"><a href=\"./index-letters.html\">lettres</a></div>" in
-    let () = pf "%s" "<div class=\"index-books\"><a href=\"./index-books.html\">livres</a></div>" in
-    let songs = List.sort ~cmp:(fun t1 t2 ->
-      match uppercase_compare t1.Song.titre t2.Song.titre with
-      | 0 -> uppercase_compare t1.Song.auteur t2.Song.auteur
-      | n -> n
-    ) songs in
-
-    let _ = List.fold_left ( fun (initiale,index) t ->
-      let html = String.slice ~first:(String.length Sys.argv.(2)) t.Song.filename in
-      let current = String.get (String.uppercase t.Song.titre) 0 in
-      let initiale = if current<>initiale then (
-	pf "<a name=\"letter-%c\"/><div class=\"nouvelle-initiale\"><a href=\"index-letter-%c.html\">--- %c ---</a></div>\n" current current current ;
-	current
-      )
-	  else (
-	    initiale 
-	  )
-      in
-      let d = index mod 2 in 
-	pf "<a name=\"%s\"/><div class=\"index-entry-%d\"><a href=\".%s\"><span class=\"index-titre-%d\">%s</span> <span class=\"index-auteur-%d\">(%s)</span></a></div>\n" 
-	  t.Song.id
-	  d html d t.Song.titre d t.Song.auteur ;
-	initiale,index+1
-    ) (' ',0) songs in
-      pf "
-</body>
-</html>
-" ;
-      close_out fout
-  in (* write index *)
 
   let write_index_one_letter songs l = (
     let fout = open_out (Sys.argv.(2) // (sprintf "index-letter-%c.html" l)) in
@@ -383,9 +236,9 @@ let _ =
       List.iteri ( fun index b ->
 	pf "%s</br>" b ;
 	let () = try
-		   let song = List.find ( fun s -> s.Song.titre = b ) songs in
-		   print_song fout song ;
-		   pf "<p style=\"page-break-after:always;\"></p>\n" ;
+	    let song = List.find ( fun s -> s.Song.titre = b ) songs in
+	      Write_song.write fout song ;
+	      pf "<p style=\"page-break-after:always;\"></p>\n" ;
 	  with
 	    | Not_found -> printf "song %s not found\n" b
 	in
@@ -402,7 +255,7 @@ let _ =
 
 
     write_index_letters () ;
-    write_index songs ;
+    Write_index.write songs ;
     write_index_books books ;
     List.iter ( fun b -> write_book b songs ) books ;
     List.iter ( fun l -> write_index_one_letter songs l ) letters

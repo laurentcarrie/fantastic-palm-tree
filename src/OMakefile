@@ -25,6 +25,10 @@ OCAMLFLAGS    += -g -warn-error all
 
 src[]=
 	read
+	datamodel
+	helpers
+	write_index
+	write_song
 
 prog = $(OCamlProgram song-to-html,$(src))
 
