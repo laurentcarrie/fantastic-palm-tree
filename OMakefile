@@ -1,6 +1,8 @@
-.PHONY: build clean install doc toto distant
+.PHONY: build 
 
 .DEFAULT: build
+
+
 
 srcdir = $(absname $(dir $(CWD)))
 
@@ -10,45 +12,6 @@ if $(not $(defined prefix))
 
 println($"prefix is : $(prefix)")
 
-USE_OCAMLFIND = true
-
-OCAMLPACKS[] =
-	extlib
-	cryptokit
-	unix
-	str
-
-NATIVE_ENABLED = true
-BYTE_ENABLED = false
-
-#
-# Various options
-#
-OCAMLFLAGS    += -g -warn-error all
-# OCAMLCFLAGS   +=
-# OCAMLOPTFLAGS +=
-# OCAML_LINK_FLAGS +=
-# OCAML_BYTE_LINK_FLAGS +=
-# OCAML_NATIVE_LINK_FLAGS +=
-
-src[]=
-	read
-
-prog = $(OCamlProgram song-to-html,$(src))
-
-build : $(prefix)/bin/song-to-html
-
-mkdir -p $(prefix)/bin
-
-$(prefix)/bin/song-to-html : song-to-html
-	cp $< $@
-
-
-
-
-println($"scrdir : $(srcdir)")
-
-
 songs=$(glob songs/*.song)
 println($"songs : $(songs)")
 
@@ -56,8 +19,10 @@ targets=$(removeprefix songs/,$(songs))
 targets=$(addprefix $(srcdir)/,$(targets))
 println($"targets : $(targets)")
 
-build : $(prog) $(songs)
-	./song-to-html $(srcdir)/songs $(prefix)
+generator=$(prefix)/bin/song-to-html
+
+build : $(generator) $(songs)
+	$(generator) $(srcdir)/songs $(prefix)
 
 
 
@@ -68,13 +33,18 @@ css[]=
 foreach(f,$(css))
 	build : $(prefix)/$f
 
-	$(prefix)/$f : css/$f
+	$(prefix)/$f : $(srcdir)/css/$f
 		cp $< $@
 
 	export .RULE
+
+
+
+.SUBDIRS: src
 
 clean :
 	rm $(filter-proper-targets $(ls R, .))
 
 distant : build
 	auto-ftp --hostname $(host) --port $(port) --user laurent --script script.txt
+

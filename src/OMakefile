@@ -1,0 +1,38 @@
+.PHONY: build clean install doc toto distant
+
+.DEFAULT: build
+
+USE_OCAMLFIND = true
+
+OCAMLPACKS[] =
+	extlib
+	cryptokit
+	unix
+	str
+
+NATIVE_ENABLED = true
+BYTE_ENABLED = false
+
+#
+# Various options
+#
+OCAMLFLAGS    += -g -warn-error all
+# OCAMLCFLAGS   +=
+# OCAMLOPTFLAGS +=
+# OCAML_LINK_FLAGS +=
+# OCAML_BYTE_LINK_FLAGS +=
+# OCAML_NATIVE_LINK_FLAGS +=
+
+src[]=
+	read
+
+prog = $(OCamlProgram song-to-html,$(src))
+
+build : $(prefix)/bin/song-to-html
+
+mkdir -p $(prefix)/bin
+
+$(prefix)/bin/song-to-html : song-to-html
+	cp $< $@
+
+
