@@ -51,7 +51,10 @@ div.lyrics {
     page-break-inside:avoid ;
     break-inside:avoid ;
     -webkit-column-break-inside:void ;
-
+    -moz-text-align: left; /* Code for Firefox */
+    text-align:left;
+    -moz-text-align-last: right; /* Code for Firefox */
+    text-align-last:right;
 }
 
 p.lyrics {
@@ -87,7 +90,7 @@ div.titre-auteur {
     border: 1px dotted black ;
     text-align:center ;
     background: #aaffff ;
-    font-size:20pt ;
+    font-size:24pt ;
 }
 
 /*
@@ -112,17 +115,12 @@ a:link {
 
 span.remarque {
     font-family: "Times New Roman", Times, serif;
-    background:plum ;
-    foreground:black ;
-    font-style:italic ;
-}
-
-
-span.remarque {
-    font-family: "Times New Roman", Times, serif;
     background:#b2beb5 ; /* ashgrey */
     foreground:black ;
     font-style:italic ;
+    text-align:left ;
+    -moz-text-align-last: left; /* Code for Firefox */
+    text-align-last:left;
 }
 
 
