@@ -11,3 +11,6 @@ OMakefile.omc
 OMakeroot.omc
 .omakedb
 .omakedb.lock
+src/OMakefile.omc
+src/song-to-html
+src/song-to-html.opt

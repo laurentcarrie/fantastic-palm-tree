@@ -24,6 +24,15 @@ div.lyrics {
     background: #ffffff ;
 }
 
+div.titre-auteur {
+    text-align: center ;
+    border: 3px dotted black ;
+    font-family: "Times New Roman", Times, serif;
+    font-size:3cm;
+    background: #aaffff ;
+}
+
+/*
 div.titre {
     text-align: center ;
     border: 3px dotted black ;
@@ -36,6 +45,7 @@ div.auteur {
     font-size:2cm;
     background: #aaffaa ;
 }
+*/
 
 a:link {
     text-decoration: none;
@@ -71,9 +81,10 @@ span.index-auteur-1 {
 
 span.remarque {
     font-family: "Times New Roman", Times, serif;
-    background:plum ;
+    background:#b2beb5 ; /* ashgrey */
     foreground:black ;
     font-style:italic ;
+    font-size: 1cm ;
 }
 
 div.index-entry-0 {
@@ -100,4 +111,20 @@ div.index-books {
     font-family: "Times New Roman", Times, serif;
     font-size:1cm;
     background:PeachPuff ;
+}
+
+div.tablature {
+    white-space: pre ; display: block; unicode-bidi: embed
+}
+
+span.chord {
+    vertical-align:super ;
+    color : red ;
+    text-shadow: 2px 2px 8px #FF0000;
+    font-size: 0.8cm ;
+}
+span.chord-position {
+    text-decoration: underline ;
+    text-decoration-style: dotted ;
+
 }

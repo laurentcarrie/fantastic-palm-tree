@@ -8,7 +8,7 @@ body {
   width: auto;
   margin: auto;
   font-family: serif;
-  font-size: 12pt;
+  font-size: 14pt;
 /*  background-color: #ffa; */
   color: #000;
 }
@@ -27,15 +27,43 @@ div.mp3 {
     display:none ;
 }
 
+div.grille {
+    border: 1px dotted red ;
+}
+
 div.lyrics {
+    margin:0 0 0 0 ;
+    padding:0 0 0 0 ;
     -webkit-column-count: 2; /* Chrome, Safari, Opera */
     -moz-column-count: 2; /* Firefox */
     column-count: 2;
+    -webkit-column-rule: 4px outset #ff00ff; /* Chrome, Safari, Opera */
+    -moz-column-rule: 4px outset #ff00ff; /* Firefox */
+    column-rule: 4px outset #ff00ff;
+
     font-family: "Times New Roman", Times, serif;
-    font-size:0.3cm;
     background: #ffffff ;
     foreground: red ;
-/*    background-color: #eebbee ;*/
+/*    border: 2px solid black ; */
+
+    orphans:10 ;
+    widows:10 ;
+    page-break-inside:avoid ;
+    break-inside:avoid ;
+    -webkit-column-break-inside:void ;
+
+}
+
+p.lyrics {
+    margin:0 0 0 0 ;
+    padding:0 0 0 0 ;
+    color:black ;
+    orphans:10 ;
+    widows:10 ;
+    border:1px dotted black ;
+    page-break-inside:avoid ;
+    break-inside:avoid ;
+    -webkit-column-break-inside:void ;
 }
 
 td.grille {
@@ -47,7 +75,6 @@ td.grille {
     background: #eebbee ;
     width:2cm ;
     font-family: "Times New Roman", Times, serif;
-    font-size:0.3cm ;
 }
 table.grille{
     width: 100%;
@@ -55,7 +82,15 @@ table.grille{
     empty-cells:hide ;
 } 
 
+div.titre-auteur {
+    font-family: "Times New Roman", Times, serif;
+    border: 1px dotted black ;
+    text-align:center ;
+    background: #aaffff ;
+    font-size:20pt ;
+}
 
+/*
 div.titre {
     font-family: "Times New Roman", Times, serif;
     border: 1px dotted black ;
@@ -68,8 +103,43 @@ div.auteur {
     font-size:1cm;
     background: #aaffaa ;
 }
+*/
 
 a:link {
     text-decoration: none;
+}
+
+
+span.remarque {
+    font-family: "Times New Roman", Times, serif;
+    background:plum ;
+    foreground:black ;
+    font-style:italic ;
+}
+
+
+span.remarque {
+    font-family: "Times New Roman", Times, serif;
+    background:#b2beb5 ; /* ashgrey */
+    foreground:black ;
+    font-style:italic ;
+}
+
+
+div.tablature {
+    white-space: pre ; display: block; unicode-bidi: embed ;
+    font-size: 8pt ;
+}
+
+span.chord {
+    vertical-align:super ;
+    color : red ;
+    text-shadow: 2px 2px 8px #FF0000;
+    font-size: 6pt ;
+}
+span.chord-position {
+    text-decoration: underline ;
+    text-decoration-style: dotted ;
+
 }
 

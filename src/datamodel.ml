@@ -10,6 +10,7 @@ type context =
     | Auteur of string
     | Grille of string list
     | Lyrics of string list
+    | Tab of string list
     | Mp3 of string
 
 type document = context list 

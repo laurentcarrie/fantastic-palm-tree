@@ -33,6 +33,7 @@ let read_song filename : document = (
       | "\\titre" -> r ((Titre (read_string_until_empty_line fin))::acc)
       | "\\auteur" -> r ((Auteur (read_string_until_empty_line fin))::acc)
       | "\\grille" -> r ((Grille (read_array_until_empty_line fin))::acc)
+      | "\\tab" -> r ((Tab (read_array_until_empty_line fin))::acc)
       | "\\lyrics" -> r ((Lyrics (read_array_until_empty_line fin))::acc)
       | "\\mp3" -> r ((Mp3 (read_string_until_empty_line fin))::acc)
       | "" -> r acc
@@ -224,27 +225,41 @@ let _ =
 <html>
 <head>
 <meta http-equiv=\"Content-Type\" content=\"text/html\"; charset=\"UTF-8\">
-<link href=\"song.css\" type=\"text/css\" rel=\"stylesheet\"/>
+<link href=\"song.css\" type=\"text/css\" rel=\"stylesheet\" media=\"screen\"/>
+<link href=\"song-print.css\" type=\"text/css\" rel=\"stylesheet\" media=\"print\"/>
 <title>index des livres</title>
 </head>
 <body>
 "   in
-      pf "this is book</br>\n" ;
       pf "<ul>\n" ;
-      List.iter ( fun b -> pf "<li>%s</li>\n" b ) book.Book.songs ;
-      pf "</ul>\n" ;
-      List.iteri ( fun index b ->
-	pf "%s</br>" b ;
-	let () = try
-	    let song = List.find ( fun s -> s.Song.titre = b ) songs in
-	      Write_song.write fout song ;
-	      pf "<p style=\"page-break-after:always;\"></p>\n" ;
-	  with
-	    | Not_found -> printf "song %s not found\n" b
-	in
-	  ()
-      ) book.Book.songs ;
-      pf "
+      let songs = List.map ( fun b ->
+	try 
+	  let song = List.find ( fun s -> s.Song.titre = b ) songs  in
+	    (b,Some song)
+	with
+	  | Not_found -> (b,None)
+      ) book.Book.songs in
+
+      let () = pf "<ul>\n" in
+      let () = 
+	List.iter ( fun (b,song) -> 
+	  match song with
+	    | Some _ -> ()
+	    | None -> 
+		pf "<li>not found : '%s'</li>\n" b 
+	) songs in
+      let () = pf "</ul>\n" in
+	
+      let () =
+	List.iteri ( fun index (b,song) ->
+	  match song with
+	    | None -> ()
+	    | Some song -> (
+		Write_song.write fout song ;
+		pf "<p style=\"page-break-after:always;\"></p>\n" ;
+	      )
+	) songs in
+	pf "
 </body>
 </html>
 " ;
@@ -256,6 +271,11 @@ let _ =
 
     write_index_letters () ;
     Write_index.write songs ;
-    write_index_books books ;
-    List.iter ( fun b -> write_book b songs ) books ;
-    List.iter ( fun l -> write_index_one_letter songs l ) letters
+    let books = 
+      let all = { Book.filename=Sys.argv.(2)//"all.html" ; titre = "all" ; auteur = "" ; id = "xxx" ; 
+		  songs = List.sort ~cmp:Helpers.uppercase_compare (List.map ( fun b -> b.Song.titre ) songs) } in
+	all::books 
+    in
+      write_index_books books ;
+      List.iter ( fun b -> write_book b songs ) books ;
+      List.iter ( fun l -> write_index_one_letter songs l ) letters

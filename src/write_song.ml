@@ -6,10 +6,6 @@ open Datamodel
 
 let (//) = Filename.concat
 
-let write_title (pf : ('a, unit, string, unit) format4 -> 'a) title = (
-  pf "<h1>%s</h1>" title
-) ;;
-
 let write_mp3 (pf : ('a, unit, string, unit) format4 -> 'a) title = (
   pf "<div class=\"mp3\"><a href=%s>./%s</a></div>" title title
 ) ;;
@@ -42,27 +38,52 @@ let html_of_chord c = (
   ]
 )
 let write_grille  (pf : ('a, unit, string, unit) format4 -> 'a) (g:string list) = (
+  pf "%s" "<div class=\"grille\">\n" ;
   pf "%s" "\n<table>\n" ;
   List.iter ( fun line ->
     pf "%s" "<tr>"  ;
     let a = String.nsplit line ":" in
-    List.iter ( fun a -> pf "<td class=\"grille\">%s</td>" (html_of_chord a) ) a ;
-    pf "%s" "</tr>\n"  ;
+      List.iter ( fun a -> pf "<td class=\"grille\">%s</td>" (html_of_chord a) ) a ;
+      pf "%s" "</tr>\n"  ;
   ) g ;
-  pf "%s" "</table>\n" 
+  pf "%s" "</table>\n"  ;
+  pf "%s" "</div>\n" ;
 ) ;;
 
 let write_lyrics  (pf : ('a, unit, string, unit) format4 -> 'a) l = (
   pf "%s""<div class=\"lyrics\">\n" ;
-  let l = List.map ( fun line -> if line="\\" then "" else line) l in
+  pf "%s" "<p class=\"lyrics\">\n" ;
   List.iter ( fun line ->
-    let reg = Str.regexp "{\\(.*\\)}" in
-    let line = Str.global_replace reg "<span class=\"remarque\">\\1</span>" line in
-    pf "%s<br/>\n" line
+    if line="\\" then (
+      pf "%s" "</p>\n<p class=\"lyrics\">\n"
+    )  else (
+      let reg = Str.regexp "{\\(.*\\)}" in
+      let line = Str.global_replace reg "<span class=\"remarque\">\\1</span>" line in
+      let reg = Str.regexp "\\[\\([^;]*\\);\\([^]]*\\)]" in
+      let line = Str.global_replace reg "<span class=\"chord\">\\1</span><span class=\"chord-position\">\\2</span>" line in
+	pf "%s<br/>\n" line
+    )
   ) l ;
+  pf "%s" "</p>\n" ;
   pf "%s" "</div>\n" ; 
 ) 
 
+let write_tab  (pf : ('a, unit, string, unit) format4 -> 'a) l = (
+  pf "%s" "<div class=\"tablature\">\n<pre>" ;
+  List.iter ( fun line ->
+    if line="\\" then (
+      pf "%s" "</p>\n<p class=\"tablature\">\n"
+    )  else (
+      let reg = Str.regexp "{\\(.*\\)}" in
+      let line = Str.global_replace reg "<span class=\"remarque\">\\1</span>" line in
+	pf "%s\n" line
+    )
+  ) l ;
+  pf "%s" "</p>\n" ;
+  pf "%s" "</pre></div>\n" ; 
+) 
+
+(*
 let read_song filename : document = (
   let fin = open_in filename in
   let rec r acc  = 
@@ -73,6 +94,7 @@ let read_song filename : document = (
       | "\\auteur" -> r ((Auteur (read_string_until_empty_line fin))::acc)
       | "\\grille" -> r ((Grille (read_array_until_empty_line fin))::acc)
       | "\\lyrics" -> r ((Lyrics (read_array_until_empty_line fin))::acc)
+      | "\\tab" -> r ((Tab (read_array_until_empty_line fin))::acc)
       | "\\mp3" -> r ((Mp3 (read_string_until_empty_line fin))::acc)
       | "" -> r acc
       | s -> r ((Normal s)::acc)
@@ -85,7 +107,7 @@ let read_song filename : document = (
   let data = r []   in
   data
 ) ;;
-
+*)
 
 
 let write fout song = (
@@ -105,18 +127,22 @@ let write fout song = (
 
 
     pf "<a href=\"index.html#%s\">\n" song.Song.id ;
+    pf "<div class=\"titre-auteur\">\n" ;
     pf "<div class=\"titre\">%s</div>\n" song.Song.titre ;
     pf "<div class=\"auteur\">%s</div>\n" song.Song.auteur ;
+    pf "</div>\n" ;
     pf "</a>\n" ;
+
 
     List.iter ( fun c ->
       match c with 
-      | Normal s -> pf "%s<br/>" s
-      | Titre _ 
-      | Auteur _ -> ()
-      | Grille g -> write_grille pf (g:string list)
-      | Lyrics l -> write_lyrics pf l
-      | Mp3 l -> write_mp3 pf l
+	| Normal s -> pf "<span class=\"remarque\">%s</span><br/>" s
+	| Titre _ 
+	| Auteur _ -> ()
+	| Grille g -> write_grille pf (g:string list)
+	| Lyrics l -> write_lyrics pf l
+	| Mp3 l -> write_mp3 pf l
+	| Tab l -> write_tab pf l
     ) song.Song.data
     ;
     fprintf fout "</body></html>" ;
