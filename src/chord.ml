@@ -62,10 +62,6 @@ let write_svg filename frette_1 frette_2 c = (
   let fout = open_out filename in
   let pf fs = ksprintf (fun s -> fprintf fout "%s" s ) fs in
 
-  let () = pf "%s"
-    "
-<svg >
-" in
 
 
   let frette_offset = frette_1 - 1 in
@@ -77,6 +73,12 @@ let write_svg filename frette_1 frette_2 c = (
   let nb_vert= 6 in
   let offset_v = 100 in
   let step_v = 60 in
+
+  let height = offset_v + (nb_vert+1) * step_v in
+  let width = offset_h + (nb_hor+1) * step_h in
+
+  let () = pf "<svg width=\"%d\" height=\"%d\" >\n" width height in
+
     
   let draw_lignes_verticales () = 
     let rec print_line x i =
@@ -170,7 +172,7 @@ let write_svg filename frette_1 frette_2 c = (
 
     
   let nacre =  [ 3 ; 5 ; 7; 9 ; 12 ; 15 ]  in
-  let nacre = List.filter ( fun f -> f>=frette_1 && f<=frette_2) nacre in
+  let nacre = List.filter ( fun f -> f>=frette_1 && f<=frette_2-1) nacre in
 
   let () = List.iter ( fun frette -> put_nacre frette_offset frette ) nacre in
   let () = draw_lignes_verticales () in
