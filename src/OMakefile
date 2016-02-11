@@ -42,6 +42,7 @@ $(prefix)/bin/song-to-html : song-to-html
 
 src_chord[]=
 	make_chord_svg
+	chord
 
 make_chord = $(OCamlProgram make-chord,$(src_chord))
 
