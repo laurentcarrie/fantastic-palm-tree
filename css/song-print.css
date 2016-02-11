@@ -62,7 +62,7 @@ p.lyrics {
     padding:0 0 0 0 ;
     color:black ;
     orphans:10 ;
-    widows:10 ;
+
     border:1px dotted black ;
     page-break-inside:avoid ;
     break-inside:avoid ;
@@ -78,6 +78,7 @@ td.grille {
     background: #eebbee ;
     width:2cm ;
     font-family: "Times New Roman", Times, serif;
+    orphans:10 ;
 }
 table.grille{
     width: 100%;
