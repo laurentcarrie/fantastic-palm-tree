@@ -46,10 +46,27 @@ src_chord[]=
 
 make_chord = $(OCamlProgram make-chord,$(src_chord))
 
-chord : A.png
+chords[]=
+	C
+	D
+	D-sharp
+	E
+	F
+	F-sharp
+	G
+	G-sharp
+	A
+	A-sharp
+	B
 
-A.svg : $(make_chord)
+svg_chords=$(addsuffix .svg,$(chords))
+
+$(svg_chords) : $(make_chord)
 	./make-chord $@
 
-A.png : A.svg
-	inkscape --export-png $@ --file $<
+foreach(f,$(chords))
+	$f.png : $f.svg
+		inkscape --export-png $@ --file $<
+	export .RULE
+
+chord : $(addsuffix .png,$(chords))

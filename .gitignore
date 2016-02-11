@@ -14,3 +14,8 @@ OMakeroot.omc
 src/OMakefile.omc
 src/song-to-html
 src/song-to-html.opt
+src/make-chord
+src/make-chord.opt
+src/*.png
+src/*.svg
+

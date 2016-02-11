@@ -22,10 +22,10 @@ type c = {
   fingers : t ;
 }
 
-val e_form : c
+val e_form : int -> c
 
 val c_form : c
   
     
-val write_svg : string -> c -> unit
+val write_svg : string -> int -> int -> c -> unit
       
