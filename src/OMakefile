@@ -1,4 +1,4 @@
-.PHONY: build clean install doc toto distant
+.PHONY: build clean install doc toto distant chord
 
 .DEFAULT: build
 
@@ -40,3 +40,15 @@ $(prefix)/bin/song-to-html : song-to-html
 	cp $< $@
 
 
+src_chord[]=
+	make_chord_svg
+
+make_chord = $(OCamlProgram make-chord,$(src_chord))
+
+chord : A.png
+
+A.svg : $(make_chord)
+	./make-chord $@
+
+A.png : A.svg
+	inkscape --export-png $@ --file $<
