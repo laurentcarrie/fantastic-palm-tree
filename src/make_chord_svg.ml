@@ -13,6 +13,12 @@ let main () =
     Chord.em7_form ;
     Chord.e7M_form ; 
 
+    Chord.a_form ;
+    Chord.a7_form ;
+    Chord.am_form ;
+    Chord.am7_form ;
+    Chord.a7M_form ; 
+
     Chord.c_form ;
   ] in
 
@@ -29,5 +35,7 @@ let main () =
     ()
 
 let _ = 
-  main ()
+  let () = main () in
+  let () = printf "svg files written.\n" ; flush stdout ; in
+    ()
     

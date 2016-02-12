@@ -35,6 +35,13 @@ val cm_form : int -> c
 val cm7_form : int -> c
 val cM7_form : int -> c
 *)
+
+val a_form : int -> c
+val a7_form : int -> c
+val a7M_form : int -> c
+val am_form : int -> c
+val am7_form : int -> c
+
     
 val write_svg : string -> c -> unit
       

@@ -49,14 +49,14 @@ make_chord = $(OCamlProgram make-chord,$(src_chord))
 letters[]=
 	C
 	D
-	D-sharp
+	Dsharp
 	E
 	F
-	F-sharp
+	Fsharp
 	G
-	G-sharp
+	Gsharp
 	A
-	A-sharp
+	Asharp
 	B
 
 chords[]=
@@ -65,6 +65,11 @@ chords[]=
 	$(addsuffix m-e-form,$(letters)) 
 	$(addsuffix m7-e-form,$(letters)) 
 	$(addsuffix 7M-e-form,$(letters)) 
+	$(addsuffix -a-form,$(letters))
+	$(addsuffix m-a-form,$(letters))
+	$(addsuffix m7-a-form,$(letters))
+	$(addsuffix 7M-a-form,$(letters))
+	$(addsuffix 7-a-form,$(letters))
 	$(addsuffix -c-form,$(letters))
 
 svg_chords=$(addsuffix .svg,$(chords))
