@@ -19,16 +19,23 @@ type t = {
 
 type c = {
   name : string ;
+  filename : string ;
   fingers : t ;
 }
 
 let chord_names = ["E";"F";"F#";"G";"G#";"A";"A#";"B";"C";"C#";"D";"D#" ]
+let chord_filenames = List.map ( fun s ->  let s = Str.global_replace (Str.regexp (Str.quote "#")) "-sharp" s in s ) chord_names
 
 let e_form f = 
   let name = List.nth chord_names (f mod 12) in
+  let filename = 
+    let s = List.nth chord_filenames (f mod 12) in
+      s ^ "-e-form" 
+  in
   let  b = { from_string=6;to_string=1;frette=f } in
     {
       name = name;
+      filename = filename ;
       fingers = {
 	b = Some b ;
 	s6 = In_barre b ;
@@ -40,25 +47,132 @@ let e_form f =
       }
     }
 
-let c_form = 
-  { 
-    name = "C" ;
-    fingers = {
-      b = None ;
-      s6 = Mute ;
-      s5 = Finger 3 ;
-      s4 = Finger 2 ;
-      s3 = Finger 0 ;
-      s2 = Finger 1 ;
-      s1 = Finger 0 ;
+let e7_form f = 
+  let name = List.nth chord_names (f mod 12) in
+  let name = name ^ "7" in
+  let filename = 
+    let s = List.nth chord_filenames (f mod 12) in
+      s ^ "7-e-form" 
+  in
+  let  b = { from_string=6;to_string=1;frette=f } in
+    {
+      name = name;
+      filename = filename ;
+      fingers = {
+	b = Some b ;
+	s6 = In_barre b ;
+	s5 = Finger (2+f) ;
+	s4 = Finger (f) ;
+	s3 = Finger (1+f) ;
+	s2 = In_barre b ;
+	s1 = In_barre b ;
+      }
     }
-  } 
 
+let em_form f = 
+  let name = List.nth chord_names (f mod 12) in
+  let name = name ^ "m" in
+  let filename = 
+    let s = List.nth chord_filenames (f mod 12) in
+      s ^ "m-e-form" 
+  in
+  let  b = { from_string=6;to_string=1;frette=f } in
+    {
+      name = name;
+      filename = filename ;
+      fingers = {
+	b = Some b ;
+	s6 = In_barre b ;
+	s5 = Finger (2+f) ;
+	s4 = Finger (2+f) ;
+	s3 = In_barre b ;
+	s2 = In_barre b ;
+	s1 = In_barre b ;
+      }
+    }
 
+let em7_form f = 
+  let name = List.nth chord_names (f mod 12) in
+  let name = name ^ "m7" in
+  let filename = 
+    let s = List.nth chord_filenames (f mod 12) in
+      s ^ "m7-e-form" 
+  in
+  let  b = { from_string=6;to_string=1;frette=f } in
+    {
+      name = name;
+      filename = filename ;
+      fingers = {
+	b = Some b ;
+	s6 = In_barre b ;
+	s5 = Finger (2+f) ;
+	s4 = In_barre b ;
+	s3 = In_barre b ;
+	s2 = In_barre b ;
+	s1 = In_barre b ;
+      }
+    }
+
+let e7M_form f = 
+  let name = List.nth chord_names (f mod 12) in
+  let name = name ^ "7M" in
+  let filename = 
+    let s = List.nth chord_filenames (f mod 12) in
+      s ^ "7M-e-form" 
+  in
+  let  b = { from_string=6;to_string=1;frette=f } in
+    {
+      name = name;
+      filename = filename ;
+      fingers = {
+	b = Some b ;
+	s6 = In_barre b ;
+	s5 = Finger (2+f) ;
+	s4 = Finger (1+f) ;
+	s3 = Finger (1+f) ;
+	s2 = In_barre b ;
+	s1 = In_barre b ;
+      }
+    }
+
+let c_form f = 
+  let name = List.nth chord_names (f mod 12) in
+  let filename = 
+    let s = List.nth chord_filenames (f mod 12) in
+      s ^ "-c-form" 
+  in
+  let f= if f>7 then f-8 else f+4 in
+  let  b = { from_string=3;to_string=1;frette=(f) } in
+    { 
+      name = name ;
+      filename = filename ;
+      fingers = {
+	b = Some b ;
+	s6 = Mute ;
+	s5 = Finger (3+f) ;
+	s4 = Finger (2+f) ;
+	s3 = In_barre b ;
+	s2 = Finger (1+f) ;
+	s1 = In_barre b ;
+      }
+    } 
+      
+      
 open Printf
       
 
-let write_svg filename frette_1 frette_2 c = (
+let write_svg filename c = (
+  let frette_1 = List.fold_left ( fun acc t ->
+    match t with
+      | Finger f -> if f<acc then f else acc
+      | Mute | Open -> acc
+      | In_barre b -> if b.frette<acc then b.frette else acc
+  ) 30 [ c.fingers.s6 ; c.fingers.s5 ; c.fingers.s4 ; c.fingers.s3 ; c.fingers.s2 ; c.fingers.s1 ]
+  in
+
+  let frette_1 = if frette_1 = 0 then 1 else frette_1 in
+  let frette_2 = frette_1 + 5 in
+
   let fout = open_out filename in
   let pf fs = ksprintf (fun s -> fprintf fout "%s" s ) fs in
 
@@ -205,6 +319,7 @@ let write_svg filename frette_1 frette_2 c = (
 </svg>
 " 
   in
+  let () = close_out fout in
 
     
 

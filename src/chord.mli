@@ -19,13 +19,22 @@ type t = {
 
 type c = {
   name : string ;
+  filename : string ;
   fingers : t ;
 }
 
 val e_form : int -> c
+val e7_form : int -> c
+val e7M_form : int -> c
+val em_form : int -> c
+val em7_form : int -> c
 
-val c_form : c
-  
+val c_form : int -> c
+(*
+val cm_form : int -> c
+val cm7_form : int -> c
+val cM7_form : int -> c
+*)
     
-val write_svg : string -> int -> int -> c -> unit
+val write_svg : string -> c -> unit
       

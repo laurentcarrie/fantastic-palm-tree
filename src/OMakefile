@@ -46,7 +46,7 @@ src_chord[]=
 
 make_chord = $(OCamlProgram make-chord,$(src_chord))
 
-chords[]=
+letters[]=
 	C
 	D
 	D-sharp
@@ -59,14 +59,25 @@ chords[]=
 	A-sharp
 	B
 
+chords[]=
+	$(addsuffix -e-form,$(letters)) 
+	$(addsuffix 7-e-form,$(letters)) 
+	$(addsuffix m-e-form,$(letters)) 
+	$(addsuffix m7-e-form,$(letters)) 
+	$(addsuffix 7M-e-form,$(letters)) 
+	$(addsuffix -c-form,$(letters))
+
 svg_chords=$(addsuffix .svg,$(chords))
 
 $(svg_chords) : $(make_chord)
-	./make-chord $@
+	./make-chord 
+
+prefix=$(dir $(prefix))
+mkdir -p $(prefix)/png
 
 foreach(f,$(chords))
-	$f.png : $f.svg
+	$(prefix)/png/$f.png : $f.svg
 		inkscape --export-png $@ --file $<
 	export .RULE
 
-chord : $(addsuffix .png,$(chords))
+chord : $(addprefix $(prefix)/png/,$(addsuffix .png,$(chords)))
