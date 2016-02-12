@@ -1,6 +1,7 @@
 open Printf
 open ExtList
 
+let (//) = Filename.concat
 
 let main () =
   
@@ -20,6 +21,17 @@ let main () =
     Chord.a7M_form ; 
 
     Chord.c_form ;
+    Chord.c7_form ;
+    Chord.cm_form ;
+    Chord.cm7_form ;
+    Chord.c7M_form ; 
+
+    Chord.g_form ;
+    Chord.g7_form ;
+    Chord.gm_form ;
+    Chord.gm7_form ;
+    Chord.g7M_form ; 
+
   ] in
 
   let chords = List.fold_left ( 
@@ -27,7 +39,7 @@ let main () =
   ) [] functions in
     
   let () = List.iter ( fun (i,c) ->
-    let out_filename = c.Chord.filename ^ ".svg" in
+    let out_filename = "tmp" // c.Chord.filename ^ ".svg" in
     let () = printf "write file '%s\n" out_filename ; flush stdout ; in
     let () = Chord.write_svg out_filename c in
       ()

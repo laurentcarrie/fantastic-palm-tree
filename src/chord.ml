@@ -135,13 +135,15 @@ let e7M_form f =
       }
     }
 
+let c_offset f = if f>7 then f-8 else f+4 
+
 let c_form f = 
   let name = List.nth chord_names (f mod 12) in
   let filename = 
     let s = List.nth chord_filenames (f mod 12) in
       s ^ "-c-form" 
   in
-  let f= if f>7 then f-8 else f+4 in
+  let f = c_offset f in
   let  b = { from_string=3;to_string=1;frette=(f) } in
     { 
       name = name ;
@@ -152,6 +154,97 @@ let c_form f =
 	s5 = Finger (3+f) ;
 	s4 = Finger (2+f) ;
 	s3 = In_barre b ;
+	s2 = Finger (1+f) ;
+	s1 = In_barre b ;
+      }
+    } 
+      
+let cm_form f = 
+  let name = List.nth chord_names (f mod 12) in
+  let name = name ^ "m" in
+  let filename = 
+    let s = List.nth chord_filenames (f mod 12) in
+      s ^ "m-c-form" 
+  in
+  let f = c_offset f in
+  let  b = { from_string=3;to_string=1;frette=(f) } in
+    { 
+      name = name ;
+      filename = filename ;
+      fingers = {
+	b = Some b ;
+	s6 = Mute ;
+	s5 = Finger (3+f) ;
+	s4 = Finger (1+f) ;
+	s3 = In_barre b ;
+	s2 = Finger (1+f) ;
+	s1 = In_barre b ;
+      }
+    } 
+      
+let cm7_form f = 
+  let name = List.nth chord_names (f mod 12) in
+  let name = name ^ "m7" in
+  let filename = 
+    let s = List.nth chord_filenames (f mod 12) in
+      s ^ "m7-c-form" 
+  in
+  let f = c_offset f in
+  let  b = { from_string=3;to_string=1;frette=(f) } in
+    { 
+      name = name ;
+      filename = filename ;
+      fingers = {
+	b = Some b ;
+	s6 = Mute ;
+	s5 = Finger (3+f) ;
+	s4 = Finger (1+f) ;
+	s3 = In_barre b ;
+	s2 = Finger (1+f) ;
+	s1 = In_barre b ;
+      }
+    } 
+
+let c7_form f = 
+  let name = List.nth chord_names (f mod 12) in
+  let name = name ^ "7" in
+  let filename = 
+    let s = List.nth chord_filenames (f mod 12) in
+      s ^ "7-c-form" 
+  in
+  let f = c_offset f in
+    { 
+      name = name ;
+      filename = filename ;
+      fingers = {
+	b = None ;
+	s6 = Mute ;
+	s5 = Finger (3+f) ;
+	s4 = Finger (2+f) ;
+	s3 = Finger (3+f) ;
+	s2 = Finger (1+f) ;
+	s1 = Mute ;
+      }
+    } 
+      
+let c7M_form f = 
+  let name = List.nth chord_names (f mod 12) in
+  let name = name ^ "7M" in
+  let filename = 
+    let s = List.nth chord_filenames (f mod 12) in
+      s ^ "7M-c-form" 
+  in
+  let f = c_offset f in
+  let  b = { from_string=3;to_string=1;frette=(f) } in
+    { 
+      name = name ;
+      filename = filename ;
+      fingers = {
+	b = Some b ;
+	s6 = Mute ;
+	s5 = Finger (3+f) ;
+	s4 = Finger (1+f) ;
+	s3 = Finger (3+f) ;
 	s2 = Finger (1+f) ;
 	s1 = In_barre b ;
       }
@@ -275,6 +368,126 @@ let a7_form f =
       }
     }
 
+
+let g_offset f = if f>2 then f-3 else f+9
+
+let g_form f = 
+  let name = List.nth chord_names (f mod 12) in
+  let name = name ^ "" in
+  let filename = 
+    let s = List.nth chord_filenames (f mod 12) in
+      s ^ "-g-form" 
+  in
+  let f= g_offset f in
+  let  b = { from_string=5;to_string=1;frette=f } in
+    {
+      name = name;
+      filename = filename ;
+      fingers = {
+	b = Some b ;
+	s6 = Finger (3+f) ;
+	s5 = Finger (2+f) ;
+	s4 = In_barre b ;
+	s3 = In_barre b ;
+	s2 = In_barre b ;
+	s1 = Finger (3+f) ;
+      }
+    }
+
+let gm_form f = 
+  let name = List.nth chord_names (f mod 12) in
+  let name = name ^ "" in
+  let filename = 
+    let s = List.nth chord_filenames (f mod 12) in
+      s ^ "m-g-form" 
+  in
+  let f= g_offset f in
+  let  b = { from_string=5;to_string=2;frette=f } in
+    {
+      name = name;
+      filename = filename ;
+      fingers = {
+	b = Some b ;
+	s6 = Finger (3+f) ;
+	s5 = Finger (1+f) ;
+	s4 = In_barre b ;
+	s3 = In_barre b ;
+	s2 = Finger (3+f) ;
+	s1 = Mute ;
+      }
+    }
+
+let gm7_form f = 
+  let name = List.nth chord_names (f mod 12) in
+  let name = name ^ "m7" in
+  let filename = 
+    let s = List.nth chord_filenames (f mod 12) in
+      s ^ "m7-g-form" 
+  in
+  let f= g_offset f in
+  let  b = { from_string=6;to_string=1;frette=f } in
+    {
+      name = name;
+      filename = filename ;
+      fingers = {
+	b = Some b ;
+	s6 = Finger (3+f) ;
+	s5 = Finger (2+f) ;
+	s4 = In_barre b ;
+	s3 = In_barre b ;
+	s2 = In_barre b ;
+	s1 = Finger (3+f) ;
+      }
+    }
+
+let g7_form f = 
+  let name = List.nth chord_names (f mod 12) in
+  let name = name ^ "7" in
+  let filename = 
+    let s = List.nth chord_filenames (f mod 12) in
+      s ^ "7-g-form" 
+  in
+  let f= g_offset f in
+  let  b = { from_string=6;to_string=1;frette=f } in
+    {
+      name = name;
+      filename = filename ;
+      fingers = {
+	b = Some b ;
+	s6 = Finger (3+f) ;
+	s5 = Finger (2+f) ;
+	s4 = In_barre b ;
+	s3 = In_barre b ;
+	s2 = In_barre b ;
+	s1 = Finger (3+f) ;
+      }
+    }
+
+let g7M_form f = 
+  let name = List.nth chord_names (f mod 12) in
+  let name = name ^ "7M" in
+  let filename = 
+    let s = List.nth chord_filenames (f mod 12) in
+      s ^ "7M-g-form" 
+  in
+  let f= g_offset f in
+  let  b = { from_string=6;to_string=1;frette=f } in
+    {
+      name = name;
+      filename = filename ;
+      fingers = {
+	b = Some b ;
+	s6 = Finger (3+f) ;
+	s5 = Finger (2+f) ;
+	s4 = In_barre b ;
+	s3 = In_barre b ;
+	s2 = In_barre b ;
+	s1 = Finger (3+f) ;
+      }
+    }
+
+
+
       
 open Printf
       
@@ -376,7 +589,7 @@ let write_svg filename c = (
       | Finger frette -> if frette>0 then put_barre s s frette else put_open s
       | Mute -> put_mute s 
       | Open -> put_open s
-      | In_barre b -> ()
+      | In_barre b -> if b.frette=0 then put_open s else ()
   in
 
   let put_nacre offset frette =

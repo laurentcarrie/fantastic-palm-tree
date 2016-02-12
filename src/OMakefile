@@ -48,6 +48,7 @@ make_chord = $(OCamlProgram make-chord,$(src_chord))
 
 letters[]=
 	C
+	Csharp
 	D
 	Dsharp
 	E
@@ -59,29 +60,50 @@ letters[]=
 	Asharp
 	B
 
+decoration[]=
+	$(EMPTY)
+	7
+	m
+	m7
+	M
+
 chords[]=
 	$(addsuffix -e-form,$(letters)) 
 	$(addsuffix 7-e-form,$(letters)) 
 	$(addsuffix m-e-form,$(letters)) 
 	$(addsuffix m7-e-form,$(letters)) 
 	$(addsuffix 7M-e-form,$(letters)) 
+
 	$(addsuffix -a-form,$(letters))
 	$(addsuffix m-a-form,$(letters))
 	$(addsuffix m7-a-form,$(letters))
 	$(addsuffix 7M-a-form,$(letters))
 	$(addsuffix 7-a-form,$(letters))
-	$(addsuffix -c-form,$(letters))
 
-svg_chords=$(addsuffix .svg,$(chords))
+	$(addsuffix -c-form,$(letters))
+	$(addsuffix m-c-form,$(letters))
+	$(addsuffix m7-c-form,$(letters))
+	$(addsuffix 7M-c-form,$(letters))
+	$(addsuffix 7-c-form,$(letters))
+
+	$(addsuffix -g-form,$(letters))
+	$(addsuffix m-g-form,$(letters))
+	$(addsuffix m7-g-form,$(letters))
+	$(addsuffix 7M-g-form,$(letters))
+	$(addsuffix 7-g-form,$(letters))
+
+
+svg_chords=$(addprefix tmp/,$(addsuffix .svg,$(chords)))
 
 $(svg_chords) : $(make_chord)
 	./make-chord 
 
 prefix=$(dir $(prefix))
 mkdir -p $(prefix)/png
+mkdir -p tmp
 
 foreach(f,$(chords))
-	$(prefix)/png/$f.png : $f.svg
+	$(prefix)/png/$f.png : tmp/$f.svg
 		inkscape --export-png $@ --file $<
 	export .RULE
 

@@ -30,17 +30,22 @@ val em_form : int -> c
 val em7_form : int -> c
 
 val c_form : int -> c
-(*
+val c7_form : int -> c
+val c7M_form : int -> c
 val cm_form : int -> c
 val cm7_form : int -> c
-val cM7_form : int -> c
-*)
 
 val a_form : int -> c
 val a7_form : int -> c
 val a7M_form : int -> c
 val am_form : int -> c
 val am7_form : int -> c
+
+val g_form : int -> c
+val g7_form : int -> c
+val g7M_form : int -> c
+val gm_form : int -> c
+val gm7_form : int -> c
 
     
 val write_svg : string -> c -> unit
