@@ -4,6 +4,12 @@ open Printf
 
 let (//) = Filename.concat
 
+let int_of_string s = 
+  try
+    int_of_string s
+  with
+    | _ -> failwith ("not a string : " ^ s)
+
 type context =
     | Normal of string
     | Titre of string
@@ -12,11 +18,14 @@ type context =
     | Lyrics of string list
     | Tab of string list
     | Mp3 of string
+    | Accords of string list
+    | Transpose of int
 
 type document = context list 
 
 module Song = struct
   type t = {
+    transpose:int ;
     filename:string ;
     titre:string ;
     auteur:string ;

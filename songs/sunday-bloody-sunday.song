@@ -4,6 +4,9 @@ sunday bloody sunday
 \auteur
 U2
 
+\transpose
+-1
+
 \mp3
 sunday-bloody-sunday.mp3
 
@@ -51,6 +54,7 @@ Sunday bloody sunday
 \
 {8 mesures dures, sans chant}
 {cool}
+\
 And the battle's just begun
 There's many lost, but tell me who has won
 The trench is dug within our hearts
@@ -61,10 +65,13 @@ Sunday, Bloody Sunday
 Sunday, Bloody Sunday
 \
 {pont 1}
+\
 How long
 How long must we sing this song
 How long, how long
+\
 {dur}
+\
 Cause tonight, we can be as one
 Tonight, tonight. Tonight, tonight
 \

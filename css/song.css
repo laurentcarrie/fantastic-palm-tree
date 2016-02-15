@@ -85,6 +85,7 @@ span.remarque {
     foreground:black ;
     font-style:italic ;
     font-size: 1cm ;
+    clear:both ;
 }
 
 div.index-entry-0 {
@@ -127,4 +128,54 @@ span.chord-position {
     text-decoration: underline ;
     text-decoration-style: dotted ;
 
+}
+
+
+div.chords {
+    width:100% ;
+    clear:both ;
+}
+
+ul.chords {
+    display: inline ;
+    margin:0 ; 
+    list-style-type : none ;
+    padding: 0 ;
+}
+
+li.chords {
+    margin-left: 2px ;
+    float: left ;
+}
+
+ul.chords li.chords {
+display:block;
+float:left;   
+width:100px;
+/*background-color:#6495ED;*/
+color:black;
+text-decoration:none;
+text-align:center;
+padding:50px;
+}
+
+ul.chords {
+border-width:2px;
+border-style:solid;
+border-color:#DCDCDC #696969 #696969 #DCDCDC;  /*pour avoir un effet "outset" avec IE*/
+}
+
+li.pos-0 {
+/*    position:absolute ;*/
+    left:0% ;
+    float:left ;
+}
+li.pos-1 {
+    left:20% ;
+}
+li.pos-2 {
+    left:20% ;
+}
+li.pos-3 {
+    left:30% ;
 }

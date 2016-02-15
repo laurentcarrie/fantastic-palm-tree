@@ -36,6 +36,10 @@ let read_song filename : document = (
       | "\\tab" -> r ((Tab (read_array_until_empty_line fin))::acc)
       | "\\lyrics" -> r ((Lyrics (read_array_until_empty_line fin))::acc)
       | "\\mp3" -> r ((Mp3 (read_string_until_empty_line fin))::acc)
+      | "\\transpose" -> r ((Transpose (int_of_string (read_string_until_empty_line fin))::acc))
+      | "\\chords"
+      | "\\accords" -> 
+	  r ((Accords ((read_array_until_empty_line fin)))::acc)
       | "" -> r acc
       | s -> r ((Normal s)::acc)
     with
@@ -69,11 +73,12 @@ let manage_song filename fileout song_id = (
     let data = read_song filename in
     let title = List.fold_left ( fun acc d -> match d with | Titre s -> s | _ -> acc ) "???" data in
     let auteur = List.fold_left ( fun acc d -> match d with | Auteur s -> s | _ -> acc ) "???" data in
-    let song = {Song.filename=fileout;titre=title;auteur=auteur;id=song_id;data=data} in
+    let transpose = List.fold_left ( fun acc d -> match d with | Transpose h -> h | _ -> acc ) 0 data in
+    let song = {Song.filename=fileout;titre=title;auteur=auteur;id=song_id;data=data;transpose=transpose;} in
 
     let () = printf "open %s\n" fileout ; flush stdout ; in
     let fout = open_out fileout in
-    let () = Write_song.write fout song in
+    let () = Write_song.write_song fout song in
     close_out fout ;
       song
   with
@@ -255,7 +260,7 @@ let _ =
 	  match song with
 	    | None -> ()
 	    | Some song -> (
-		Write_song.write fout song ;
+		Write_song.write_song fout song ;
 		pf "<p style=\"page-break-after:always;\"></p>\n" ;
 	      )
 	) songs in

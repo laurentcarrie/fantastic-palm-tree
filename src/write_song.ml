@@ -10,44 +10,43 @@ let write_mp3 (pf : ('a, unit, string, unit) format4 -> 'a) title = (
   pf "<div class=\"mp3\"><a href=%s>./%s</a></div>" title title
 ) ;;
 
-let read_array_until_empty_line fin = (
-  let rec r acc =
-    try
-      let line = input_line fin in
-      let line = String.strip line in
-      if line = "" then ( List.rev acc) else ( r (line::acc))
-    with
-    | End_of_file -> (List.rev acc)
-  in
-  r []
-) ;;
 
-let read_string_until_empty_line fin = (
-  let a = read_array_until_empty_line fin in
-  String.join "\n" a
-) ;;
+  
 
 let html_of_chord c = (
   List.fold_left ( fun c (sub,by) ->
     let reg = Str.regexp (Str.quote sub) in
-    Str.global_replace reg by c
+      Str.global_replace reg by c
   ) c  [
     "#","&#x266f;" ;
     "b","&#x266d;" ;
     "m","<sub>m</sub>" ;
   ]
 )
-let write_grille  (pf : ('a, unit, string, unit) format4 -> 'a) (g:string list) = (
-  pf "%s" "<div class=\"grille\">\n" ;
-  pf "%s" "\n<table>\n" ;
-  List.iter ( fun line ->
-    pf "%s" "<tr>"  ;
-    let a = String.nsplit line ":" in
-      List.iter ( fun a -> pf "<td class=\"grille\">%s</td>" (html_of_chord a) ) a ;
-      pf "%s" "</tr>\n"  ;
-  ) g ;
-  pf "%s" "</table>\n"  ;
-  pf "%s" "</div>\n" ;
+
+let write_grille ~transpose fout (g:string list) = (
+  let pf fs = ksprintf ( fun s -> fprintf fout "%s" s) fs in
+    pf "<div class=\"grille\">\n" ;
+    pf "\n<table>\n" ;
+    List.iter ( fun line ->
+      pf "<tr>"  ;
+      let a = String.nsplit line ":" in
+	List.iter ( fun a -> 
+	  let chords = String.nsplit a " " in
+	  let chords = List.map ( fun c -> 
+	    match c with 
+	      | "/" -> "/"
+	      | "%" -> "%"
+	      | "3x" -> "3x"
+	      | c -> let c2 = Chord.transpose c transpose in printf "transpose:%d ; avant %s ; apres %s\n" transpose c c2 ; c2
+	  ) chords in
+	  let chords = List.map html_of_chord chords in
+	    pf "<td class=\"grille\">%s</td>" (String.join " " chords)
+	)  a ;
+	pf "</tr>\n"  ;
+    ) g ;
+    pf "</table>\n"  ;
+    pf "</div>\n" ;
 ) ;;
 
 let write_lyrics  (pf : ('a, unit, string, unit) format4 -> 'a) l = (
@@ -83,6 +82,19 @@ let write_tab  (pf : ('a, unit, string, unit) format4 -> 'a) l = (
   pf "%s" "</pre></div>\n" ; 
 ) 
 
+let write_accords  fout l = (
+  let pf fs = ksprintf ( fun s -> fprintf fout "%s" s) fs in
+    pf "\n<div class=\"chords\">\n" ;
+    pf "\t<ul class=\"chords\">\n" ;
+    List.iteri ( fun index l -> 
+      pf "\t\t<li class=\"chords pos-%d\"><img class=\"chord\" src=\"png/%s.png\" alt=\"image %s pas trouvée\"/></li>\n" index l l ;
+    ) l ;
+    pf "\t</ul>\n" ;
+    pf "</div>\n" ;
+    pf "<div style=\"text-align:center; clear:both; margin-top:10px;border:1px solid white;\"></div>\n" ;    
+)
+
+
 (*
 let read_song filename : document = (
   let fin = open_in filename in
@@ -110,9 +122,11 @@ let read_song filename : document = (
 *)
 
 
-let write fout song = (
+let write_song fout song = (
 
   let pf fs = ksprintf ( fun s -> fprintf fout "%s" s) fs in
+
+  let () = printf "write song %s\n" song.Song.titre in
     
   let _ = pf  "<!DOCTYPE html>
 <html>
@@ -139,10 +153,12 @@ let write fout song = (
 	| Normal s -> pf "<span class=\"remarque\">%s</span><br/>" s
 	| Titre _ 
 	| Auteur _ -> ()
-	| Grille g -> write_grille pf (g:string list)
+	| Grille g -> write_grille ~transpose:song.Song.transpose fout (g:string list)
 	| Lyrics l -> write_lyrics pf l
 	| Mp3 l -> write_mp3 pf l
 	| Tab l -> write_tab pf l
+	| Accords l -> write_accords fout l
+	| Transpose i -> pf "<span class=\"remarque\">Transpose de %d demi-tons</span><br/>" i
     ) song.Song.data
     ;
     fprintf fout "</body></html>" ;

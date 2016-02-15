@@ -23,6 +23,8 @@ type c = {
   fingers : t ;
 }
 
+val transpose : string -> int -> string 
+
 val e_form : int -> c
 val e7_form : int -> c
 val e7M_form : int -> c

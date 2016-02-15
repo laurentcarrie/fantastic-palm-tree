@@ -13,11 +13,11 @@ if $(not $(defined prefix))
 println($"prefix is : $(prefix)")
 
 songs=$(glob songs/*.song)
-println($"songs : $(songs)")
+#println($"songs : $(songs)")
 
 targets=$(removeprefix songs/,$(songs))
 targets=$(addprefix $(srcdir)/,$(targets))
-println($"targets : $(targets)")
+#println($"targets : $(targets)")
 
 generator=$(prefix)/bin/song-to-html
 

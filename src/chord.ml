@@ -1,3 +1,7 @@
+open ExtList
+open ExtString
+open Printf
+
 type barre = { from_string : int ; to_string : int ; frette : int }
 
 type w =
@@ -24,7 +28,39 @@ type c = {
 }
 
 let chord_names = ["E";"F";"F#";"G";"G#";"A";"A#";"B";"C";"C#";"D";"D#" ]
+let chord_prefer = [ ("A#","Bb") ; ("D#","Eb") ]
 let chord_filenames = List.map ( fun s ->  let s = Str.global_replace (Str.regexp (Str.quote "#")) "sharp" s in s ) chord_names
+
+
+
+let transpose c offset  = (
+  let offset = 
+    let rec r i = if i>=0 then i else r(i+12) in 
+      r offset
+  in
+  let c0 = c in
+  let c = String.strip ~chars:"mM7b" c in
+  let c = String.strip ~chars:"mM7b" c in
+  let (i,_) = try
+      let (i,s) = List.findi ( fun _ l -> l=c ) chord_names  in
+	i,s
+    with
+      | Not_found -> printf "Not found : cannot transpose '%s'\n" c ; flush stdout ; exit 1 
+  in
+  let j = (i+offset) mod 12 in
+  let c2 = List.nth chord_names j in
+  let c2 = try
+	List.assoc c2 chord_prefer 
+    with
+      | Not_found -> c2
+  in
+    printf "transpose %s %s %s %d %d %d\n" c0 c c2 offset i j ;
+    c2
+)
+
+
+
+
 
 let e_form f = 
   let name = List.nth chord_names (f mod 12) in
@@ -396,13 +432,13 @@ let g_form f =
 
 let gm_form f = 
   let name = List.nth chord_names (f mod 12) in
-  let name = name ^ "" in
+  let name = name ^ "m" in
   let filename = 
     let s = List.nth chord_filenames (f mod 12) in
       s ^ "m-g-form" 
   in
   let f= g_offset f in
-  let  b = { from_string=5;to_string=2;frette=f } in
+  let  b = { from_string=4;to_string=2;frette=f } in
     {
       name = name;
       filename = filename ;

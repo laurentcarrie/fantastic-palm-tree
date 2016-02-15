@@ -29,6 +29,7 @@ src[]=
 	helpers
 	write_index
 	write_song
+	chord
 
 prog = $(OCamlProgram song-to-html,$(src))
 

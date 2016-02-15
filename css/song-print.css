@@ -50,6 +50,7 @@ div.lyrics {
     widows:10 ;
     page-break-inside:avoid ;
     break-inside:avoid ;
+    text-align:left ;
     -webkit-column-break-inside:void ;
     -moz-text-align: left; /* Code for Firefox */
     text-align:left;
@@ -141,3 +142,42 @@ span.chord-position {
 
 }
 
+div.chords {
+    width:100% ;
+    clear:both ;
+}
+
+ul.chords {
+    display: inline ;
+    margin:0 ; 
+    list-style-type : none ;
+    padding: 0 ;
+}
+
+li.chords {
+    margin-left: 2px ;
+    float: left ;
+}
+
+ul.chords li.chords {
+display:block;
+float:left;   
+width:100px;
+/*background-color:#6495ED;*/
+color:black;
+text-decoration:none;
+text-align:center;
+padding:5px;
+}
+
+ul.chords {
+/*
+border-width:2px;
+border-style:solid;
+border-color:#DCDCDC #696969 #696969 #DCDCDC;  /*pour avoir un effet "outset" avec IE*/
+*/
+}
+
+img.chord {
+    width:2cm ;
+}
