@@ -12,18 +12,24 @@ if $(not $(defined prefix))
 
 println($"prefix is : $(prefix)")
 
-songs=$(glob songs/*.song)
-#println($"songs : $(songs)")
+song_files=$(glob songs/*.song)
+songs=$(song_files)
+songs=$(removeprefix songs,$(songs))
+songs=$(removesuffix .song,$(songs))
+songs=$(basename $(songs))
+println($"songs : $(songs)")
 
-targets=$(removeprefix songs/,$(songs))
-targets=$(addprefix $(srcdir)/,$(targets))
-#println($"targets : $(targets)")
+targets=$(songs)
+targets=$(addprefix $(prefix)/,$(targets))
+targets=$(addsuffix .html,$(targets))
+println($"targets : $(targets)")
 
 generator=$(prefix)/bin/song-to-html
 
-build : $(generator) $(songs)
+$(targets) : $(generator) $(song_files)
 	$(generator) $(srcdir)/songs $(prefix)
 
+build : $(targets)
 
 
 css[]=
@@ -48,3 +54,12 @@ clean :
 distant : build
 	auto-ftp --hostname $(host) --port $(port) --user laurent --script script.txt
 
+
+$(prefix)/ftp-script.txt : $(song_files)
+	echo "echo on" > $@	
+	echo "mkdir partoches" >> $@
+	echo "cd partoches" >> $@
+	foreach(f,$(addsuffix .html,$(songs)) index.html song.css song-print.css)
+		echo "put_no_sha1 $f" >> $@
+
+build : $(prefix)/ftp-script.txt

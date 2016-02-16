@@ -98,7 +98,8 @@ let rec walk (songs,books) dirname dirout = (
 	| "song" -> (
 	    try 
 	      let count = List.length songs in
-	      let fileout = dirout // (sprintf "song-%d.html" count) in
+	      (*let fileout = dirout // (sprintf "song-%d.html" count) in*)
+	      let fileout = dirout // (sprintf "%s.html" (Filename.(Filename.basename (Filename.chop_suffix e ".song")))) in
 	      let song = manage_song (dirname//e) fileout (sprintf "song-%d" count) in
 		(song::songs,books)
 	    with

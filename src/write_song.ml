@@ -38,7 +38,7 @@ let write_grille ~transpose fout (g:string list) = (
 	      | "/" -> "/"
 	      | "%" -> "%"
 	      | "3x" -> "3x"
-	      | c -> let c2 = Chord.transpose c transpose in printf "transpose:%d ; avant %s ; apres %s\n" transpose c c2 ; c2
+	      | c -> let c2 = Chord.transpose c transpose in (*printf "transpose:%d ; avant %s ; apres %s\n" transpose c c2 ; *)c2
 	  ) chords in
 	  let chords = List.map html_of_chord chords in
 	    pf "<td class=\"grille\">%s</td>" (String.join " " chords)

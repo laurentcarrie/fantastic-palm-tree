@@ -38,7 +38,6 @@ let transpose c offset  = (
     let rec r i = if i>=0 then i else r(i+12) in 
       r offset
   in
-  let c0 = c in
   let c = String.strip ~chars:"mM7b" c in
   let c = String.strip ~chars:"mM7b" c in
   let (i,_) = try
@@ -54,7 +53,6 @@ let transpose c offset  = (
     with
       | Not_found -> c2
   in
-    printf "transpose %s %s %s %d %d %d\n" c0 c c2 offset i j ;
     c2
 )
 
