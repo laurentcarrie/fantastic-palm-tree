@@ -37,6 +37,7 @@ let read_song filename : document = (
       | "\\lyrics" -> r ((Lyrics (read_array_until_empty_line fin))::acc)
       | "\\mp3" -> r ((Mp3 (read_string_until_empty_line fin))::acc)
       | "\\transpose" -> r ((Transpose (int_of_string (read_string_until_empty_line fin))::acc))
+      | "\\pagebreak" -> r ((PageBreak :: acc))
       | "\\chords"
       | "\\accords" -> 
 	  r ((Accords ((read_array_until_empty_line fin)))::acc)

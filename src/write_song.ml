@@ -160,6 +160,7 @@ let write_song fout song = (
 	| Tab l -> write_tab pf l
 	| Accords l -> write_accords fout l
 	| Transpose i -> pf "<span class=\"remarque\">Transpose de %d demi-tons</span><br/>" i
+	| PageBreak -> pf "<div class=\"pagebreak\"></div>\n"
     ) song.Song.data
     ;
     fprintf fout "</body></html>" ;

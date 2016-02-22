@@ -20,6 +20,7 @@ type context =
     | Mp3 of string
     | Accords of string list
     | Transpose of int
+    | PageBreak
 
 type document = context list 
 
