@@ -4,41 +4,61 @@ back in the ussr
 \auteur
 beatles
 
+couplet 1
+\grille
+B:E:D:E
+B:E:D:E
+B:D:E:E . . .
+B:. D D# E
+
+couplet 2
+à la fin on triple le "back in the..."
+et on passe au refrain
+\grille
+B:E:D:E
+B:E:D:E
+B:D:E:E . . .
+E . . .:E:B:B C# D D#:
+
+refrain
+\grille
+E:E:B:B
+E:E:D7:F#7
+B:. D D# E
+
+
+<div class="pagebreak"></div>
+
 \lyrics
-Flew in from Miami Beach BOAC
-Didn't get to bed last night
-On the way the paper bag was on my knee
-Man, I had a dreadful flight
-I'm back in the USSR
+{couplet 1}
+[B;Flew] in from Miami Beach B[E;O]AC, [D;Didn't] get to bed last [E;night]
+[B;On] the way the paper bag was [E;on] my knee, [D;Man], I had a dreadful [E;flight], 
+I'm back in the USS[B;R] [D;] You don't know how lucky you [E;are], boy [E; Back] in the USS
+[B;R], yeah
+{couplet 2}
+Been away so long I hardly knew the place, Gee, it's good to be back home
+Leave it till tomorrow to unpack my case, Honey disconnect the phone, I'm back in the USSR
 You don't know how lucky you are, boy
-Back in the USSR, yeah
-\
-Been away so long I early knew the place
-Gee, it's good to be back home
-Leave it till tomorrow to unpack my case
-Honey disconnect the phone
-I'm back in the USSR
-You don't know how lucky you are, boy
-Back in the US
-Back in the US
-Back in the USSR
-\
-Well the Ukraine girls really knock me out
-They leave the west behind
-And Moscow girls make me sing and shout
-That Georgia's always on my my my my my my my my my mind
+Back in the US, Back in the US, Back in the USSR
+{refrain 1}
+Well the [E;U]kraine girls really [E;knock] me out
+They [B;leave] the west be[B;hind]
+And [E;Mos]cow girls make me [E;sing] and shout
+That [D7;Geor]gia's always on my my my [F#7;my] my my my my my [B;mind]
 Oh, come on
+{solo (couplet)}
 Hu hey hu, hey, ah, yeah
 Yeah, yeah, yeah
 I'm back in the USSR
 You don't know how lucky you are, boys
 Back in the USSR
-\
+{refrain 2}
 Well the Ukraine girls really knock me out
 They leave the west behind
 And Moscow girls make me sing and shout
 That Georgia's always on my my my my my my my my my mind
-\
+{couplet 3}
+{guitare balalaika E}
 Oh, show me round your snow peaked
 Mountain way down south
 Take me to your daddy's farm
