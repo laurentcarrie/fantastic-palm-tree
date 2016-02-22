@@ -64,7 +64,7 @@ let manage_book filename fileout book_id = (
       | End_of_file -> close_in fin ; List.rev acc
   in
   let songs = r [] in 
-    {Book.filename=fileout;titre=book_id;auteur="book";id=book_id;songs=songs}
+    {Book.filename=fileout;titre=filename;auteur="book";id=book_id;songs=songs}
 )
 
 
@@ -108,7 +108,8 @@ let rec walk (songs,books) dirname dirout = (
 	| "book" -> (
 	    try 
 	      let count = List.length books in
-	      let fileout = dirout // (sprintf "book-%d.html" count) in
+	      (*let fileout = dirout // (sprintf "book-%d.html" count) in*)
+	      let fileout = dirout // (sprintf "book-%s.html" (Filename.chop_suffix e ".book")) in
 	      let id = sprintf "book-%d" count in
 	      let book = manage_book (dirname//e) fileout id in
 		(songs,book::books)

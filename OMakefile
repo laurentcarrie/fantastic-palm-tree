@@ -17,32 +17,26 @@ songs=$(song_files)
 songs=$(removeprefix songs,$(songs))
 songs=$(removesuffix .song,$(songs))
 songs=$(basename $(songs))
-println($"songs : $(songs)")
 
-targets=$(songs)
-targets=$(addprefix $(prefix)/,$(targets))
-targets=$(addsuffix .html,$(targets))
-println($"targets : $(targets)")
+book_files=$(glob songs/*.book)
+books=$(book_files)
+books=$(removeprefix songs,$(books))
+books=$(removesuffix .book,$(books))
+books=$(basename $(books))
+println($"books : $(books)")
+
+targets=
+targets+=$(addsuffix .html,$(addprefix $(prefix)/,$(songs)))
+targets+=$(addsuffix .html,$(addprefix $(prefix)/book-,$(books)))
 
 generator=$(prefix)/bin/song-to-html
 
-$(targets) : $(generator) $(song_files)
-	$(generator) $(srcdir)/songs $(prefix)
-
-build : $(targets)
 
 
 css[]=
 	song.css
 	song-print.css
 
-foreach(f,$(css))
-	build : $(prefix)/$f
-
-	$(prefix)/$f : $(srcdir)/css/$f
-		cp $< $@
-
-	export .RULE
 
 
 
@@ -54,12 +48,39 @@ clean :
 distant : build
 	auto-ftp --hostname $(host) --port $(port) --user laurent --script script.txt
 
+other_files[]=
+	index.html
+	song.css
+	song-print.css
+	index-letters.html
+	index-books.html
 
-$(prefix)/ftp-script.txt : $(song_files)
+letters= A B C D E F G H I J K L M N O P Q R S T U V W X Y Z
+other_files+=$(addsuffix .html,$(addprefix index-letter-,$(letters)))
+
+foreach(f,$(css))
+	build : $(prefix)/$f
+
+	$(prefix)/$f : $(srcdir)/css/$f
+		cp $< $@
+
+	export .RULE
+
+$(targets) : $(generator) $(song_files)
+	$(generator) $(srcdir)/songs $(prefix)
+
+
+build : $(targets)
+
+
+$(prefix)/ftp-script.txt : $(targets)
 	echo "echo on" > $@	
 	echo "mkdir partoches" >> $@
 	echo "cd partoches" >> $@
-	foreach(f,$(addsuffix .html,$(songs)) index.html song.css song-print.css)
-		echo "put_no_sha1 $f" >> $@
+	foreach(f,$(targets) $(addprefix $(prefix)/,$(other_files)))
+		echo "put_no_sha1 $(basename $f)" >> $@
 
 build : $(prefix)/ftp-script.txt
+
+
+
