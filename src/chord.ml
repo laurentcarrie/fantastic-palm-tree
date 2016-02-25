@@ -38,6 +38,7 @@ let transpose c offset  = (
     let rec r i = if i>=0 then i else r(i+12) in 
       r offset
   in
+  let is_minor = if String.length c>1 then (String.get c 1 = 'm') else false in
   let c = String.strip ~chars:"mM7b" c in
   let c = String.strip ~chars:"mM7b" c in
   let (i,_) = try
@@ -53,6 +54,7 @@ let transpose c offset  = (
     with
       | Not_found -> c2
   in
+  let c2 = if is_minor then c2^"m" else c2 in
     c2
 )
 
