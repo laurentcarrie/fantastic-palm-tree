@@ -42,6 +42,7 @@ pngdir=$(dir $(prefix)/png)
 
 build : $(prefix)/bin/song-to-html
 
+mkdir -p tmp
 mkdir -p $(prefix)/bin
 mkdir -p $(pngdir)
 
