@@ -1,4 +1,4 @@
-.PHONY: build clean install doc toto distant chord
+.PHONY: build clean install doc toto distant chords check bin 
 
 .DEFAULT: build
 
@@ -31,81 +31,64 @@ src[]=
 	write_song
 	chord
 
+src_chord[]=
+	chord
+	make_chord_svg
+
 prog = $(OCamlProgram song-to-html,$(src))
+
+prefix=$(dir $(prefix))
+pngdir=$(dir $(prefix)/png)
 
 build : $(prefix)/bin/song-to-html
 
 mkdir -p $(prefix)/bin
+mkdir -p $(pngdir)
 
 $(prefix)/bin/song-to-html : song-to-html
 	cp $< $@
 
-
-src_chord[]=
-	make_chord_svg
-	chord
-
 make_chord = $(OCamlProgram make-chord,$(src_chord))
 
-letters[]=
-	C
-	Csharp
-	D
-	Dsharp
-	E
-	F
-	Fsharp
-	G
-	Gsharp
-	A
-	Asharp
-	B
+chord_list : $(make_chord)
+	./make-chord --prefix $(prefix) --show-targets > $@
 
-decoration[]=
-	$(EMPTY)
-	7
-	m
-	m7
-	M
+bin : $(make_chord) $(prog)
 
-chords[]=
-	$(addsuffix -e-form,$(letters)) 
-	$(addsuffix 7-e-form,$(letters)) 
-	$(addsuffix m-e-form,$(letters)) 
-	$(addsuffix m7-e-form,$(letters)) 
-	$(addsuffix 7M-e-form,$(letters)) 
-
-	$(addsuffix -a-form,$(letters))
-	$(addsuffix m-a-form,$(letters))
-	$(addsuffix m7-a-form,$(letters))
-	$(addsuffix 7M-a-form,$(letters))
-	$(addsuffix 7-a-form,$(letters))
-
-	$(addsuffix -c-form,$(letters))
-	$(addsuffix m-c-form,$(letters))
-	$(addsuffix m7-c-form,$(letters))
-	$(addsuffix 7M-c-form,$(letters))
-	$(addsuffix 7-c-form,$(letters))
-
-	$(addsuffix -g-form,$(letters))
-	$(addsuffix m-g-form,$(letters))
-	$(addsuffix m7-g-form,$(letters))
-	$(addsuffix 7M-g-form,$(letters))
-	$(addsuffix 7-g-form,$(letters))
+png_digest.txt : $(make_chord) 
+	./make-chord --prefix $(prefix)
 
 
-svg_chords=$(addprefix tmp/,$(addsuffix .svg,$(chords)))
+build : png_digest.txt
 
-$(svg_chords) : $(make_chord)
-	./make-chord 
+make_show =
+	png_files=$(set $(ls $(pngdir)))
+	ret=$(EMPTY)
+	foreach(l,$(png_files))
+		ret=$(concat $(EMPTY),$(ret) $"$(basename $l) $(digest $l)
+")
+		export
+	value $(ret)
 
-prefix=$(dir $(prefix))
-mkdir -p $(prefix)/png
-mkdir -p tmp
+check : $(make_chord)
+	section
+		v1=$(make_show)
+		v2=$(cat png_digest.pristine.txt)
+		if $(not $(equal $"$(v1)",$"$(v2)"))
+			println($"v1 and v2 are different")
+			./make-chord --prefix $(prefix)
+		else
+			println($"v1 and v2 are the same")
 
-foreach(f,$(chords))
-	$(prefix)/png/$f.png : tmp/$f.svg
-		inkscape --export-png $@ --file $<
-	export .RULE
+		println($"done")
 
-chord : $(addprefix $(prefix)/png/,$(addsuffix .png,$(chords)))
+
+#.SCANNER: png_digest.txt : $(make_chord) :value: $(digest-in-path-optional $(prefix)/png , $&)
+
+#$(png_chords) : $(make_chord)
+#	./make-chord $(prefix)
+
+#chord : $(addprefix $(prefix)/png/,$(addsuffix .png,$(chords)))
+
+clean :
+	rm -rf install
