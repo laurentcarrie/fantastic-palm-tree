@@ -1,4 +1,4 @@
-.PHONY: build 
+.PHONY: build clean
 
 .DEFAULT: build
 
@@ -84,3 +84,6 @@ build : $(prefix)/ftp-script.txt
 
 
 
+clean :
+	rm -f $(filter-proper-targets $(ls R,.))
+	rm -f *~
