@@ -11,7 +11,7 @@ let write_mp3 (pf : ('a, unit, string, unit) format4 -> 'a) title = (
 ) ;;
 
 let tex_of_chord (c:Accord.t) = (
-  let s = sprintf "$%c" c.Accord.note in
+  let s = sprintf "%c" c.Accord.note in
   let s = match c.Accord.alteration with
     | Accord.None -> s
     | Accord.Flat -> s ^ "^{\\flat}"
@@ -21,8 +21,9 @@ let tex_of_chord (c:Accord.t) = (
   let subscript = if c.Accord.minor then subscript^"m" else subscript in
   let subscript = if c.Accord.minor7 then subscript^"7" else subscript in
   let subscript = if c.Accord.major7 then subscript^"7M" else subscript in
-  let s = s^"_{"^subscript^"}" in
-  s ^ "$"
+  let s = if subscript="" then s else s^"_{"^subscript^"}" in
+  let s = if s="%" then "" else "$"^s^"$" in
+  s
 )
 
 let pdf_of_line c = (
@@ -52,11 +53,11 @@ let write_grille ~transpose fout name (g:Accord.t list list list) = (
   pf "\\begin{tabular}{|%s|}\n" (String.join "|" (List.init taille (fun _ -> "p{1.5cm}"))) ;
 
   List.iter ( fun line ->
-    pf "%s" "\\hline\n" ;
+    pf "%s" "\n\\hline\n" ;
     let tex_of_bar (b:Accord.t list) = String.join " " (List.map tex_of_chord b) in
     let bars = List.map tex_of_bar line in
     pf "%s" (String.join " & " bars ) ;
-    pf "%s" "\\\\"
+    pf "%s" " \\\\"
   ) g ;
   pf "
   \\hline

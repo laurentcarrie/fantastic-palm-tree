@@ -42,7 +42,7 @@ foreach(s,$(songs))
 	build: $(LaTeXDocument $s,$s)
 
 	clean :
-		rm -f $s.tex $s.fls $s.aux $s.log
+		rm -f $s.fls $s.aux $s.log
 
 	export .RULE
 
