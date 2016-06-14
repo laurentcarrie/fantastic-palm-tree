@@ -10,15 +10,19 @@ let write_mp3 (pf : ('a, unit, string, unit) format4 -> 'a) title = (
   (* pf "mp3 file : %s\n" title  *)
 ) ;;
 
-let pdf_of_chord c = (
-  List.fold_left ( fun c (sub,by) ->
-    let reg = Str.regexp (Str.quote sub) in
-      Str.global_replace reg by c
-  ) c  [
-    "#","$\\sharp$" ;
-    "b","$\\flat$" ;
-    "m","m" ;
-  ]
+let tex_of_chord (c:Accord.t) = (
+  let s = sprintf "$%c" c.Accord.note in
+  let s = match c.Accord.alteration with
+    | Accord.None -> s
+    | Accord.Flat -> s ^ "^{\\flat}"
+    | Accord.Sharp -> s ^ "^{\\sharp}"
+  in
+  let subscript = "" in
+  let subscript = if c.Accord.minor then subscript^"m" else subscript in
+  let subscript = if c.Accord.minor7 then subscript^"7" else subscript in
+  let subscript = if c.Accord.major7 then subscript^"7M" else subscript in
+  let s = s^"_{"^subscript^"}" in
+  s ^ "$"
 )
 
 let pdf_of_line c = (
@@ -30,60 +34,37 @@ let pdf_of_line c = (
   ]
 )
 
-let write_grille ~transpose fout name (g:string list) = (
+let write_grille ~transpose fout name (g:Accord.t list list list) = (
   let pf fs = ksprintf ( fun s -> fprintf fout "%s" s) fs in
 
   let taille = List.fold_left ( fun t line ->
-    let t2 = List.length (String.nsplit line ":") in
+    let t2 = List.length line in
     if t > t2 then t else t2
   ) 0 g in
   
   pf "\
+\\begin{center}
 \\begin{table}[h!]
   \\centering
 " ;
   pf "\\caption{%s}\n" name ;
   pf "\\label{%s}\n" "" ;
-  pf "\\begin{tabular}{|%s|}\n" (String.join "|" (List.init taille (fun _ -> "c"))) ;
+  pf "\\begin{tabular}{|%s|}\n" (String.join "|" (List.init taille (fun _ -> "p{1.5cm}"))) ;
 
   List.iter ( fun line ->
-    let a = String.nsplit line ":" in
-    let a = List.map pdf_of_chord a in
     pf "%s" "\\hline\n" ;
-    pf "%s" (String.join " & " a) ;
+    let tex_of_bar (b:Accord.t list) = String.join " " (List.map tex_of_chord b) in
+    let bars = List.map tex_of_bar line in
+    pf "%s" (String.join " & " bars ) ;
     pf "%s" "\\\\"
   ) g ;
   pf "
   \\hline
   \\end{tabular}
 \\end{table}
+\\end{center}
 " ;
 
-(*
-    pf "<div class=\"grille\">\n" ;
-    pf "\n<table>\n" ;
-    List.iter ( fun line ->
-      pf "<tr>"  ;
-      let a = String.nsplit line ":" in
-	List.iter ( fun a -> 
-	  let chords = String.nsplit a " " in
-	  let chords = List.map ( fun c -> 
-	    match c with 
-	      | "/" -> "/"
-	      | "%" -> "%"
-	      | "3x" -> "3x"
-	      | "." -> "."
-		  (*| c -> let c2 = Chord.transpose c transpose in (*printf "transpose:%d ; avant %s ; apres %s\n" transpose c c2 ; *)c2*)
-	      | c -> c
-	  ) chords in
-	  let chords = List.map html_of_chord chords in
-	    pf "<td class=\"grille\">%s</td>" (String.join " " chords)
-	)  a ;
-	pf "</tr>\n"  ;
-    ) g ;
-    pf "</table>\n"  ;
-    pf "</div>\n" ;
-*)
 ) ;;
 
 let write_lyrics fout l = (
@@ -150,6 +131,7 @@ let write_song fout song = (
   let () = pf "\\author{%s}\n" song.Song.auteur in
   let () = pf "\
 \\usepackage[utf8]{inputenc}
+\\usepackage{array}
 \\usepackage{fancyhdr} 
 \\pagestyle{fancy} 
 " in
@@ -163,7 +145,7 @@ let write_song fout song = (
   let () = pf "\\fancyfoot[R]{page \\thepage} \n" in
   let () = pf "\\renewcommand\\headrulewidth{0.02in}" in 
   let () = pf "\\renewcommand\\footrulewidth{0.02in}" in 
-
+  let () = pf "\\newcolumntype{C}{>{\\lower 2ex\\hbox to 6ex\\bgroup\\hss}c<{\\hss\\egroup}}\n" in
   let () = pf "
 \\begin{document}
 " 
@@ -178,7 +160,7 @@ let write_song fout song = (
     | Normal s -> pf "%s\\newline\n" s
     | Titre _ 
     | Auteur _ -> ()
-    | Grille (name,g) -> write_grille ~transpose:song.Song.transpose fout name (g:string list)
+    | Grille (name,g) -> write_grille ~transpose:song.Song.transpose fout name (g:Accord.t list list list)
     | Lyrics l -> write_lyrics fout l
     | Mp3 l -> write_mp3 pf l
     | Tab l -> write_tab pf l

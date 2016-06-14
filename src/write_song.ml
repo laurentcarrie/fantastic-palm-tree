@@ -13,38 +13,29 @@ let write_mp3 (pf : ('a, unit, string, unit) format4 -> 'a) title = (
 
   
 
-let html_of_chord c = (
-  List.fold_left ( fun c (sub,by) ->
-    let reg = Str.regexp (Str.quote sub) in
-      Str.global_replace reg by c
-  ) c  [
-    "#","&#x266f;" ;
-    "b","&#x266d;" ;
-    "m","<sub>m</sub>" ;
-  ]
+let html_of_chord (c:Accord.t) = (
+  let s = sprintf "%c" c.Accord.note in
+  let s = if c.Accord.minor then s^"<sub>m</sub>" else s in
+  let s = match c.Accord.alteration with
+    | Accord.None -> s
+    | Accord.Flat -> s ^ "&#x266d;"
+    | Accord.Sharp -> s ^ "&#x266f;"
+  in
+  let s = if c.Accord.minor7 then s^"7" else s in
+  let s = if c.Accord.major7 then s^"7M" else s in
+  s
 )
 
-let write_grille ~transpose fout name (g:string list) = (
+let write_grille ~transpose fout name (g:Accord.t list list list) = (
   let pf fs = ksprintf ( fun s -> fprintf fout "%s" s) fs in
     pf "<div class=\"grille\">\n" ;
     pf "\n<table>\n" ;
     List.iter ( fun line ->
       pf "<tr>"  ;
-      let a = String.nsplit line ":" in
-	List.iter ( fun a -> 
-	  let chords = String.nsplit a " " in
-	  let chords = List.map ( fun c -> 
-	    match c with 
-	      | "/" -> "/"
-	      | "%" -> "%"
-	      | "3x" -> "3x"
-	      | "." -> "."
-		  (*| c -> let c2 = Chord.transpose c transpose in (*printf "transpose:%d ; avant %s ; apres %s\n" transpose c c2 ; *)c2*)
-	      | c -> c
-	  ) chords in
-	  let chords = List.map html_of_chord chords in
-	    pf "<td class=\"grille\">%s</td>" (String.join " " chords)
-	)  a ;
+	List.iter ( fun bar -> 
+	  let s = String.join " " (List.map html_of_chord bar) in
+	  pf "<td class=\"grille\">%s</td>" s ;
+	)  line ;
 	pf "</tr>\n"  ;
     ) g ;
     pf "</table>\n"  ;
@@ -157,7 +148,7 @@ let write_song fout song = (
 	| Normal s -> pf "<span class=\"remarque\">%s</span><br/>" s
 	| Titre _ 
 	| Auteur _ -> ()
-	| Grille (name,g) -> write_grille ~transpose:song.Song.transpose fout name (g:string list)
+	| Grille (name,g) -> write_grille ~transpose:song.Song.transpose fout name (g:Accord.t list list list)
 	| Lyrics l -> write_lyrics fout l
 	| Mp3 l -> write_mp3 pf l
 	| Tab l -> write_tab pf l
