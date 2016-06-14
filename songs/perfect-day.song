@@ -4,6 +4,13 @@ perfect day
 \auteur
 Lou Reed
 
+#\chords
+#Am-a-form
+
+intro
+\grille
+E:Am:E:Am
+
 couplet
 \grille 
 Am:D:G:C
@@ -16,7 +23,7 @@ A:E:F#m E:D
 F#m E:D
 
 
-\lyrics
+\lyrics2
 Just a perfect day
 Drink Sangria in the park
 And then later

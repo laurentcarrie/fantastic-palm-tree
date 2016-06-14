@@ -29,6 +29,7 @@ src[]=
 	helpers
 	write_index
 	write_song
+	write_pdf_song
 	chord
 
 src_chord[]=

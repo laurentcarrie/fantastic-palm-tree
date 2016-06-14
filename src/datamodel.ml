@@ -11,17 +11,17 @@ let int_of_string s =
     | _ -> failwith ("not a string : " ^ s)
 
 type context =
-    | Normal of string
-    | Titre of string
-    | Auteur of string
-    | Grille of string list
-    | Lyrics of string list
-    | Tab of string list
-    | Mp3 of string
-    | Accords of string list
-    | Transpose of int
-    | PageBreak
-
+| Normal of string
+| Titre of string
+| Auteur of string
+| Grille of (string*string list)
+| Lyrics of (int*string list)
+| Tab of string list
+| Mp3 of string
+| Accords of string list
+| Transpose of int
+| PageBreak
+    
 type document = context list 
 
 module Song = struct

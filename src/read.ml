@@ -29,20 +29,26 @@ let read_song filename : document = (
   let rec r acc  = 
     try
       let line = String.strip (input_line fin) in
-      match line with
-      | "\\titre" -> r ((Titre (read_string_until_empty_line fin))::acc)
-      | "\\auteur" -> r ((Auteur (read_string_until_empty_line fin))::acc)
-      | "\\grille" -> r ((Grille (read_array_until_empty_line fin))::acc)
-      | "\\tab" -> r ((Tab (read_array_until_empty_line fin))::acc)
-      | "\\lyrics" -> r ((Lyrics (read_array_until_empty_line fin))::acc)
-      | "\\mp3" -> r ((Mp3 (read_string_until_empty_line fin))::acc)
-      | "\\transpose" -> r ((Transpose (int_of_string (read_string_until_empty_line fin))::acc))
-      | "\\pagebreak" -> r ((PageBreak :: acc))
-      | "\\chords"
-      | "\\accords" -> 
+      if String.starts_with line "#" then
+	r acc 
+      else (
+	let (word,arg) = try String.split line " " with | ExtString.Invalid_string -> line,"" in
+	match word with
+	| "\\titre" -> r ((Titre (read_string_until_empty_line fin))::acc)
+	| "\\auteur" -> r ((Auteur (read_string_until_empty_line fin))::acc)
+	| "\\grille" -> r ((Grille (arg,(read_array_until_empty_line fin))::acc))
+	| "\\tab" -> r ((Tab (read_array_until_empty_line fin))::acc)
+	| "\\lyrics" -> r ((Lyrics (1,(read_array_until_empty_line fin))::acc))
+	| "\\lyrics2" -> r ((Lyrics (2,(read_array_until_empty_line fin))::acc))
+	| "\\mp3" -> r ((Mp3 (read_string_until_empty_line fin))::acc)
+	| "\\transpose" -> r ((Transpose (int_of_string (read_string_until_empty_line fin))::acc))
+	| "\\pagebreak" -> r ((PageBreak :: acc))
+	| "\\chords"
+	| "\\accords" -> 
 	  r ((Accords ((read_array_until_empty_line fin)))::acc)
-      | "" -> r acc
-      | s -> r ((Normal s)::acc)
+	| "" -> r acc
+	| s -> r ((Normal s)::acc)
+      )
     with
     | End_of_file -> (
       close_in fin ;
@@ -69,19 +75,26 @@ let manage_book filename fileout book_id = (
 )
 
 
-let manage_song filename fileout song_id = (
+let manage_song filename fileout_html fileout_latex song_id = (
   try
     let data = read_song filename in
     let title = List.fold_left ( fun acc d -> match d with | Titre s -> s | _ -> acc ) "???" data in
     let auteur = List.fold_left ( fun acc d -> match d with | Auteur s -> s | _ -> acc ) "???" data in
     let transpose = List.fold_left ( fun acc d -> match d with | Transpose h -> h | _ -> acc ) 0 data in
-    let song = {Song.filename=fileout;titre=title;auteur=auteur;id=song_id;data=data;transpose=transpose;} in
-
-    let () = printf "open %s\n" fileout ; flush stdout ; in
-    let fout = open_out fileout in
-    let () = Write_song.write_song fout song in
-    close_out fout ;
-      song
+    let song = {Song.filename=fileout_html;titre=title;auteur=auteur;id=song_id;data=data;transpose=transpose;} in
+    let () =
+      let () = printf "open %s\n" fileout_html ; flush stdout ; in
+      let fout = open_out fileout_html in
+      let () = Write_song.write_song fout song in
+      close_out fout ;
+    in
+    let () =
+      let () = printf "open %s\n" fileout_latex ; flush stdout ; in
+      let fout = open_out fileout_latex in
+      let () = Write_pdf_song.write_song fout song in
+      close_out fout ;
+    in
+    song
   with
     | e -> failwith (sprintf "ERREUR : %s\n" (Printexc.to_string e) )
 ) ;;
@@ -100,8 +113,9 @@ let rec walk (songs,books) dirname dirout = (
 	    try 
 	      let count = List.length songs in
 	      (*let fileout = dirout // (sprintf "song-%d.html" count) in*)
-	      let fileout = dirout // (sprintf "%s.html" (Filename.(Filename.basename (Filename.chop_suffix e ".song")))) in
-	      let song = manage_song (dirname//e) fileout (sprintf "song-%d" count) in
+	      let fileout_html = dirout // (sprintf "%s.html" (Filename.(Filename.basename (Filename.chop_suffix e ".song")))) in
+	      let fileout_latex = (sprintf "%s.tex" (Filename.(Filename.basename (Filename.chop_suffix e ".song")))) in
+	      let song = manage_song (dirname//e) fileout_html fileout_latex (sprintf "song-%d" count) in
 		(song::songs,books)
 	    with
 	      | e -> printf "%s\n" (Printexc.to_string e) ; (songs,books)
@@ -282,7 +296,7 @@ let _ =
     let books = 
       let all = { Book.filename=Sys.argv.(2)//"all.html" ; titre = "all" ; auteur = "" ; id = "xxx" ; 
 		  songs = List.sort ~cmp:Helpers.uppercase_compare (List.map ( fun b -> b.Song.titre ) songs) } in
-	all::books 
+      all::books 
     in
       write_index_books books ;
       List.iter ( fun b -> write_book b songs ) books ;

@@ -18,10 +18,19 @@ table.grille{
     empty-cells:hide ;
 } 
 
-div.lyrics {
+div.lyrics1 {
     font-family: "Times New Roman", Times, serif;
     font-size:1cm;
     background: #ffffff ;
+}
+
+div.lyrics2 {
+    font-family: "Times New Roman", Times, serif;
+    font-size:1cm;
+    background: #ffffff ;
+    -webkit-column-count: 2; /* Chrome, Safari, Opera */
+    -moz-column-count: 2; /* Firefox */
+    column-count: 2;
 }
 
 div.titre-auteur {
@@ -30,6 +39,9 @@ div.titre-auteur {
     font-family: "Times New Roman", Times, serif;
     font-size:3cm;
     background: #aaffff ;
+    -webkit-column-count: 1; /* Chrome, Safari, Opera */
+    -moz-column-count: 1; /* Firefox */
+    column-count: 1;
 }
 
 /*

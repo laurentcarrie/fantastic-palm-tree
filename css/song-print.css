@@ -37,12 +37,38 @@ div.pagebreak {
 }
 
 
-div.lyrics {
+div.lyrics1 {
     margin:0 0 0 0 ;
     padding:0 0 0 0 ;
     -webkit-column-count: 1; /* Chrome, Safari, Opera */
     -moz-column-count: 1; /* Firefox */
     column-count: 1;
+    -webkit-column-rule: 4px outset #ff00ff; /* Chrome, Safari, Opera */
+    -moz-column-rule: 4px outset #ff00ff; /* Firefox */
+    column-rule: 4px outset #ff00ff;
+
+    font-family: "Times New Roman", Times, serif;
+    background: #ffffff ;
+    foreground: red ;
+/*    border: 2px solid black ; */
+
+    orphans:10 ;
+    widows:10 ;
+    page-break-inside:avoid ;
+    break-inside:avoid ;
+    text-align:left ;
+    -webkit-column-break-inside:void ;
+    -moz-text-align: left; /* Code for Firefox */
+    text-align:left;
+    -moz-text-align-last: left; /* Code for Firefox */
+    text-align-last:right;
+}
+div.lyrics2 {
+    margin:0 0 0 0 ;
+    padding:0 0 0 0 ;
+    -webkit-column-count: 2; /* Chrome, Safari, Opera */
+    -moz-column-count: 2; /* Firefox */
+    column-count: 2;
     -webkit-column-rule: 4px outset #ff00ff; /* Chrome, Safari, Opera */
     -moz-column-rule: 4px outset #ff00ff; /* Firefox */
     column-rule: 4px outset #ff00ff;

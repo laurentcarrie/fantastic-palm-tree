@@ -24,7 +24,7 @@ let html_of_chord c = (
   ]
 )
 
-let write_grille ~transpose fout (g:string list) = (
+let write_grille ~transpose fout name (g:string list) = (
   let pf fs = ksprintf ( fun s -> fprintf fout "%s" s) fs in
     pf "<div class=\"grille\">\n" ;
     pf "\n<table>\n" ;
@@ -51,12 +51,14 @@ let write_grille ~transpose fout (g:string list) = (
     pf "</div>\n" ;
 ) ;;
 
-let write_lyrics  (pf : ('a, unit, string, unit) format4 -> 'a) l = (
-  pf "%s""<div class=\"lyrics\">\n" ;
-  pf "%s" "<p class=\"lyrics\">\n" ;
+let write_lyrics fout l = (
+  let pf fs = ksprintf ( fun s -> fprintf fout "%s" s) fs in
+  let (nbcols,l) = l in
+  pf "<div class=\"lyrics%d\">\n" nbcols ;
+  pf "%s" "<p>\n" ;
   List.iter ( fun line ->
     if line="\\" then (
-      pf "%s" "</p>\n<p class=\"lyrics\">\n"
+      pf "%s" "</p>\n<p>\n" 
     )  else (
       let reg = Str.regexp "{\\(.*\\)}" in
       let line = Str.global_replace reg "<span class=\"remarque\">\\1</span>" line in
@@ -155,8 +157,8 @@ let write_song fout song = (
 	| Normal s -> pf "<span class=\"remarque\">%s</span><br/>" s
 	| Titre _ 
 	| Auteur _ -> ()
-	| Grille g -> write_grille ~transpose:song.Song.transpose fout (g:string list)
-	| Lyrics l -> write_lyrics pf l
+	| Grille (name,g) -> write_grille ~transpose:song.Song.transpose fout name (g:string list)
+	| Lyrics l -> write_lyrics fout l
 	| Mp3 l -> write_mp3 pf l
 	| Tab l -> write_tab pf l
 	| Accords l -> write_accords fout l

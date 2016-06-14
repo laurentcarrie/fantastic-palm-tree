@@ -27,7 +27,21 @@ println($"books : $(books)")
 
 targets=
 targets+=$(addsuffix .html,$(addprefix $(prefix)/,$(songs)))
+targets+=$(addsuffix .tex,$(songs))
 targets+=$(addsuffix .html,$(addprefix $(prefix)/book-,$(books)))
+
+mkdir -p $(prefix)/pdf
+
+foreach(s,$(songs))
+	build : $(prefix)/pdf/$s.pdf
+
+	$(prefix)/pdf/$s.pdf : $s.pdf
+		cp $< $@
+
+#	LocalTeXGeneratedFiles($s)
+	build: $(LaTeXDocument $s,$s)
+
+	export .RULE
 
 generator=$(prefix)/bin/song-to-html
 
@@ -44,6 +58,7 @@ css[]=
 
 clean :
 	rm $(filter-proper-targets $(ls R, .))
+	rm -rf $(prefix)
 
 distant : build
 	auto-ftp --hostname $(host) --port $(port) --user laurent --script script.txt
