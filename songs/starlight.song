@@ -7,23 +7,20 @@ muse
 \mp3
 starlight-muse.mp3
 
-couplet (2 lignes)
-\grille
+
+\grille couplet (2 lignes)
 B:C#m:G#m:E
 
-pont 1
-\grille
+\grille pont 1
 C#m:F#:D#m:G#m
 A:E:A:D#
 
-pont 2 en arpeges case 7
-\grille
+\grille pont 2 en arpeges case 7
 G#m:D#:E:B
 3x
 G#m:D#:E:F#
 
-pont 3
-\grille
+\grille pont 3
 G#m:D#:E:B
 
 

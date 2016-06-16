@@ -29,6 +29,7 @@ targets=
 targets+=$(addsuffix .html,$(addprefix $(prefix)/,$(songs)))
 targets+=$(addsuffix .tex,$(songs))
 targets+=$(addsuffix .html,$(addprefix $(prefix)/book-,$(books)))
+targets+=$(addsuffix .tex,$(addprefix book-,$(books)))
 
 mkdir -p $(prefix)/pdf
 
@@ -42,7 +43,21 @@ foreach(s,$(songs))
 	build: $(LaTeXDocument $s,$s)
 
 	clean :
-		rm -f $s.fls $s.aux $s.log
+		rm -f $s.fls $s.aux $s.log $s.out
+
+	export .RULE
+
+foreach(s,$(books))
+	s=book-$s
+	build : $(prefix)/pdf/$s.pdf
+
+	$(prefix)/pdf/$s.pdf : $s.pdf
+		cp $< $@
+
+	build : $(LaTeXDocument $s,$s)
+
+	clean :
+		rm -f $s.fls $s.aux $s.log $s.out
 
 	export .RULE
 

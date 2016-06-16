@@ -96,7 +96,7 @@ let read_song filename : document = (
 ) ;;
 
 
-let manage_book filename fileout book_id = (
+let manage_book filename fileout  book_id = (
   let () = printf "open book '%s'\n" filename ; flush stdout ; in
   let fin = open_in filename in
   let rec r acc =
@@ -160,9 +160,9 @@ let rec walk (songs,books) dirname dirout = (
 	    try 
 	      let count = List.length books in
 	      (*let fileout = dirout // (sprintf "book-%d.html" count) in*)
-	      let fileout = dirout // (sprintf "book-%s.html" (Filename.chop_suffix e ".book")) in
+	      let fileout = dirout // (sprintf "book-%s" (Filename.chop_suffix e ".book")) in
 	      let id = sprintf "book-%d" count in
-	      let book = manage_book (dirname//e) fileout id in
+	      let book = manage_book (dirname//e) fileout  id in
 		(songs,book::books)
 	    with
 	      | e -> printf "%s\n" (Printexc.to_string e) ; (songs,books)
@@ -276,8 +276,8 @@ let _ =
   ) in
 
 
-  let write_book book songs = (
-    let fout = open_out book.Book.filename in
+  let write_book_html book songs = (
+    let fout = open_out (book.Book.filename^".html") in
     let pf fs = ksprintf ( fun s -> fprintf fout "%s" s) fs in
     let () = pf "%s" "<!DOCTYPE html>
 <html>
@@ -326,7 +326,6 @@ let _ =
 
 
 
-
     write_index_letters () ;
     Write_index.write songs ;
     let books = 
@@ -335,5 +334,6 @@ let _ =
       all::books 
     in
       write_index_books books ;
-      List.iter ( fun b -> write_book b songs ) books ;
+      List.iter ( fun b -> write_book_html b songs ) books ;
+      List.iter ( fun b -> printf "book : %s\n" b.Book.filename ;  Write_pdf_song.write_book b songs ) books ;
       List.iter ( fun l -> write_index_one_letter songs l ) letters
