@@ -8,8 +8,7 @@ the beatles
 C:G:Am:F
 C:G:F F C D:C
 
-refrain
-\grille
+\grille refrain
 Am:G:F:C
 C:G:F F C D:C
 
@@ -28,8 +27,8 @@ And when the broken hearted people, Living in the world agree
 There will be an answer, let it be
 But though they may be parted, There is still a chance that they may see
 There will be an answer, let it be
-\
-[refrain]
+
+\lyrics refrain
 Let it be, let it be, let it be, let it be
 There will be an answer, let it be
 Let it be, let it be, let it be, let it be

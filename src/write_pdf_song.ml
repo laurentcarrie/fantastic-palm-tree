@@ -73,20 +73,23 @@ let write_grille ~transpose fout name (g:Accord.t list list list) = (
 
 let write_lyrics fout l = (
   let pf fs = ksprintf ( fun s -> fprintf fout "%s" s) fs in
-  let (nbcols,l) = l in
-  let () = pf "\\paragraph{xxx} \n" in 
+  let (nbcols,title,l) = l in
+  let () = pf "\\begin{verse}\n" in
+  let () = pf "{\\commentfont \\hl{%s}} \n" title in  
+  (* let () = pf "\\paragraph{\\commentfont \\hl{%s}} \n" title in  *)
   let () = List.iter ( fun line ->
     if line="\\" then (
-      pf "%s" "\\newline\n" 
+      (* pf "%s" "\\newline\n"  *) ()
     )  else (
       let line = pdf_of_line line in 
       let reg = Str.regexp "{\\(.*\\)}" in
-      let line = Str.global_replace reg "{\\commentfont \\hl{\\1}}" line in
+      let line = Str.global_replace reg "{\\sethlcolor{grey8}\\commentfont \\hl{\\1}}" line in
       let reg = Str.regexp "\\[\\([^;]*\\);\\([^]]*\\)]" in
-      let line = Str.global_replace reg "((\\1))((\\2)" line in
-	pf "%s\\newline\n" line
+      let line = Str.global_replace reg "\\textsuperscript{\\1}\\2" line in
+	pf "%s\\\\\n" line
     )
   ) l in
+  let () = pf "\\end{verse}\n" in
   let () = pf "\n" in
   ()
 ) 
@@ -161,7 +164,8 @@ let write_preamble fout  = (
 \\usepackage[scale=0.8]{geometry}
 \\usepackage{color,soul}
 \\definecolor{grey}{rgb}{0.7,0.7,0.7}
-\\sethlcolor{grey}
+\\definecolor{grey8}{rgb}{0.8,0.8,0.8}
+\\sethlcolor{grey8}
 %%\\usepackage{lmodern}
 %%\\usepackage{textcomp}
 \\usepackage{kpfonts}
@@ -183,6 +187,7 @@ let write_preamble fout  = (
   let () = pf "\\newcommand*{\\authorfont}{\\fontfamily{ptm}\\fontsize{20}{25}\\fontshape{it}\\selectfont} \n" in
   let () = pf "\\newcommand*{\\titlefont}{\\fontfamily{ptm}\\fontsize{30}{35}\\fontshape{it}\\selectfont} \n" in
   let () = pf "\\newcommand*{\\commentfont}{\\fontfamily{ptm}\\fontsize{12}{15}\\fontshape{it}\\selectfont} \n" in
+  let () = pf "\\newcommand*{\\lyricstitlefont}{\\fontfamily{ptm}\\fontsize{12}{15}\\fontshape{it}\\selectfont} \n" in
   let () = pf "\\newcommand{\\tstamp}{\\today}   \n" in
   (* let () = pf "\\fancyhead[C]{{\\titlefont %s} \\textsubscript{\\authorfont (%s)}} \n"  song.Song.titre song.Song.auteur in 
   let () = pf "\\fancyhead[R]{} \n" in
@@ -237,26 +242,41 @@ let write_book book songs = (
   let () = write_preamble fout in
   let _ = pf  "\
 \\title{%s}
-" book.Book.titre 
+" (Filename.basename book.Book.titre)
   in
 
   let () = pf "
 \\begin{document} 
+\\maketitle
+\\tableofcontents
 " in
   let songs = List.fold_left ( fun acc b ->
     try 
       let song = List.find ( fun s -> s.Song.titre = b ) songs  in
-      song::acc
+      (b,Some song)::acc
     with
-    | Not_found -> acc
+    | Not_found -> (b,None)::acc
   ) [] book.Book.songs in
 
-  let () = List.iter ( fun song ->
-    let () = pf "\\clearpage\n" in
-    let () = pf "\\fancyhead[L]{{\\titlefont %s} } \n"  song.Song.titre in 
-    let () = pf "\\fancyhead[R]{{\\authorfont %s}} \n"  song.Song.auteur in
-    let () = pf "\\fancyhead[C]{} \n" in
-    write_song_body fout song
+  let () = List.iter ( fun (name,song) ->
+    match song with
+    | Some song -> (
+      let () = pf "\\clearpage\n" in
+      let () = pf "\\section{%s}\n" song.Song.titre in
+      let () = pf "\\fancyhead[L]{{\\titlefont %s} } \n"  song.Song.titre in 
+      let () = pf "\\fancyhead[R]{{\\authorfont %s}} \n"  song.Song.auteur in
+      let () = pf "\\fancyhead[C]{} \n" in
+      write_song_body fout song
+    )
+    | None -> (
+      let () = pf "\\clearpage\n" in
+      let () = pf "\\section{%s (non trouvé)}\n" name in
+      let () = pf "\\fancyhead[L]{{\\titlefont %s} } \n"  name in
+      let () = pf "\\fancyhead[R]{{\\authorfont %s}} \n"  "" in 
+      let () = pf "\\fancyhead[C]{} \n" in
+      let () = pf "no such song : '%s'\n" name in
+      ()
+    )
   ) songs in
 
   let () = pf "

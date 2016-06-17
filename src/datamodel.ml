@@ -27,7 +27,7 @@ type context =
 | Titre of string
 | Auteur of string
 | Grille of (string*Accord.t list list list)
-| Lyrics of (int*string list)
+| Lyrics of (int*string*string list)
 | Tab of string list
 | Mp3 of string
 | Accords of string list

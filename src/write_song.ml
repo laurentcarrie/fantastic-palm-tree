@@ -44,8 +44,9 @@ let write_grille ~transpose fout name (g:Accord.t list list list) = (
 
 let write_lyrics fout l = (
   let pf fs = ksprintf ( fun s -> fprintf fout "%s" s) fs in
-  let (nbcols,l) = l in
+  let (nbcols,title,l) = l in
   pf "<div class=\"lyrics%d\">\n" nbcols ;
+  pf "title : %s" title ;
   pf "%s" "<p>\n" ;
   List.iter ( fun line ->
     if line="\\" then (

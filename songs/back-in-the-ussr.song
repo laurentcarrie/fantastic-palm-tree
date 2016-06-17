@@ -4,39 +4,24 @@ back in the ussr
 \auteur
 beatles
 
-couplet 1
-\grille
+\grille couplet
 B:E:D:E
 B:E:D:E
 B:D:E:E . . .
 B:. E F F#
 
-couplet 2
-à la fin on triple le "back in the..."
-et on passe au refrain
-\grille
-B:E:D:E
-B:E:D:E
-B:D:E:E . . .
-E . . .:E:B:B E F F#
-
-refrain
-\grille
+\grille refrain
 E:E:B:B
 E:E:F#7:E7
 B:. E F F#
 
 
-\pagebreak
-
-\lyrics
-{couplet 1}
+\lyrics couplet 1
 [B;Flew] in from Miami Beach B[E;O]AC, [D;Didn't] get to bed last [E;night]
 [B;On] the way the paper bag was [E;on] my knee, [D;Man], I had a dreadful [E;flight], 
-I'm back in the USS[B;R] [D;] You don't know how lucky you [E;are], boy [E; Back] in the USS
-[B;R], yeah
-\
-{couplet 2}
+I'm back in the USS[B;R] [D;] You don't know how lucky you [E;are], boy [E; Back] in the USS[B;R], yeah
+
+\lyrics couplet 2
 Been away so long I hardly knew the place, Gee, it's good to be back home
 Leave it till tomorrow to unpack my case, Honey disconnect the phone, I'm back in the USSR
 You don't know how lucky you are, boy
