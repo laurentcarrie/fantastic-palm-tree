@@ -7,8 +7,8 @@ open Datamodel
 let (//) = Filename.concat
 
 
-let write songs =  
-  let fout = open_out (Sys.argv.(2) // "index.html") in
+let write install_dir songs =  
+  let fout = open_out (install_dir // "index.html") in
   let pf fs = ksprintf ( fun s -> fprintf fout "%s" s) fs in
   let _ = pf "%s"  "<!DOCTYPE html>
 <html>
@@ -29,7 +29,7 @@ let write songs =
 
   let _ = List.fold_left ( fun (initiale,index) t ->
     let html = t.Song.filename in
-    let current = String.get (String.uppercase t.Song.titre) 0 in
+    let current = try String.get (String.uppercase t.Song.titre) 0 with _ -> ' ' in
     let initiale = if current<>initiale then (
       pf "<a name=\"letter-%c\"/><div class=\"nouvelle-initiale\"><a href=\"index-letter-%c.html\">--- %c ---</a></div>\n" current current current ;
       current

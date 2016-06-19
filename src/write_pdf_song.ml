@@ -237,7 +237,7 @@ let write_song fout song = (
 
 
 let write_book book songs = (
-  let fout = open_out ((Filename.basename book.Book.filename)^".tex") in
+  let fout = open_out ( "tmp" // ("book-"^(Filename.chop_suffix (Filename.basename book.Book.filename) ".book")^".tex")) in
   let pf fs = ksprintf ( fun s -> fprintf fout "%s" s) fs in
     
   let () = write_preamble fout in

@@ -45,6 +45,7 @@ build : $(prefix)/bin/song-to-html
 
 mkdir -p tmp
 mkdir -p $(prefix)/bin
+mkdir -p $(prefix)/html
 mkdir -p $(pngdir)
 
 $(prefix)/bin/song-to-html : song-to-html

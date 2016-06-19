@@ -26,44 +26,52 @@ books=$(basename $(books))
 println($"books : $(books)")
 
 targets=
-targets+=$(addsuffix .html,$(addprefix $(prefix)/,$(songs)))
-targets+=$(addsuffix .tex,$(songs))
-targets+=$(addsuffix .html,$(addprefix $(prefix)/book-,$(books)))
-targets+=$(addsuffix .tex,$(addprefix book-,$(books)))
+targets+=$(addsuffix .html,$(addprefix $(prefix)/html/,$(songs)))
+targets+=$(addprefix tmp/,$(addsuffix .tex,$(songs)))
+targets+=$(addsuffix .html,$(addprefix $(prefix)/html/book-,$(books)))
+targets+=$(addprefix tmp/,$(addsuffix .tex,$(addprefix book-,$(books))))
 
 mkdir -p $(prefix)/pdf
+mkdir -p tmp
 
 foreach(s,$(songs))
 	pdf build : $(prefix)/pdf/$s.pdf
 
-	$(prefix)/pdf/$s.pdf : $s.pdf
-		cp $< $@
+	section
+		cd tmp
+		$(prefix)/pdf/$s.pdf : $s.pdf
+			cp $< $@
 
-#	LocalTeXGeneratedFiles($s)
-	build: $(LaTeXDocument $s,$s)
+		targets+=$(file $s.tex)
+		build: $(LaTeXDocument $s,$s)
 
-	clean :
-		rm -f $s.fls $s.aux $s.log $s.out
-
+		clean :
+			rm -f $s.fls $s.aux $s.log $s.out
+	export
 	export .RULE
 
 foreach(s,$(books))
 	s=book-$s
 	pdf build : $(prefix)/pdf/$s.pdf
 
-	$(prefix)/pdf/$s.pdf : $s.pdf
-		cp $< $@
+	section
+		cd tmp
 
-	build : $(LaTeXDocument $s,$s)
+		$(prefix)/pdf/$s.pdf : $s.pdf
+			cp $< $@
 
-	clean :
-		rm -f $s.fls $s.aux $s.log $s.out
+		targets+=$(file $s.tex)
+		build : $(LaTeXDocument $s,$s)
 
+		clean :	
+			rm -f $s.fls $s.aux $s.log $s.out
+
+	export
 	export .RULE
 
 generator=$(prefix)/bin/song-to-html
 
-
+#println("$(targets)")
 
 css[]=
 	song.css

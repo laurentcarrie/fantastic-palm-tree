@@ -19,6 +19,7 @@ let read_array_until_empty_line fin = (
   r []
 ) ;;
 
+
 let read_string_until_empty_line fin = (
   let a = read_array_until_empty_line fin in
   String.join "\n" a
@@ -97,7 +98,6 @@ let read_song filename : document = (
 
 
 let manage_book filename fileout  book_id = (
-  let () = printf "open book '%s'\n" filename ; flush stdout ; in
   let fin = open_in filename in
   let rec r acc =
     try
@@ -107,7 +107,9 @@ let manage_book filename fileout  book_id = (
       | End_of_file -> close_in fin ; List.rev acc
   in
   let songs = r [] in 
-    {Book.filename=Filename.basename fileout;titre="book-"^(Filename.basename fileout);auteur="book";id=book_id;songs=songs}
+  let titre = Filename.basename filename in
+  let () = assert (titre <> "" ) in
+    {Book.filename=filename;titre;auteur="book";id=book_id;songs=songs}
 )
 
 
@@ -117,7 +119,8 @@ let manage_song filename fileout_html fileout_latex song_id = (
     let title = List.fold_left ( fun acc d -> match d with | Titre s -> s | _ -> acc ) "???" data in
     let auteur = List.fold_left ( fun acc d -> match d with | Auteur s -> s | _ -> acc ) "???" data in
     let transpose = List.fold_left ( fun acc d -> match d with | Transpose h -> h | _ -> acc ) 0 data in
-    let song = {Song.filename=Filename.basename fileout_html;titre=title;auteur=auteur;id=song_id;data=data;transpose=transpose;} in
+    let () = assert(title<>"") in
+    let song = {Song.filename=filename;titre=title;auteur=auteur;id=song_id;data=data;transpose=transpose;} in
     let () =
       let () = printf "open %s\n" fileout_html ; flush stdout ; in
       let fout = open_out fileout_html in
@@ -125,8 +128,7 @@ let manage_song filename fileout_html fileout_latex song_id = (
       close_out fout ;
     in
     let () =
-      let () = printf "open %s\n" fileout_latex ; flush stdout ; in
-      let fout = open_out fileout_latex in
+      let fout = open_out (fileout_latex) in
       let () = Write_pdf_song.write_song fout song in
       close_out fout ;
     in
@@ -149,8 +151,8 @@ let rec walk (songs,books) dirname dirout = (
 	    try 
 	      let count = List.length songs in
 	      (*let fileout = dirout // (sprintf "song-%d.html" count) in*)
-	      let fileout_html = dirout // (sprintf "%s.html" (Filename.(Filename.basename (Filename.chop_suffix e ".song")))) in
-	      let fileout_latex = (sprintf "%s.tex" (Filename.(Filename.basename (Filename.chop_suffix e ".song")))) in
+	      let fileout_html = dirout // "html" // (sprintf "%s.html" (Filename.(Filename.basename (Filename.chop_suffix e ".song")))) in
+	      let fileout_latex = "tmp" // ((Filename.chop_suffix e ".song") ^ ".tex") in
 	      let song = manage_song (dirname//e) fileout_html fileout_latex (sprintf "song-%d" count) in
 		(song::songs,books)
 	    with
@@ -160,9 +162,9 @@ let rec walk (songs,books) dirname dirout = (
 	    try 
 	      let count = List.length books in
 	      (*let fileout = dirout // (sprintf "book-%d.html" count) in*)
-	      let fileout = dirout // (sprintf "book-%s" (Filename.chop_suffix e ".book")) in
+	      let fileout_html = dirout // ((Filename.chop_suffix e ".book")^".html") in
 	      let id = sprintf "book-%d" count in
-	      let book = manage_book (dirname//e) fileout  id in
+	      let book = manage_book (dirname//e) fileout_html  id in
 		(songs,book::books)
 	    with
 	      | e -> printf "%s\n" (Printexc.to_string e) ; (songs,books)
@@ -176,7 +178,10 @@ let rec walk (songs,books) dirname dirout = (
 
 let _ = 
   try
+    let () = Printexc.record_backtrace true in () ;
   assert(Array.length Sys.argv > 2) ;
+
+  let prefix = Sys.argv.(2) in
 
   let (songs,books) = walk ([],[]) Sys.argv.(1) Sys.argv.(2) in
 
@@ -186,7 +191,7 @@ let _ =
   in
 
   let write_index_letters () = ( 
-    let fout = open_out (Sys.argv.(2) // "index-letters.html") in
+    let fout = open_out (prefix // "html" // "index-letters.html") in
     let pf fs = ksprintf ( fun s -> fprintf fout "%s" s) fs in
     let _ = pf "%s"  "<!DOCTYPE html>
 <html>
@@ -212,7 +217,7 @@ let _ =
 
 
   let write_index_one_letter songs l = (
-    let fout = open_out (Sys.argv.(2) // (sprintf "index-letter-%c.html" l)) in
+    let fout = open_out ( prefix // "html" // (sprintf "index-letter-%c.html" l)) in
     let pf fs = ksprintf ( fun s -> fprintf fout "%s" s) fs in
     let _ = pf "<!DOCTYPE html>
 <html>
@@ -225,6 +230,7 @@ let _ =
 "  l in
     let () = pf "<a href=\"./index.html#letter-%c\">Index lettre %c</a></br>" l l in
     let songs = List.filter ( fun t ->
+      let () = assert (t.Song.titre <> "") in
       let i = String.get (String.uppercase t.Song.titre) 0 in
 	l = i
     ) songs in
@@ -253,7 +259,7 @@ let _ =
 
 
   let write_index_books books = (
-    let fout = open_out (Sys.argv.(2) // "index-books.html") in
+    let fout = open_out (prefix // "html" // "index-books.html") in
     let pf fs = ksprintf ( fun s -> fprintf fout "%s" s) fs in
     let () = pf "%s" "<!DOCTYPE html>
 <html>
@@ -280,7 +286,7 @@ let _ =
 
 
   let write_book_html book songs = (
-    let fout = open_out (book.Book.filename^".html") in
+    let fout = open_out (prefix // "html" // "book-"^(Filename.basename book.Book.filename)^".html") in
     let pf fs = ksprintf ( fun s -> fprintf fout "%s" s) fs in
     let () = pf "%s" "<!DOCTYPE html>
 <html>
@@ -330,9 +336,9 @@ let _ =
 
 
     write_index_letters () ;
-    Write_index.write songs ;
+    Write_index.write (prefix//"html") songs ;
     let books = 
-      let all = { Book.filename=Sys.argv.(2)//"all.html" ; titre = "all" ; auteur = "" ; id = "xxx" ; 
+      let all = { Book.filename="all.book" ; titre = "all" ; auteur = "yyy" ; id = "xxx" ; 
 		  songs = List.sort ~cmp:Helpers.uppercase_compare (List.map ( fun b -> b.Song.titre ) songs) } in
       all::books 
     in
