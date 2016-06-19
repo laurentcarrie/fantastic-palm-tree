@@ -127,4 +127,5 @@ build : $(prefix)/ftp-script.txt
 
 clean :
 	rm -f $(filter-proper-targets $(ls R,.))
+	rm -rf tmp
 	rm -f *~
