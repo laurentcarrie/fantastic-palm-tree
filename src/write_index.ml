@@ -28,7 +28,7 @@ let write songs =
   ) songs in
 
   let _ = List.fold_left ( fun (initiale,index) t ->
-    let html = String.slice ~first:(String.length Sys.argv.(2)) t.Song.filename in
+    let html = t.Song.filename in
     let current = String.get (String.uppercase t.Song.titre) 0 in
     let initiale = if current<>initiale then (
       pf "<a name=\"letter-%c\"/><div class=\"nouvelle-initiale\"><a href=\"index-letter-%c.html\">--- %c ---</a></div>\n" current current current ;
@@ -39,10 +39,13 @@ let write songs =
       )
     in
     let d = index mod 2 in 
-      pf "<a name=\"%s\"/><div class=\"index-entry-%d\"><a href=\".%s\"><span class=\"index-titre-%d\">%s</span> <span class=\"index-auteur-%d\">(%s)</span></a></div>\n" 
-	t.Song.id
-	d html d t.Song.titre d t.Song.auteur ;
-      initiale,index+1
+    pf "<a name=\"%s\"/><div class=\"index-entry-%d\"><a href=\"./%s\"><span class=\"index-titre-%d\">%s</span> <span class=\"index-auteur-%d\">(%s)</span></a>\n" 
+      t.Song.id
+      d  html d t.Song.titre d t.Song.auteur ;
+    pf "<span class=\"pdf-%d\"><a href=\"./pdf/%s.pdf\">(pdf)</a></span>\n" 
+      d (Filename.chop_suffix (Filename.basename html) ".html") ;
+    pf "</div>\n" ;
+    initiale,index+1
   ) (' ',0) songs in
     pf "
 </body>

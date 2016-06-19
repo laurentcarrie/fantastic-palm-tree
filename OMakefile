@@ -1,4 +1,4 @@
-.PHONY: build clean
+.PHONY: build clean pdf
 
 .DEFAULT: build
 
@@ -34,7 +34,7 @@ targets+=$(addsuffix .tex,$(addprefix book-,$(books)))
 mkdir -p $(prefix)/pdf
 
 foreach(s,$(songs))
-	build : $(prefix)/pdf/$s.pdf
+	pdf build : $(prefix)/pdf/$s.pdf
 
 	$(prefix)/pdf/$s.pdf : $s.pdf
 		cp $< $@
@@ -49,7 +49,7 @@ foreach(s,$(songs))
 
 foreach(s,$(books))
 	s=book-$s
-	build : $(prefix)/pdf/$s.pdf
+	pdf build : $(prefix)/pdf/$s.pdf
 
 	$(prefix)/pdf/$s.pdf : $s.pdf
 		cp $< $@

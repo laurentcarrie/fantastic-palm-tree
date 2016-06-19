@@ -155,8 +155,9 @@ let write_preamble fout  = (
   let _ = pf  "\
 \\documentclass[a4paper,portrait,twocolumn]{article}
 \\usepackage[utf8]{inputenc}
-%%\\usepackage[T1]{fontenc}
+\\usepackage[T1]{fontenc}
 %%\\usepackage{wasysym}
+\\usepackage{soulutf8}
 \\usepackage{fixltx2e}
 \\usepackage{hyperref}
 \\usepackage{diagbox}
@@ -269,11 +270,13 @@ let write_book book songs = (
       write_song_body fout song
     )
     | None -> (
-      let () = pf "\\clearpage\n" in
+      let () = pf "\\clearpage\n" in 
+
       let () = pf "\\section{%s (non trouvé)}\n" name in
       let () = pf "\\fancyhead[L]{{\\titlefont %s} } \n"  name in
       let () = pf "\\fancyhead[R]{{\\authorfont %s}} \n"  "" in 
       let () = pf "\\fancyhead[C]{} \n" in
+
       let () = pf "no such song : '%s'\n" name in
       ()
     )
@@ -282,6 +285,7 @@ let write_book book songs = (
   let () = pf "
 \\end{document}
 " in
+  let () = close_out fout in
   ()
 
 

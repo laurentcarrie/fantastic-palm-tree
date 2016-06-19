@@ -90,6 +90,17 @@ span.index-auteur-1 {
     background:PeachPuff ;
 
 }
+span.pdf-1 {
+    font-family: "Times New Roman", Times, serif;
+    font-size:2cm; 
+    background: PeachPuff;
+}
+span.pdf-1 {
+    font-family: "Times New Roman", Times, serif;
+    font-size:1cm;
+    background:PeachPuff ;
+
+}
 
 span.remarque {
     font-family: "Times New Roman", Times, serif;

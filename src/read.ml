@@ -107,7 +107,7 @@ let manage_book filename fileout  book_id = (
       | End_of_file -> close_in fin ; List.rev acc
   in
   let songs = r [] in 
-    {Book.filename=fileout;titre=filename;auteur="book";id=book_id;songs=songs}
+    {Book.filename=Filename.basename fileout;titre="book-"^(Filename.basename fileout);auteur="book";id=book_id;songs=songs}
 )
 
 
@@ -117,7 +117,7 @@ let manage_song filename fileout_html fileout_latex song_id = (
     let title = List.fold_left ( fun acc d -> match d with | Titre s -> s | _ -> acc ) "???" data in
     let auteur = List.fold_left ( fun acc d -> match d with | Auteur s -> s | _ -> acc ) "???" data in
     let transpose = List.fold_left ( fun acc d -> match d with | Transpose h -> h | _ -> acc ) 0 data in
-    let song = {Song.filename=fileout_html;titre=title;auteur=auteur;id=song_id;data=data;transpose=transpose;} in
+    let song = {Song.filename=Filename.basename fileout_html;titre=title;auteur=auteur;id=song_id;data=data;transpose=transpose;} in
     let () =
       let () = printf "open %s\n" fileout_html ; flush stdout ; in
       let fout = open_out fileout_html in
@@ -175,6 +175,7 @@ let rec walk (songs,books) dirname dirout = (
   
 
 let _ = 
+  try
   assert(Array.length Sys.argv > 2) ;
 
   let (songs,books) = walk ([],[]) Sys.argv.(1) Sys.argv.(2) in
@@ -264,9 +265,11 @@ let _ =
 <body>
 "   in
       List.iteri ( fun index b ->
-	let html = String.slice ~first:(String.length Sys.argv.(2)) b.Book.filename in
+	let html = b.Book.filename in
 	let d = index mod 2 in
-	  pf "<div class=\"index-book-%d\"><a href=\".%s\">%s</a></div>\n" d html b.Book.titre
+	pf "<div class=\"index-book-%d\"><a href=\"./%s.html\">%s</a>\n" d html b.Book.titre ;
+	pf "<a href=\"./pdf/%s.pdf\">(pdf)</a>\n" b.Book.filename ;
+	pf "</div>\n" ;
       ) books ;
       pf "
 </body>
@@ -336,4 +339,11 @@ let _ =
       write_index_books books ;
       List.iter ( fun b -> write_book_html b songs ) books ;
       List.iter ( fun b -> printf "book : %s\n" b.Book.filename ;  Write_pdf_song.write_book b songs ) books ;
-      List.iter ( fun l -> write_index_one_letter songs l ) letters
+      List.iter ( fun l -> write_index_one_letter songs l ) letters ;
+      exit 0
+  with
+  | e -> (
+    printf "xxxx %s\n" (Printexc.to_string e) ; 
+    Printexc.print_backtrace stdout ;
+    exit 1 
+  )

@@ -1,3 +1,2 @@
 echo on
-rmdir partoches
-putdir_no_sha1 install partoches
+putdir_no_sha1 install public/partoches
