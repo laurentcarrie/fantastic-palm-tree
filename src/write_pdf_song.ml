@@ -26,7 +26,7 @@ let tex_of_chord (c:Accord.t) = (
   s
 )
 
-let pdf_of_line c = (
+let tex_of_string c = (
   List.fold_left ( fun c (sub,by) ->
     let reg = Str.regexp (Str.quote sub) in
       Str.global_replace reg by c
@@ -75,13 +75,13 @@ let write_lyrics fout l = (
   let pf fs = ksprintf ( fun s -> fprintf fout "%s" s) fs in
   let (nbcols,title,l) = l in
   let () = pf "\\begin{verse}\n" in
-  let () = pf "{\\commentfont \\hl{%s}} \n" title in  
+  let () = pf "{\\commentfont \\hl{%s}} \n" (tex_of_string title) in  
   (* let () = pf "\\paragraph{\\commentfont \\hl{%s}} \n" title in  *)
   let () = List.iter ( fun line ->
     if line="\\" then (
       (* pf "%s" "\\newline\n"  *) ()
     )  else (
-      let line = pdf_of_line line in 
+      let line = tex_of_string line in 
       let reg = Str.regexp "{\\(.*\\)}" in
       let line = Str.global_replace reg "{\\sethlcolor{grey8}\\commentfont \\hl{\\1}}" line in
       let reg = Str.regexp "\\[\\([^;]*\\);\\([^]]*\\)]" in
@@ -258,6 +258,7 @@ let write_book book songs = (
     with
     | Not_found -> (b,None)::acc
   ) [] book.Book.songs in
+  let songs = List.rev songs in
 
   let () = List.iter ( fun (name,song) ->
     match song with
