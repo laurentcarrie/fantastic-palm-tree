@@ -7,29 +7,38 @@ U2
 \mp3
 new-years-day.mp3
 
- 
-couplet
-\grille
-Am:C:Em:Em
-Am:C:Em:Em
-Am:C:Em:Em
-Am:C:Em:Em
+\grille intro et solo piano
+G#m:B:D#m:D#m
+G#m:B:F#:F#
+E:E:G#m:G#m
+F#:F#:E:E
 
-refrain
-\grille
-G:Am:G:Am
 
-\lyrics
+\grille couplet
+G#m:B:D#m:D#m
+G#m:B:D#m:D#m
+G#m:B:D#m:D#m
+G#m:B:D#m:D#m
+G#m:B:D#m:D#m
+
+\grille refrain
+F#:F#:G#m:G#m
+F#:F#:E:E
+
+
+\lyrics couplet 1
 All is quiet on New Year's Day
 A world in white gets underway
 I want to be with you
 Be with you night and day
 Nothing changes on New Year's Day
 On New Year's Day
-\
+
+\lyrics refrain
 I will be with you again
 I will be with you again
-\
+
+\lyrics couplet
 Under a blood red sky
 A crowd has gathered in black and white
 Arms entwined, the chosen few
@@ -38,10 +47,16 @@ Say it's true it's true...
 And we can break through
 Though torn in two
 We can be one
-\
+
+\lyrics solo piano
+
+\lyrics solo guitare D#m
+
+\lyrics refrain
 I...I will begin again
 I...I will begin again
-\
+
+\lyrics
 Oh...
 Maybe the time is right
 Oh...maybe tonight...

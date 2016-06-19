@@ -7,49 +7,51 @@ Lou Reed
 #\chords
 #Am-a-form
 
-intro
-\grille
+\grille intro
 E:Am:E:Am
 
-couplet
-\grille 
+\grille couplet
 Am:D:G:C
 F:Dm:E:E
 
-refrain
-\grille 
+\grille refrain 
 A:D:C#m:D C#m Bm A
 A:E:F#m E:D
 F#m E:D
 
 
-\lyrics2
+\lyrics couplet
 Just a perfect day
 Drink Sangria in the park
 And then later
 When it gets dark, we go home
-\
+
+\lyrics couplet
 Just a perfect day
 Feed animals in the zoo
 Then later
 A movie, too, and then home
-\
+
+\lyrics refrain
 Oh, it's such a perfect day
 I'm glad I spent it with you
 Oh, such a perfect day
 You just keep me hanging on
 You just keep me hanging on
-\
+
+\lyrics couplet
 Just a perfect day
 Problems all left alone
 Weekenders on our own
 It's such fun
-\
+
+\lyrics couplet
 Just a perfect day
 You made me forget myself
 I thought I was
 Someone else, someone good
-\
+
+\lyrics refrain
 Oh, it's such a perfect day
 I'm glad I spent it with you
 Oh, such a perfect day
