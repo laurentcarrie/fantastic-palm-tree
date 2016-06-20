@@ -8,7 +8,8 @@ David Bowie
 starman-bowie.mp3
 
 \grille intro
-Bb7M:F7M:Bb7M:F7M
+Bb7M:Bb7M:F7M:F7M
+Bb7M:Bb7M:F7M:F7M
 
 \grille couplet
 Gm:Gm:F:F
@@ -28,14 +29,16 @@ Bb Bbm:F D7:Gm C7
 Bb:F:C:F
 Bb:F:C
 
-\lyrics2
+
+\lyrics couplet
 Didn't know what time it was, the lights were low-ow-o w
 I leaned back on my radio-o-o  o
 Some cat was layin'down some rock'n roll 'lotta soul, he said
 Then they loud sound did seem to fa-a-ade 
 Came back like a slow voice on a wave of pha-a-ase
 That weren't no DJ that was hazy cosmic jive
-\
+
+\lyrics refrain
 There's a Starman waiting in the sky
 He'd like to come and meet us
 But he thinks he'd blow our minds
@@ -46,14 +49,16 @@ He told me :
 Let the children lose it
 Let the children use it 
 Let all the children boogie
-\ 
+
+\lyrics couplet
 I had to phone someone so I picked on you
 Hey, that's far out so you heard him too !
 Switch on the TV we may pick him up on channel two
 Look out your window I can see his light
 If we can sparkle he may land tonight
 Don't tell your poppa or he'll get us locked up in fright
-\
+
+\lyrics refrain
 There's a Starman waiting in the sky
 He'd like to come and meet us
 But he thinks he'd blow our minds
@@ -64,3 +69,4 @@ He told me :
 Let the children lose it
 Let the children use it
 Let all the children boogie
+
