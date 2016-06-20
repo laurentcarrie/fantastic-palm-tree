@@ -14,70 +14,68 @@ sunday-bloody-sunday.mp3
 sunday-bloody-sunday-equal-plus-un-demi-ton.mp3
 
 \grille couplet
-Bm:D:G:G
+Am:C:F:F
 
 \grille pont 1
-D:Em:D:Em
+C:Dm:C:Dm
 
 \grille pont 2
-F:Em:D:D
-F:Em:D:D
+D#:Dm:C:C
 
 
-\lyrics
+\lyrics couplet
 Yeah
-\
 I can't believe the news today
 Oh, I can't close my eyes
 And make it go away
-{pont 1}How long
+
+\lyrics pont 1
+How long
 How long must we sing this song
 How long, how long
 Cause tonight {couplet}, we can be as one
 Tonight
-\
 Broken bottles under children's feet
-{cool}
+
+\lyrics cool
 Bodies strewn across the dead end street
 But I won't heed the battle call
 It puts my back up
 Puts my back up against the wall
-\
 Sunday, Bloody Sunday
 Sunday, Bloody Sunday
-{pont 2}
+
+\lyrics pont 2
 Sunday, Bloody Sunday
 Sunday bloody sunday
-\
-{8 mesures dures, sans chant}
-{cool}
-\
+
+\lyrics 8 mesures dures, sans chant violon
+
+\lyrics couplet
 And the battle's just begun
 There's many lost, but tell me who has won
 The trench is dug within our hearts
 And mothers, children, brothers, sisters
 Torn apart
-\
 Sunday, Bloody Sunday
 Sunday, Bloody Sunday
-\
-{pont 1}
-\
+
+\lyrics pont 1
 How long
 How long must we sing this song
 How long, how long
-\
-{dur}
-\
+
+\lyrics dur
 Cause tonight, we can be as one
 Tonight, tonight. Tonight, tonight
-\
 Sunday, Bloody Sunday
 Sunday, Bloody Sunday
-\
-{solo}
-\
-{sans guitare}
+
+\lyrics solo penta A départ D
+
+\lyrics basse seule
+
+\lyrics couplet
 Wipe the tears from your eyes
 Wipe your tears away
 {guitare etouffee}

@@ -9,20 +9,20 @@ starlight-muse.mp3
 
 
 \grille couplet (2 lignes)
-B:C#m:G#m:E
+A:Bm:F#m:D
 
 \grille pont 1
-C#m:F#:D#m:G#m
-A:E:A:D#
+Bm:E:C#m:F#
+G:D:G:C#
 
 \grille pont 2 en arpeges case 7
-G#m:D#:E:B
-3x
-G#m:D#:E:F#
+F#m:C#:D:A
 
 \grille pont 3
-G#m:D#:E:B
+F#m:C#:D:A
 
+\grille final
+F#m:C#:D:E
 
 \lyrics
 {1 ligne sans guitare}
