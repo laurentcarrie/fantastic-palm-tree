@@ -4,37 +4,33 @@ karma police
 \auteur
 radio head
 
-couplet
-\grille
+\grille couplet
 Am D:Em G:Am F:Em G
 Am D:G G C G:Am:Bm D
 
-refrain
-\grille
+\grille refrain
 C D:G F#:C D:G F#
 C D:G F#:C:Bm D
 
-final
-\grille
+\grille final
 Bm D:G D:G D:E
 
-\lyrics
-Verse 1
+\lyrics couplet 1
 Karma Police   arrest this 
 Man he talks in maths He buzzes  like a fridge 
 Is like a detuned radio
-\
-Verse 2
+
+\lyrics couplet 2
 Karma police    arrest this girl
 her hitler hairdo is making me feel ill
 and we have crashed her party
-\
-Chorus.
+
+\lyrics refrain
 This is what you'll get
 this is what you'll get
 this is what you'll get, when you mess with us
-\
-(Repeat verse and chorus)
+
+\lyrics (Repeat verse and chorus)
 And for a minute there, I lost myself, I lost myself
 and for a minute there, I lost myself, I lost myself
 and for a minute there, I lost myself, I lost myself

@@ -4,27 +4,29 @@ You shook me all night long
 \auteur
 AC/DC
 
-couplet 
-4 lignes,
-D remplace G avant le refrain
-\grille
+#couplet 
+#4 lignes,
+#D remplace G avant le refrain
+
+\grille couplet
 G:C:D:G
 
 
-refrain
-\grille
+\grille refrain
 G:C:G:D C
 
 
 
-\lyrics
+\lyrics2
 {2 lignes sans chant}
-\
+
+\lyrics couplet
 She was a fast [G;ma]chine she kept her [C;mo]tor clean
 She was the best [D;damn] woman that I [G;e]ver seen
 She had the sightless eyes telling me no lies
 Knocking me out with those American thighs
-\
+
+\lyrics couplet
 Taking more than her share
 Had me fighting for air
 She told me to come but I was already there
@@ -32,22 +34,26 @@ Cause the walls start shaking
 The earth was quaking
 My mind was aching
 And we were making it
-\
+
+\lyrics refrain
 And you shook me all night long
 Yeah you shook me all night long
-\
+
+\lyrics couplet
 I'm working double time on the seduction line
 She's one of a kind she's just mine all mine
 Wanted no applause it's just another course
 Made a meal outta me
 And come back for more
-\
+
+\lyrics couplet
 Had to cool me down to take another round
 Now I'm back in the ring to take another swing
 Cause the walls were shaking the earth was quaking
 My mind was aching
 And we were making it
-\
+
+\lyrics refrain
 And you shook me all night long
 Yeah you shook me all night long
 Knocked me out I said you
@@ -56,9 +62,10 @@ You had me shaking and you
 Shook me all night long
 Yeah you shook me
 When you took me
-\
-{solo}
-\
+
+\lyrics solo
+
+\lyrics refrain
 You really took me and you
 Shook me all night long
 You shook me all night long

@@ -4,26 +4,22 @@ crash
 \auteur
 sum 41
 
-couplet
-\grille
+\grille couplet
 C:G:Am:F
 C:G:Am:F
 Am:G:Am:F
 C:G:Am:Am
 
-chorus
-\grille
+\grille refrain
 F:G:Am:Am
 F:G:Am:Am
 
-post chorus
-\grille
+\grille post chorus
 F:G:F:G
 
-\lyrics
-intro
-\
-Verse 1:
+\lyrics3 intro
+
+\lyrics couplet 1
 Hold me now cause I 
 couldn't even if I tried
 It's over now
@@ -34,10 +30,10 @@ got to say goodbye
 So hold me me now
 cause this will 
 be our last time
-\
-Interlude (1 ligne)
-\
-Verse 2:
+
+\lyrics Interlude (1 ligne)
+
+\lyrics couplet 2
 I'm slowing down and I don't 
 think that I can fight
 I know somehow you'll 
@@ -47,8 +43,8 @@ day like it's your last
 And hold me now
 cause I think it's 
 time for me to pass
-\
-Chorus 1:
+
+\lyrics refrain 1
 I don't want to die
 I don't know why this kind 
 of fate was meant for me
@@ -61,12 +57,12 @@ to end up this way
   What do I have to do
 was I supposed to 
 grow old with you?
-\
-Post Chorus:
+
+\lyrics Post Chorus
   But that ain't gonna happen
 No that ain't gonna happen
-\
-Verse 3:
+
+\lyrics couplet 3
 Hold me now
 cause the time I've 
 got's running out
@@ -77,8 +73,8 @@ I just want to feel your
 head laying on my chest
 So hold me now
 as I take my last breath
-\
-Chorus 2:
+
+\lyrics refrain 2
   I don't want to die
 I don't know why this kind 
 of fate was meant for me
@@ -91,6 +87,6 @@ to end up this way
   What do I have to do
 was I supposed to 
 grow old with you?
-\
-(Repeat Post Chorus)
+
+\lyrics (Repeat Post Chorus)
 
