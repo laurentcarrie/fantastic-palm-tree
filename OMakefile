@@ -23,6 +23,7 @@ books=$(book_files)
 books=$(removeprefix songs,$(books))
 books=$(removesuffix .book,$(books))
 books=$(basename $(books))
+books+= all
 println($"books : $(books)")
 
 targets=

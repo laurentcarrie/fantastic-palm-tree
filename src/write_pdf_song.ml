@@ -50,29 +50,39 @@ let write_grille ~transpose fout name (g:Accord.t list list list) = (
   \\centering
 " ;
   pf "%%\\caption*{%s}\n" (tex_of_string name) ;
-  if name <> "" then pf "{\\lyricstitlefont %s}\\newline \n" (tex_of_string name) else () ;
+  if name <> "" then pf "{\\lyricstitlefont %s}\\\\*\n" (tex_of_string name) else () ;
   pf "%%\\label{%s}\n" "" ;
   pf "\\begin{grillefont} \n" ;
-  pf "\\begin{tabular}{|%s|}
-\n" (String.join "|" (List.init taille (fun _ -> "M{2.5cm}"))) ;
-  pf "%%\\diagbox{i}{j} \\\\\\hline\n" ;
-
-
+  pf "\\begin{tabular}{|%s|}\n" (String.join "|" 
+       (List.init taille (fun _ -> "M{2cm}"))
+) ;
   let length = List.fold_left ( fun previous_length line ->
     let l = Pervasives.max previous_length (List.length line) in
-    pf "\n\\cline{1-%d}\n" l ;
-    let tex_of_bar (b:Accord.t list) = String.join " " (List.map tex_of_chord b) in
+    pf "\\cline{1-%d}\n" l ;
+    let tex_of_bar (b:Accord.t list) = 
+      let  l = List.map tex_of_chord b in
+      let s = match l with
+	| [] -> ""
+	| s::[] -> s
+	| a::b::[] -> 
+	  (* sprintf "\\diagbox[dir=NE]{%s}{%s}" a b *)
+	  sprintf "%s %s" a b
+	| l -> String.join " " l in
+      (* "\\tabbox[c]{" ^ s ^ "}"   *)
+      s
+    in
     let bars = List.map tex_of_bar line in
     pf "%s" (String.join " & " bars ) ;
     pf "%s" "\\\\\n" ;
     List.length line
   ) (-1) g in
-  pf "
+  pf "\
   \\cline{1-%d}
   \\end{tabular}
   \\end{grillefont}
 %%\\end{table}
 %%\\end{center}
+  \\par
 
 " length ;
 
@@ -81,6 +91,7 @@ let write_grille ~transpose fout name (g:Accord.t list list list) = (
 let write_lyrics fout l = (
   let pf fs = ksprintf ( fun s -> fprintf fout "%s" s) fs in
   let (nbcols,title,l) = l in
+  let () = pf "\\begin{lyricsfont}\n" in 
   let () = pf "\\begin{verse}\n" in
   let () = pf "{\\commentfont \\hl{%s}} \n" (tex_of_string title) in  
   (* let () = pf "\\paragraph{\\commentfont \\hl{%s}} \n" title in  *)
@@ -97,6 +108,7 @@ let write_lyrics fout l = (
     )
   ) l in
   let () = pf "\\end{verse}\n" in
+  let () = pf "\\end{lyricsfont}\n" in 
   let () = pf "\n" in
   ()
 ) 
@@ -141,7 +153,7 @@ let write_song_body fout song = (
     | Normal s -> pf "%s\n" s
     | Titre _ 
     | Auteur _ -> ()
-    | Grille (name,g) -> write_grille ~transpose:song.Song.transpose fout name (g:Accord.t list list list)
+    | Grille (name,g) -> () (*write_grille ~transpose:song.Song.transpose fout name (g:Accord.t list list list)*)
     | Lyrics l -> () (* write_lyrics fout l *)
     | Mp3 l -> write_mp3 pf l
     | Tab l -> write_tab pf l
@@ -150,10 +162,16 @@ let write_song_body fout song = (
     | PageBreak -> pf "\\newpage\n"
   ) song.Song.data in
 
-  let lyrics = List.rev (List.fold_left ( fun acc c -> match c with | Lyrics l -> l::acc | _ ->acc ) [] song.Song.data) in
+  let grilles = List.rev (List.fold_left ( fun acc c -> match c with | Grille (name,g) -> (name,g)::acc | _ -> acc ) [] song.Song.data) in
   let () = pf "\\begin{multicols}{2}\n" in
-  let () = List.iter ( fun l -> write_lyrics fout l ) lyrics in
+  let () = List.iter ( fun (name,g) -> write_grille ~transpose:0 fout name g ) grilles in
   let () = pf "\\end{multicols}\n" in
+
+  let lyrics = List.rev (List.fold_left ( fun acc c -> match c with | Lyrics l -> l::acc | _ -> acc ) [] song.Song.data) in
+  let nbcols = List.fold_left ( fun acc (n,_,_) -> if n>acc then n else acc) 1 lyrics in
+  let () = if nbcols>1 then pf "\\begin{multicols}{%d}\n" nbcols in
+  let () = List.iter ( fun l -> write_lyrics fout l ) lyrics in
+  let () = if nbcols>1 then pf "\\end{multicols}\n" in
 
 
   ()
@@ -166,7 +184,7 @@ let write_preamble fout  = (
 
     
   let _ = pf  "\
-\\documentclass[a4paper,portrait]{article}
+\\documentclass[a4paper,landscape]{article}
 \\usepackage[utf8]{inputenc}
 \\usepackage[T1]{fontenc}
 %%\\usepackage{wasysym}
@@ -174,7 +192,7 @@ let write_preamble fout  = (
 \\usepackage{fixltx2e}
 \\usepackage{hyperref}
 \\usepackage{diagbox}
-\\usepackage{caption}
+%%\\usepackage{caption}
 \\usepackage[scale=0.8]{geometry}
 \\usepackage{color,soul}
 \\definecolor{grey}{rgb}{0.7,0.7,0.7}
@@ -187,11 +205,14 @@ let write_preamble fout  = (
 \\usepackage{fancyhdr} 
 \\pagestyle{fancy} 
 \\newcolumntype{M}[1]{>{\\centering\\arraybackslash}m{#1}}
+%%\\newcolumntype{M}[1]{>{\\centering}m{#1}}
 \\newcolumntype{N}{@{}m{0pt}@{}}
 \\renewcommand{\\arraystretch}{1.2}
 \\usepackage{multicol}
 %%\\usepackage{french}
 \\setlength{\\columnseprule}{0.5pt}
+\\usepackage{lastpage}
+\\usepackage{needspace}
 " in
 
 (*
@@ -205,13 +226,20 @@ let write_preamble fout  = (
 " 
 in
 *)
-
-
+  
+  let () = pf "
+  \\newcommand\\invisiblesection[1]{%%
+  \\refstepcounter{section}%%
+  \\addcontentsline{toc}{section}{\\protect\\numberline{\\thesection}#1}%%
+  \\sectionmark{#1}} \n" in
   let () = pf "\\newcommand*{\\authorfont}{\\fontfamily{ptm}\\fontsize{20}{25}\\fontshape{it}\\selectfont} \n" in
   let () = pf "\\newcommand*{\\titlefont}{\\fontfamily{ptm}\\fontsize{30}{35}\\fontshape{it}\\selectfont} \n" in
   let () = pf "\\newcommand*{\\commentfont}{\\fontfamily{ptm}\\fontsize{12}{15}\\fontshape{it}\\selectfont} \n" in
-  let () = pf "\\newcommand*{\\lyricstitlefont}{\\fontfamily{ptm}\\fontsize{12}{15}\\fontshape{it}\\selectfont} \n" in
-  let () = pf "\\newenvironment{grillefont}{\\color{black}\\fontfamily{ptm}\\fontsize{15}{15}\\selectfont}{} \n" in 
+  let () = pf "\\newcommand*{\\lyricstitlefont}{\\fontfamily{ptm}\\fontsize{15}{15}\\fontshape{it}\\selectfont} \n" in
+  let () = pf "\\newenvironment{lyricsfont}{\\fontfamily{ptm}\\fontsize{15}{15}\\selectfont}{} \n" in
+  let () = pf "\\newenvironment{grillefont}{\\color{blue}\\fontfamily{ptm}\\fontsize{15}{15}\\selectfont}{} \n" in 
+  let () = pf "\\newcommand*{\\tabbox}[2][t]{%%
+    \\vspace{0pt}\\parbox[#1][3.7\\baselineskip]{0.5cm}{\\strut#2\\strut}}\n" in
   (* let () = pf "\\newcommand{\\tstamp}{\\today}   \n" in *)
   (* let () = pf "\\fancyhead[C]{{\\titlefont %s} \\textsubscript{\\authorfont (%s)}} \n"  song.Song.titre song.Song.auteur in 
   let () = pf "\\fancyhead[R]{} \n" in
@@ -221,10 +249,19 @@ in
   let tm = Unix.localtime (Unix.time ()) in
   let () = pf "\\fancyfoot[L]{généré le %02d/%02d/%04d} \n" (tm.Unix.tm_mday)  (tm.Unix.tm_mon+1) (tm.Unix.tm_year+1900) in
   let () = pf "\\fancyfoot[C]{} \n" in
-  let () = pf "\\fancyfoot[R]{page \\thepage} \n" in
+  let () = pf "\\fancyfoot[R]{page \\thepage~sur \\pageref{LastPage}} \n" in
   let () = pf "\\renewcommand\\headrulewidth{0.02in}" in 
   let () = pf "\\renewcommand\\footrulewidth{0.02in}" in 
-  let () = pf "\\newcolumntype{C}{>{\\lower 2ex\\hbox to 6ex\\bgroup\\hss}c<{\\hss\\egroup}}\n" in
+
+
+  let () = pf "\\Needspace{5\\baselineskip}\n" in
+
+  let () = pf "\\def\\mystrut(#1,#2){\\vrule height #1 depth #2 width 0pt}\n" in
+  (* let () = pf "\\newcolumntype{C}{>{\\lower 2ex\\hbox to 6ex\\bgroup\\hss}c<{\\hss\\egroup}}\n" in *)
+  let () = pf "\\newcolumntype{C}[1]{%%
+   >{\\mystrut(3ex,2ex)\\centering}%%
+   p{#1}%%
+   <{}}  \n" in
   ()
 )
 
@@ -272,7 +309,9 @@ let write_book book songs = (
   let () = pf "
 \\begin{document} 
 \\maketitle
+\\begin{multicols}{3}
 \\tableofcontents
+\\end{multicols}
 " in
   let songs = List.fold_left ( fun acc b ->
     try 
@@ -287,7 +326,7 @@ let write_book book songs = (
     match song with
     | Some song -> (
       let () = pf "\\clearpage\n" in
-      let () = pf "\\section{%s}\n" song.Song.titre in
+      let () = pf "\\invisiblesection{%s}\n" song.Song.titre in
       let () = pf "\\fancyhead[L]{{\\titlefont %s} } \n"  song.Song.titre in 
       let () = pf "\\fancyhead[R]{{\\authorfont %s}} \n"  song.Song.auteur in
       let () = pf "\\fancyhead[C]{} \n" in

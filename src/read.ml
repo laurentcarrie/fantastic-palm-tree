@@ -77,6 +77,7 @@ let read_song filename : document = (
 	| "\\tab" -> r ((Tab (read_array_until_empty_line fin))::acc)
 	| "\\lyrics" -> r ((Lyrics (1,arg,(read_array_until_empty_line fin))::acc))
 	| "\\lyrics2" -> r ((Lyrics (2,arg,(read_array_until_empty_line fin))::acc))
+	| "\\lyrics3" -> r ((Lyrics (3,arg,(read_array_until_empty_line fin))::acc))
 	| "\\mp3" -> r ((Mp3 (read_string_until_empty_line fin))::acc)
 	| "\\transpose" -> r ((Transpose (int_of_string (read_string_until_empty_line fin))::acc))
 	| "\\pagebreak" -> r ((PageBreak :: acc))
