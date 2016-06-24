@@ -9,22 +9,22 @@ starlight-muse.mp3
 
 
 \grille couplet (2 lignes)
-B:C#m:G#m:E
+A:Bm:F#m:D
 
 \grille pont 1
-C#m:F#:D#m:G#m
-A:E:A:D#
+Bm:E:C#m:F#
+G:D:G:C#
 
 \grille pont 2 en arpeges case 7
-G#m:D#:E:B
-fois 3
-G#m:D#:E:F#
+F#m:C#:D:A
 
 \grille pont 3
-G#m:D#:E:B
+F#m:C#:D:A
 
+\grille final
+F#m:C#:D:E
 
-\lyrics3
+\lyrics
 {1 ligne sans guitare}
 {2 lignes riff}
 {couplet guitare double basse}
@@ -56,7 +56,10 @@ If you promise not to fade away
 Never fade away
 \
 {pont 2}
-Our hopes and expectations, black holes and revelations (x2)
+Our hopes and expectations
+Black holes and revelations
+Our hopes and expectations
+Black holes and revelations
 \
 {1 ligne sans guitare}
 {riff}
