@@ -99,11 +99,28 @@ let write_lyrics fout l = (
     if line="\\" then (
       (* pf "%s" "\\newline\n"  *) ()
     )  else (
-      let line = tex_of_string line in 
       let reg = Str.regexp "{\\(.*\\)}" in
       let line = Str.global_replace reg "{\\sethlcolor{grey8}\\commentfont \\hl{\\1}}" line in
       let reg = Str.regexp "\\[\\([^;]*\\);\\([^]]*\\)]" in
-      let line = Str.global_replace reg "\\textsuperscript{\\1}\\2" line in
+      let rec r line = (
+	let b = Str.string_match reg line 0 in
+	let line = if b then (
+	  let chord = 
+	    let l = Read_util.barlist_of_string (Str.matched_group 1 line) in
+	    let () = assert(List.length l>0) in
+	    let l = List.hd l in 
+	    let () = assert(List.length l>0) in
+	    tex_of_chord (List.hd l)
+	  in
+	  let word = Str.matched_group 2 line in
+	  let line = Str.replace_first reg (sprintf "\\textsuperscript{%s}(%s)" chord word) line in
+	  r line
+	) else line in
+	line
+      )
+      in
+      let line = r line in
+      let line = tex_of_string line in 
 	pf "%s\\\\\n" line
     )
   ) l in
@@ -132,15 +149,6 @@ let write_tab  (pf : ('a, unit, string, unit) format4 -> 'a) l = (
 *)
 
 let write_accords  fout l = (
-  let pf fs = ksprintf ( fun s -> fprintf fout "%s" s) fs in
-    pf "\n<div class=\"chords\">\n" ;
-    pf "\t<ul class=\"chords\">\n" ;
-    List.iteri ( fun index l -> 
-      pf "\t\t<li class=\"chords pos-%d\"><img class=\"chord\" src=\"png/%s.png\" alt=\"image %s pas trouvée\"/></li>\n" index l l ;
-    ) l ;
-    pf "\t</ul>\n" ;
-    pf "</div>\n" ;
-    pf "<div style=\"text-align:center; clear:both; margin-top:10px;border:1px solid white;\"></div>\n" ;    
 )
 
 
@@ -193,7 +201,8 @@ let write_preamble fout  = (
 \\usepackage{hyperref}
 \\usepackage{diagbox}
 %%\\usepackage{caption}
-\\usepackage[scale=0.8]{geometry}
+%%\\usepackage[scale=0.8]{geometry}
+\\usepackage[a4paper,inner=1cm,outer=1cm,top=2cm,bottom=2cm]{geometry} 
 \\usepackage{color,soul}
 \\definecolor{grey}{rgb}{0.7,0.7,0.7}
 \\definecolor{grey8}{rgb}{0.8,0.8,0.8}

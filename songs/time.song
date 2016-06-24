@@ -18,41 +18,34 @@ Csharpm7-a-form
 Bm7-a-form
 
 
-{couplet : 4 lignes}
-\grille
+\grille couplet
 F#m:A:E:F#m
 
 
-{refrain}
-\grille
+\grille refrain
 D7M:A7M:D7M:A7M
 D7M:C#m7:Bm7:E
 
 
-\lyrics
-{couplet}
-\
+\lyrics couplet
 [F#m;Tick]ing away the moments that make up a [A;dull] day,
 [E;frit]ter and waste the hours in an off-hand [F#m;way],
 [F#m;Kick]ing around on a piece of ground in your [A;home]town,
 [E;wai]ting  for someone or something to show you the [F#m;way].
-\
-{refrain}
-\
+
+\lyrics refrain
 [D7M;Ti]red of lying in the sunshine,[A7M;stay]ing home to watch the rain,
 you are young and life is long,and there is time to kill today.
 [D7M; ]And then one day,you find, [C#m7;] ten years have got behind you.
 [Bm7;No] one told you when to [E;run], You missed the starting gun.
-\
-{couplet}
-\
+
+\lyrics couplet
 run and you run to catch up with the Sun, but it's sinking,
 racing around to come up behind you again.
 The Sun is the same in a relative way, but you're older,
 shorter of breath, and one day closer to death.
-\
-{refrain}
-\
+
+\lyrics refrain
 Ev'ry year is geting shorter, never seem to find the time.
 Plans that either come to naught, or half a page of scribbled lines.
 Hanging on in quiet desperation is the English way. 
