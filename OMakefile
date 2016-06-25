@@ -125,6 +125,10 @@ $(prefix)/ftp-script.txt : $(targets)
 build : $(prefix)/ftp-script.txt
 
 
+build : $(HOME)/Dropbox/book-all.pdf
+
+$(HOME)/Dropbox/book-all.pdf : $(prefix)/pdf/book-all.pdf
+	cp $< $@
 
 clean :
 	rm -f $(filter-proper-targets $(ls R,.))
