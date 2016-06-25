@@ -318,7 +318,7 @@ let write_book book songs = (
   let () = pf "
 \\begin{document} 
 \\maketitle
-\\begin{multicols}{3}
+\\begin{multicols}{4}
 \\tableofcontents
 \\end{multicols}
 " in
