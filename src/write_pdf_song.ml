@@ -101,27 +101,30 @@ let write_lyrics fout l = (
     )  else (
       let reg = Str.regexp "{\\(.*\\)}" in
       let line = Str.global_replace reg "{\\sethlcolor{grey8}\\commentfont \\hl{\\1}}" line in
-      let reg = Str.regexp "\\[\\([^;]*\\);\\([^]]*\\)]" in
+
       let rec r line = (
-	let b = Str.string_match reg line 0 in
-	let line = if b then (
+	try
+	  let reg = Pcre.regexp "\\[(.*?);(.*?)\\]" in 
+	  let s = Pcre.exec ~rex:reg ~pos:0 line in
 	  let chord = 
-	    let l = Read_util.barlist_of_string (Str.matched_group 1 line) in
+	    let l = Read_util.barlist_of_string (Pcre.get_substring s 1) in
 	    let () = assert(List.length l>0) in
 	    let l = List.hd l in 
 	    let () = assert(List.length l>0) in
 	    tex_of_chord (List.hd l)
 	  in
-	  let word = Str.matched_group 2 line in
-	  let line = Str.replace_first reg (sprintf "\\textsuperscript{%s}(%s)" chord word) line in
+	  let word = Pcre.get_substring s 2 in
+	  let templ = sprintf "\\textsuperscript{%s}\\underline{%s}" chord word in 
+	  let line = Pcre.qreplace_first ~rex:reg ~templ:templ line in 
 	  r line
-	) else line in
-	line
-      )
-      in
+	with
+	| Not_found -> line
+	| Pcre.Error e -> printf "pcre error\n" ; line
+      ) in
       let line = r line in
-      let line = tex_of_string line in 
-	pf "%s\\\\\n" line
+
+      (* let line = tex_of_string line in  *)
+      pf "%s\\\\\n" line
     )
   ) l in
   let () = pf "\\end{verse}\n" in
@@ -139,7 +142,7 @@ let write_tab  (pf : ('a, unit, string, unit) format4 -> 'a) l = (
       pf "%s" "</p>\n<p class=\"tablature\">\n"
     )  else (
       let reg = Str.regexp "{\\(.*\\)}" in
-      let line = Str.global_replace reg "((\\1))" line in
+      let line = Str.global_replace reg "((\\underline{\\1}))" line in
 	pf "%s\n" line
     )
   ) l ;
