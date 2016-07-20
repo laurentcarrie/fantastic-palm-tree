@@ -222,6 +222,7 @@ let write_preamble fout  = (
 \\setlength{\\columnseprule}{0.5pt}
 \\usepackage{lastpage}
 \\usepackage{needspace}
+\\usepackage{titletoc}
 " in
 
 (*
@@ -316,8 +317,20 @@ let write_book book songs = (
   in
 
   let () = pf "
+
+\\makeatletter
+\\let\\latexl@section\\l@section
+\\def\\l@section#1#2{\\begingroup\\let\\numberline\\@gobble\\latexl@section{#1}{#2}\\endgroup}
+\\makeatother
+
 \\begin{document} 
 \\maketitle
+%%\\titlecontents{section}[0em]
+%%{\\vskip 0.5ex}%%
+%%{}%% numbered sections formattin
+%%{}%% unnumbered sections formatting
+%%{}%%
+
 \\begin{multicols}{4}
 \\tableofcontents
 \\end{multicols}
