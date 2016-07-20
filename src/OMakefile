@@ -9,6 +9,7 @@ OCAMLPACKS[] =
 	cryptokit
 	unix
 	str
+	pcre
 
 NATIVE_ENABLED = true
 BYTE_ENABLED = false
