@@ -201,6 +201,7 @@ let write_preamble fout  = (
 %%\\usepackage{wasysym}
 \\usepackage{soulutf8}
 \\usepackage{fixltx2e}
+%%\\usepackage[pdftex,colorlinks=true,urlcolor=blue,linkcolor=blue]{hyperref}
 \\usepackage{hyperref}
 \\usepackage{diagbox}
 %%\\usepackage{caption}
@@ -226,6 +227,8 @@ let write_preamble fout  = (
 \\usepackage{lastpage}
 \\usepackage{needspace}
 \\usepackage{titletoc}
+\\hypersetup{ pdftitle={}, pdfauthor={},bookmarks=true, bookmarksopen=true,pdftoolbar=true, pdffitwindow=false,colorlinks=false,linkcolor=red, citecolor=red,filecolor=magenta,urlcolor=black }
+\\usepackage{bookmark}
 " in
 
 (*
@@ -335,7 +338,7 @@ let write_book book songs = (
 %%{}%%
 
 \\begin{multicols}{4}
-\\tableofcontents
+\\tableofcontents{}
 \\end{multicols}
 " in
   let songs = List.fold_left ( fun acc b ->
@@ -352,6 +355,7 @@ let write_book book songs = (
     | Some song -> (
       let () = pf "\\clearpage\n" in
       let () = pf "\\invisiblesection{%s}\n" song.Song.titre in
+      let () = pf "\\pdfbookmark[1]{%s}{%s}\n" song.Song.titre song.Song.titre in
       let () = pf "\\fancyhead[L]{{\\titlefont %s} } \n"  song.Song.titre in 
       let () = pf "\\fancyhead[R]{{\\authorfont %s}} \n"  song.Song.auteur in
       let () = pf "\\fancyhead[C]{} \n" in
