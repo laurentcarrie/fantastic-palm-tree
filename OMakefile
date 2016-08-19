@@ -1,10 +1,11 @@
-.PHONY: build clean pdf help distant
+.PHONY: build clean pdf help distant clean-pdf
 
 .DEFAULT: help
 
 help :
 	println($"
 clean
+clean-pdf : supprime les pdfs
 build   : construction des binaires et des png
 pdf     : construction des pdfs
 distant : port=... host=... copie sur une autre machine
@@ -144,3 +145,7 @@ clean :
 	rm -f $(filter-proper-targets $(ls R,.))
 	rm -rf tmp
 	rm -f *~
+
+clean-pdf :
+	rm -rf $(prefix)/pdf
+	rm -rf tmp
