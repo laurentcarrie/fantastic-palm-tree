@@ -27,7 +27,7 @@ let read_string_until_empty_line fin = (
 
 
 let read_song filename : document = (
-  let fin = open_in filename in
+  let fin = open_in "read song" filename in
   let rec r acc  = 
     try
       let line = String.strip (input_line fin) in
@@ -67,8 +67,8 @@ let read_song filename : document = (
 ) ;;
 
 
-let manage_book filename fileout  book_id = (
-  let fin = open_in filename in
+let manage_book filename book_id = (
+  let fin = open_in "manage book" filename in
   let rec r acc =
     try
       let line = String.strip ( input_line fin ) in
@@ -92,13 +92,12 @@ let manage_song filename fileout_html fileout_latex song_id = (
     let () = assert(title<>"") in
     let song = {Song.filename=filename;titre=title;auteur=auteur;id=song_id;data=data;transpose=transpose;} in
     let () =
-      let () = printf "open %s\n" fileout_html ; flush stdout ; in
-      let fout = open_out fileout_html in
+      let fout = open_out "manage song" fileout_html in
       let () = Write_song.write_song fout song in
       close_out fout ;
     in
     let () =
-      let fout = open_out (fileout_latex) in
+      let fout = open_out "manage song latex" (fileout_latex) in
       let () = Write_pdf_song.write_song fout song in
       close_out fout ;
     in
@@ -132,9 +131,8 @@ let rec walk (songs,books) dirname dirout = (
 	    try 
 	      let count = List.length books in
 	      (*let fileout = dirout // (sprintf "book-%d.html" count) in*)
-	      let fileout_html = dirout // ((Filename.chop_suffix e ".book")^".html") in
 	      let id = sprintf "book-%d" count in
-	      let book = manage_book (dirname//e) fileout_html  id in
+	      let book = manage_book (dirname//e) id in
 		(songs,book::books)
 	    with
 	      | e -> printf "%s\n" (Printexc.to_string e) ; (songs,books)
@@ -161,7 +159,7 @@ let _ =
   in
 
   let write_index_letters () = ( 
-    let fout = open_out (prefix // "html" // "index-letters.html") in
+    let fout = open_out "write index letters" (prefix // "html" // "index-letters.html") in
     let pf fs = ksprintf ( fun s -> fprintf fout "%s" s) fs in
     let _ = pf "%s"  "<!DOCTYPE html>
 <html>
@@ -187,7 +185,7 @@ let _ =
 
 
   let write_index_one_letter songs l = (
-    let fout = open_out ( prefix // "html" // (sprintf "index-letter-%c.html" l)) in
+    let fout = open_out "write_index_one_letter" ( prefix // "html" // (sprintf "index-letter-%c.html" l)) in
     let pf fs = ksprintf ( fun s -> fprintf fout "%s" s) fs in
     let _ = pf "<!DOCTYPE html>
 <html>
@@ -229,7 +227,7 @@ let _ =
 
 
   let write_index_books books = (
-    let fout = open_out (prefix // "html" // "index-books.html") in
+    let fout = open_out "write_index_books" (prefix // "html" // "index-books.html") in
     let pf fs = ksprintf ( fun s -> fprintf fout "%s" s) fs in
     let () = pf "%s" "<!DOCTYPE html>
 <html>
@@ -241,7 +239,7 @@ let _ =
 <body>
 "   in
       List.iteri ( fun index b ->
-	let html = b.Book.filename in
+	let html = Filename.chop_suffix (Filename.basename b.Book.filename) ".book" in
 	let d = index mod 2 in
 	pf "<div class=\"index-book-%d\"><a href=\"./%s.html\">%s</a>\n" d html b.Book.titre ;
 	pf "<a href=\"./pdf/%s.pdf\">(pdf)</a>\n" b.Book.filename ;
@@ -256,7 +254,7 @@ let _ =
 
 
   let write_book_html book songs = (
-    let fout = open_out (prefix // "html" // "book-"^(Filename.basename book.Book.filename)^".html") in
+    let fout = open_out "write_book_html" (prefix // "html" // ("book-"^( Filename.chop_suffix (Filename.basename book.Book.filename) ".book"))^".html") in
     let pf fs = ksprintf ( fun s -> fprintf fout "%s" s) fs in
     let () = pf "%s" "<!DOCTYPE html>
 <html>

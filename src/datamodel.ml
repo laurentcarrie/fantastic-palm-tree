@@ -59,10 +59,10 @@ end
 
 
 
-let open_out s = 
-  printf "open_out %s\n" s; flush stdout ;
+let open_out msg s = 
+  printf "open_out (%s) %s\n" msg s; flush stdout ;
   open_out s
 
-let open_in s = 
-  printf "open_in %s\n" s; flush stdout ;
+let open_in msg s = 
+  printf "open_in (%s) %s\n" msg s ; flush stdout ;
   open_in s

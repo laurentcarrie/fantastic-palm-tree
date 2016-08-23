@@ -8,7 +8,7 @@ let (//) = Filename.concat
 
 
 let write install_dir songs =  
-  let fout = open_out (install_dir // "index.html") in
+  let fout = open_out "write index" (install_dir // "index.html") in
   let pf fs = ksprintf ( fun s -> fprintf fout "%s" s) fs in
   let _ = pf "%s"  "<!DOCTYPE html>
 <html>
