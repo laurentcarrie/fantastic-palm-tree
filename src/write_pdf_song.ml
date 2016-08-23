@@ -354,9 +354,11 @@ let write_book book songs = (
     match song with
     | Some song -> (
       let () = pf "\\clearpage\n" in
-      let () = pf "\\invisiblesection{%s}\n" song.Song.titre in
-      let () = pf "\\pdfbookmark[1]{%s}{%s}\n" song.Song.titre song.Song.titre in
-      let () = pf "\\fancyhead[L]{{\\titlefont %s} } \n"  song.Song.titre in 
+      let () = pf "%%\\pdfbookmark[1]{%s}{%s}\n" song.Song.titre song.Song.titre in
+      let () = pf "%%\\invisiblesection{%s}\n" song.Song.titre in
+      let () = pf "\\fancyhead[L]{{\\invisiblesection{%s (%s)} \\titlefont %s} } \n" 
+	song.Song.titre song.Song.auteur
+	song.Song.titre in 
       let () = pf "\\fancyhead[R]{{\\authorfont %s}} \n"  song.Song.auteur in
       let () = pf "\\fancyhead[C]{} \n" in
       write_song_body fout song
