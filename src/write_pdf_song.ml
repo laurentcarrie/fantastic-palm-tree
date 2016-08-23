@@ -213,7 +213,7 @@ let write_preamble fout  = (
 \\sethlcolor{grey8}
 %%\\usepackage{lmodern}
 %%\\usepackage{textcomp}
-\\usepackage{kpfonts}
+%%\\usepackage{kpfonts}
 \\usepackage{array,multirow}
 \\usepackage{fancyhdr} 
 \\pagestyle{fancy} 
