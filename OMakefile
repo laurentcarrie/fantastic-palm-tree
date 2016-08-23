@@ -1,4 +1,4 @@
-.PHONY: build clean pdf help distant clean-pdf
+.PHONY: build clean pdf help distant clean-pdf dropbox
 
 .DEFAULT: help
 
@@ -9,6 +9,7 @@ clean-pdf : supprime les pdfs
 build   : construction des binaires et des png
 pdf     : construction des pdfs
 distant : port=... host=... copie sur une autre machine
+dropbox
 ")
 
 
@@ -140,6 +141,8 @@ build : $(HOME)/Dropbox/book-all.pdf
 
 $(HOME)/Dropbox/book-all.pdf : $(prefix)/pdf/book-all.pdf
 	cp $< $@
+
+dropbox : $(HOME)/Dropbox/book-all.pdf
 
 clean :
 	rm -f $(filter-proper-targets $(ls R,.))
