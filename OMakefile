@@ -12,7 +12,7 @@ distant : port=... host=... copie sur une autre machine
 ")
 
 
-
+USEPDFLATEX=true
 
 
 srcdir = $(absname $(dir $(CWD)))
