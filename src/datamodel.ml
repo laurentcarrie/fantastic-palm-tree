@@ -22,11 +22,20 @@ module Accord = struct
   }
 end
 
+module Grille = struct
+  type case = Accord.t list
+  type ligne = case list
+  type t = {
+    titre : string ;
+    lignes : ligne list ;
+  }
+end
+
 type context =
 | Normal of string
 | Titre of string
 | Auteur of string
-| Grille of (string*Accord.t list list list)
+| Grille of Grille.t
 | Lyrics of (int*string*string list)
 | Tab of string list
 | Mp3 of string

@@ -26,7 +26,7 @@ let html_of_chord (c:Accord.t) = (
   s
 )
 
-let write_grille ~transpose fout name (g:Accord.t list list list) = (
+let write_grille ~transpose fout  (g:Grille.t) = (
   let pf fs = ksprintf ( fun s -> fprintf fout "%s" s) fs in
     pf "<div class=\"grille\">\n" ;
     pf "\n<table>\n" ;
@@ -37,7 +37,7 @@ let write_grille ~transpose fout name (g:Accord.t list list list) = (
 	  pf "<td class=\"grille\">%s</td>" s ;
 	)  line ;
 	pf "</tr>\n"  ;
-    ) g ;
+    ) g.Grille.lignes ;
     pf "</table>\n"  ;
     pf "</div>\n" ;
 ) ;;
@@ -149,7 +149,7 @@ let write_song fout song = (
 	| Normal s -> pf "<span class=\"remarque\">%s</span><br/>" s
 	| Titre _ 
 	| Auteur _ -> ()
-	| Grille (name,g) -> write_grille ~transpose:song.Song.transpose fout name (g:Accord.t list list list)
+	| Grille g -> write_grille ~transpose:song.Song.transpose fout (g:Grille.t)
 	| Lyrics l -> write_lyrics fout l
 	| Mp3 l -> write_mp3 pf l
 	| Tab l -> write_tab pf l

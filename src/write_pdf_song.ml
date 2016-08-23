@@ -35,23 +35,21 @@ let tex_of_string c = (
   ]
 )
 
-let write_grille ~transpose fout name (g:Accord.t list list list) = (
+let write_grille ~transpose fout (g:Grille.t) = (
   let pf fs = ksprintf ( fun s -> fprintf fout "%s" s) fs in
 
   let taille = List.fold_left ( fun t line ->
     let t2 = List.length line in
     if t > t2 then t else t2
-  ) 0 g in
+  ) 0 g.Grille.lignes in
 
   pf "\
 
-%%\\begin{center}
-%%\\begin{table}[h!]
   \\centering
 " ;
-  pf "%%\\caption*{%s}\n" (tex_of_string name) ;
-  if name <> "" then pf "{\\lyricstitlefont %s}\\\\*\n" (tex_of_string name) else () ;
-  pf "%%\\label{%s}\n" "" ;
+  pf "%%\\caption*{%s}\n" (tex_of_string g.Grille.titre) ;
+
+  if g.Grille.titre <> "" then pf "{\\lyricstitlefont %s}\\\\\n\n" (tex_of_string g.Grille.titre) else () ;
   pf "\\begin{grillefont} \n" ;
   pf "\\begin{tabular}{|%s|}\n" (String.join "|" 
        (List.init taille (fun _ -> "M{2cm}"))
@@ -75,14 +73,12 @@ let write_grille ~transpose fout name (g:Accord.t list list list) = (
     pf "%s" (String.join " & " bars ) ;
     pf "%s" "\\\\\n" ;
     List.length line
-  ) (-1) g in
+  ) (-1) g.Grille.lignes in
   pf "\
   \\cline{1-%d}
   \\end{tabular}
   \\end{grillefont}
-%%\\end{table}
-%%\\end{center}
-  \\par
+
 
 " length ;
 
@@ -164,7 +160,7 @@ let write_song_body fout song = (
     | Normal s -> pf "%s\n" s
     | Titre _ 
     | Auteur _ -> ()
-    | Grille (name,g) -> () (*write_grille ~transpose:song.Song.transpose fout name (g:Accord.t list list list)*)
+    | Grille g -> () (*write_grille ~transpose:song.Song.transpose fout name (g:Accord.t list list list)*)
     | Lyrics l -> () (* write_lyrics fout l *)
     | Mp3 l -> write_mp3 pf l
     | Tab l -> write_tab pf l
@@ -173,9 +169,9 @@ let write_song_body fout song = (
     | PageBreak -> pf "\\newpage\n"
   ) song.Song.data in
 
-  let grilles = List.rev (List.fold_left ( fun acc c -> match c with | Grille (name,g) -> (name,g)::acc | _ -> acc ) [] song.Song.data) in
+  let (grilles:Grille.t list) = List.rev (List.fold_left ( fun acc c -> match c with | Grille g -> g::acc | _ -> acc ) [] song.Song.data) in
   let () = pf "\\begin{multicols}{2}\n" in
-  let () = List.iter ( fun (name,g) -> write_grille ~transpose:0 fout name g ) grilles in
+  let () = List.iter ( fun g -> write_grille ~transpose:0 fout g ) grilles in
   let () = pf "\\end{multicols}\n" in
 
   let lyrics = List.rev (List.fold_left ( fun acc c -> match c with | Lyrics l -> l::acc | _ -> acc ) [] song.Song.data) in
