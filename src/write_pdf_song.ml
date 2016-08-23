@@ -49,11 +49,12 @@ let write_grille ~transpose fout (g:Grille.t) = (
 " ;
   pf "%%\\caption*{%s}\n" (tex_of_string g.Grille.titre) ;
 
-  if g.Grille.titre <> "" then pf "{\\lyricstitlefont %s}\\\\\n\n" (tex_of_string g.Grille.titre) else () ;
+  (* if g.Grille.titre <> "" then pf "{\\lyricstitlefont %s}\\\\\n\n" (tex_of_string g.Grille.titre) else () ; *)
   pf "\\begin{grillefont} \n" ;
   pf "\\begin{tabular}{|%s|}\n" (String.join "|" 
        (List.init taille (fun _ -> "M{2cm}"))
 ) ;
+  let () = pf "\\multicolumn{%d}{c}{\\lyricstitlefont %s} \\\\\n" taille (tex_of_string g.Grille.titre)  in
   let length = List.fold_left ( fun previous_length line ->
     let l = Pervasives.max previous_length (List.length line) in
     pf "\\cline{1-%d}\n" l ;
@@ -247,7 +248,7 @@ in
   let () = pf "\\newcommand*{\\authorfont}{\\fontfamily{ptm}\\fontsize{20}{25}\\fontshape{it}\\selectfont} \n" in
   let () = pf "\\newcommand*{\\titlefont}{\\fontfamily{ptm}\\fontsize{30}{35}\\fontshape{it}\\selectfont} \n" in
   let () = pf "\\newcommand*{\\commentfont}{\\fontfamily{ptm}\\fontsize{12}{15}\\fontshape{it}\\selectfont} \n" in
-  let () = pf "\\newcommand*{\\lyricstitlefont}{\\fontfamily{ptm}\\fontsize{15}{15}\\fontshape{it}\\selectfont} \n" in
+  let () = pf "\\newcommand*{\\lyricstitlefont}{\\color{black}\\fontfamily{ptm}\\fontsize{15}{15}\\fontshape{it}\\selectfont} \n" in
   let () = pf "\\newenvironment{lyricsfont}{\\fontfamily{ptm}\\fontsize{15}{15}\\selectfont}{} \n" in
   let () = pf "\\newenvironment{grillefont}{\\color{blue}\\fontfamily{ptm}\\fontsize{15}{15}\\selectfont}{} \n" in 
   let () = pf "\\newcommand*{\\tabbox}[2][t]{%%
