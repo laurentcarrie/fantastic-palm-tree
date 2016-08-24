@@ -214,6 +214,7 @@ let write_preamble fout  = (
 \\usepackage{array,multirow}
 \\usepackage{fancyhdr} 
 \\pagestyle{fancy} 
+\\usepackage{makeidx}
 \\newcolumntype{M}[1]{>{\\centering\\arraybackslash}m{#1}}
 %%\\newcolumntype{M}[1]{>{\\centering}m{#1}}
 \\newcolumntype{N}{@{}m{0pt}@{}}
@@ -296,6 +297,7 @@ let write_song fout song = (
 
   let () = pf "
 \\begin{document}
+
 " 
   in
   
@@ -325,9 +327,11 @@ let write_book book songs = (
 \\let\\latexl@section\\l@section
 \\def\\l@section#1#2{\\begingroup\\let\\numberline\\@gobble\\latexl@section{#1}{#2}\\endgroup}
 \\makeatother
+\\makeindex
 
 \\begin{document} 
 \\maketitle
+\\printindex
 %%\\titlecontents{section}[0em]
 %%{\\vskip 0.5ex}%%
 %%{}%% numbered sections formattin
@@ -351,6 +355,7 @@ let write_book book songs = (
     match song with
     | Some song -> (
       let () = pf "\\clearpage\n" in
+      let () = pf "\\index{%s@%s : %s}" song.Song.auteur song.Song.auteur song.Song.titre in
       let () = pf "%%\\pdfbookmark[1]{%s}{%s}\n" song.Song.titre song.Song.titre in
       let () = pf "%%\\invisiblesection{%s}\n" song.Song.titre in
       let () = pf "\\fancyhead[L]{{\\invisiblesection{%s (%s)} \\titlefont %s} } \n" 
