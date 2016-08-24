@@ -1,6 +1,8 @@
-.PHONY: build clean install doc toto distant chords check bin 
+.PHONY: build clean install doc toto distant chords check bin png all
 
 .DEFAULT: build
+
+all : png
 
 USE_OCAMLFIND = true
 
@@ -64,7 +66,7 @@ png_digest.txt : $(make_chord)
 	./make-chord --prefix $(prefix)
 
 
-build : png_digest.txt
+png : png_digest.txt
 
 make_show =
 	png_files=$(set $(ls $(pngdir)))

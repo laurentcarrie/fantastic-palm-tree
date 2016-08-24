@@ -1,9 +1,10 @@
-.PHONY: build clean pdf help distant clean-pdf dropbox
+.PHONY: build clean pdf help distant clean-pdf dropbox all
 
 .DEFAULT: help
 
 help :
 	println($"
+all
 clean
 clean-pdf : supprime les pdfs
 build   : construction des binaires et des png
@@ -48,7 +49,7 @@ mkdir -p $(prefix)/pdf
 mkdir -p tmp
 
 foreach(s,$(songs))
-	pdf build : $(prefix)/pdf/$s.pdf
+	pdf : $(prefix)/pdf/$s.pdf
 
 	section
 		cd tmp
@@ -56,7 +57,7 @@ foreach(s,$(songs))
 			cp $< $@
 
 		targets+=$(file $s.tex)
-		build: $(LaTeXDocument $s,$s)
+		pdf : $(LaTeXDocument $s,$s)
 
 		clean :
 			rm -f $s.fls $s.aux $s.log $s.out
@@ -65,7 +66,7 @@ foreach(s,$(songs))
 
 foreach(s,$(books))
 	s=book-$s
-	pdf build : $(prefix)/pdf/$s.pdf
+	pdf : $(prefix)/pdf/$s.pdf
 
 	section
 		cd tmp
@@ -74,7 +75,7 @@ foreach(s,$(books))
 			cp $< $@
 
 		targets+=$(file $s.tex)
-		build : $(LaTeXDocument $s,$s)
+		pdf : $(LaTeXDocument $s,$s)
 
 		clean :	
 			rm -f $s.fls $s.aux $s.log $s.out
@@ -99,7 +100,7 @@ clean :
 	rm $(filter-proper-targets $(ls R, .))
 	rm -rf $(prefix)
 
-distant : build
+distant : build pdf
 	auto-ftp --hostname $(host) --port $(port) --user $(user) --script script.txt
 
 other_files[]=
