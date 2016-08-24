@@ -331,7 +331,9 @@ let write_book book songs = (
 
 \\begin{document} 
 \\maketitle
+%%\\begin{multicols}{2}
 \\printindex
+%%\\end{multicolumns}
 %%\\titlecontents{section}[0em]
 %%{\\vskip 0.5ex}%%
 %%{}%% numbered sections formattin
@@ -355,7 +357,7 @@ let write_book book songs = (
     match song with
     | Some song -> (
       let () = pf "\\clearpage\n" in
-      let () = pf "\\index{%s@%s : %s}" song.Song.auteur song.Song.auteur song.Song.titre in
+      let () = pf "\\index{%s!%s}" song.Song.auteur song.Song.titre in
       let () = pf "%%\\pdfbookmark[1]{%s}{%s}\n" song.Song.titre song.Song.titre in
       let () = pf "%%\\invisiblesection{%s}\n" song.Song.titre in
       let () = pf "\\fancyhead[L]{{\\invisiblesection{%s (%s)} \\titlefont %s} } \n" 

@@ -15,7 +15,7 @@ dropbox
 
 
 USEPDFLATEX=true
-
+MAKEINDEX=makeindex -s song.ist
 
 srcdir = $(absname $(dir $(CWD)))
 
@@ -47,13 +47,15 @@ targets+=$(addprefix tmp/,$(addsuffix .tex,$(addprefix book-,$(books))))
 
 mkdir -p $(prefix)/pdf
 mkdir -p tmp
+cp song.ist tmp/.
+TEXDEPS+= song.ist
 
 foreach(s,$(songs))
 	pdf : $(prefix)/pdf/$s.pdf
 
 	section
 		cd tmp
-		$(prefix)/pdf/$s.pdf : $s.pdf
+		$(prefix)/pdf/$s.pdf : $s.pdf 
 			cp $< $@
 
 		targets+=$(file $s.tex)
