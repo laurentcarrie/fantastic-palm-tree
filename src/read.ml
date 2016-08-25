@@ -70,21 +70,24 @@ let read_song filename : document = (
 
 let manage_book filename book_id = (
   let fin = open_in "manage book" filename in
-  let rec r acc =
+  let print_index=false in
+  let rec r print_index acc =
     try
       let line = String.strip ( input_line fin ) in
-	r (line::acc)
+	match line with
+	  | "\\print_index" -> r true acc
+	  | line -> r print_index (line::acc)
     with
-      | End_of_file -> close_in fin ; List.rev acc
+      | End_of_file -> close_in fin ; (print_index,List.rev acc)
   in
-  let songs = r [] in 
+  let (print_index,songs) = r print_index [] in 
   let titre = Filename.basename filename in
   let () = assert (titre <> "" ) in
-    {Book.filename=filename;titre;auteur="book";id=book_id;songs=songs}
+    {Book.filename=filename;titre;auteur="book";id=book_id;songs=songs;print_index=print_index}
 )
 
 
-let manage_song filename fileout_html fileout_latex song_id = (
+let manage_song filename fileout_latex song_id = (
   try
     let data = read_song filename in
     let title = List.fold_left ( fun acc d -> match d with | Titre s -> s | _ -> acc ) "???" data in
@@ -92,11 +95,6 @@ let manage_song filename fileout_html fileout_latex song_id = (
     let transpose = List.fold_left ( fun acc d -> match d with | Transpose h -> h | _ -> acc ) 0 data in
     let () = assert(title<>"") in
     let song = {Song.filename=filename;titre=title;auteur=auteur;id=song_id;data=data;transpose=transpose;} in
-    let () =
-      let fout = open_out "manage song" fileout_html in
-      let () = Write_song.write_song fout song in
-      close_out fout ;
-    in
     let () =
       let fout = open_out "manage song latex" (fileout_latex) in
       let () = Write_pdf_song.write_song fout song in
@@ -120,10 +118,8 @@ let rec walk (songs,books) dirname dirout = (
 	| "song" -> (
 	    try 
 	      let count = List.length songs in
-	      (*let fileout = dirout // (sprintf "song-%d.html" count) in*)
-	      let fileout_html = dirout // "html" // (sprintf "%s.html" (Filename.(Filename.basename (Filename.chop_suffix e ".song")))) in
-	      let fileout_latex = "tmp" // ((Filename.chop_suffix e ".song") ^ ".tex") in
-	      let song = manage_song (dirname//e) fileout_html fileout_latex (sprintf "song-%d" count) in
+	      let fileout_latex = ((Filename.chop_suffix e ".song") ^ ".tex") in
+	      let song = manage_song (dirname//e) fileout_latex (sprintf "song-%d" count) in
 		(song::songs,books)
 	    with
 	      | e -> printf "%s\n" (Printexc.to_string e) ; (songs,books)
@@ -131,7 +127,6 @@ let rec walk (songs,books) dirname dirout = (
 	| "book" -> (
 	    try 
 	      let count = List.length books in
-	      (*let fileout = dirout // (sprintf "book-%d.html" count) in*)
 	      let id = sprintf "book-%d" count in
 	      let book = manage_book (dirname//e) id in
 		(songs,book::books)
@@ -148,173 +143,22 @@ let rec walk (songs,books) dirname dirout = (
 let _ = 
   try
     let () = Printexc.record_backtrace true in () ;
-  assert(Array.length Sys.argv > 2) ;
+      assert(Array.length Sys.argv > 2) ;
 
-  let prefix = Sys.argv.(2) in
-
-  let (songs,books) = walk ([],[]) Sys.argv.(1) Sys.argv.(2) in
-
-  let letters : char list  = 
-    let c0 = Char.code 'A' in
-      Array.to_list ( Array.init 26 ( fun i -> Char.chr (i+c0) ) )
-  in
-
-  let write_index_letters () = ( 
-    let fout = open_out "write index letters" (prefix // "html" // "index-letters.html") in
-    let pf fs = ksprintf ( fun s -> fprintf fout "%s" s) fs in
-    let _ = pf "%s"  "<!DOCTYPE html>
-<html>
-<head>
-<meta http-equiv=\"Content-Type\" content=\"text/html\"; charset=\"UTF-8\">
-<link href=\"song.css\" type=\"text/css\" rel=\"stylesheet\"/>
-<title>index des chansons</title>
-</head>
-<body>
-"  in
-      List.iter ( fun l ->
-	let songs = List.filter ( fun t ->
-	  let i = 
-	    if t.Song.titre="" then ' ' else (String.get (String.uppercase t.Song.titre) 0) in
-	    l = i
-	) songs in
-	let count = List.length songs in
-	  pf "<a href=\"./index-letter-%c.html\">%c <span class=\"letter-count\">(%d chansons)</span></a><br/>\n" l l count
-      ) letters ;
-      close_out fout
-  )
-  in
-
-
-  let write_index_one_letter songs l = (
-    let fout = open_out "write_index_one_letter" ( prefix // "html" // (sprintf "index-letter-%c.html" l)) in
-    let pf fs = ksprintf ( fun s -> fprintf fout "%s" s) fs in
-    let _ = pf "<!DOCTYPE html>
-<html>
-<head>
-<meta http-equiv=\"Content-Type\" content=\"text/html\"; charset=\"UTF-8\">
-<link href=\"song.css\" type=\"text/css\" rel=\"stylesheet\"/>
-<title>index des chansons, lettre %c</title>
-</head>
-<body>
-"  l in
-    let () = pf "<a href=\"./index.html#letter-%c\">Index lettre %c</a></br>" l l in
-    let songs = List.filter ( fun t ->
-      let () = assert (t.Song.titre <> "") in
-      let i = String.get (String.uppercase t.Song.titre) 0 in
-	l = i
-    ) songs in
-    let _ = List.fold_left ( fun (initiale,index) t ->
-      let html = String.slice ~first:(String.length Sys.argv.(2)) t.Song.filename in
-      let current = String.get (String.uppercase t.Song.titre) 0 in
-	let initiale = if current<>initiale then (
-	  pf "<div class=\"nouvelle-initiale\"><a href=\"./index.html#letter-%c\">--- %c ---</a></div>\n" current current ;
-	  current
-	)
-	  else (
-	    initiale 
-	  )
-	in
-	let d = index mod 2 in
-	  pf "<div class=\"index-entry-%d\"><a href=\".%s\"><span class=\"index-titre-%d\">%s</span> <span class=\"index-auteur-%d\">(%s)</span></a></div>\n" 
-	    d html d t.Song.titre d t.Song.auteur ;
-	  (initiale,index+1)
-    ) (' ',0) songs in
-      pf "
-</body>
-</html>
-" ;
-      close_out fout
-  ) in
-
-
-  let write_index_books books = (
-    let fout = open_out "write_index_books" (prefix // "html" // "index-books.html") in
-    let pf fs = ksprintf ( fun s -> fprintf fout "%s" s) fs in
-    let () = pf "%s" "<!DOCTYPE html>
-<html>
-<head>
-<meta http-equiv=\"Content-Type\" content=\"text/html\"; charset=\"UTF-8\">
-<link href=\"song.css\" type=\"text/css\" rel=\"stylesheet\"/>
-<title>index des livres</title>
-</head>
-<body>
-"   in
-      List.iteri ( fun index b ->
-	let html = Filename.chop_suffix (Filename.basename b.Book.filename) ".book" in
-	let d = index mod 2 in
-	pf "<div class=\"index-book-%d\"><a href=\"./%s.html\">%s</a>\n" d html b.Book.titre ;
-	pf "<a href=\"./pdf/%s.pdf\">(pdf)</a>\n" b.Book.filename ;
-	pf "</div>\n" ;
-      ) books ;
-      pf "
-</body>
-</html>
-" ;
-      close_out fout
-  ) in
-
-
-  let write_book_html book songs = (
-    let fout = open_out "write_book_html" (prefix // "html" // ("book-"^( Filename.chop_suffix (Filename.basename book.Book.filename) ".book"))^".html") in
-    let pf fs = ksprintf ( fun s -> fprintf fout "%s" s) fs in
-    let () = pf "%s" "<!DOCTYPE html>
-<html>
-<head>
-<meta http-equiv=\"Content-Type\" content=\"text/html\"; charset=\"UTF-8\">
-<link href=\"song.css\" type=\"text/css\" rel=\"stylesheet\" media=\"screen\"/>
-<link href=\"song-print.css\" type=\"text/css\" rel=\"stylesheet\" media=\"print\"/>
-<title>index des livres</title>
-</head>
-<body>
-"   in
-      pf "<ul>\n" ;
-      let songs = List.map ( fun b ->
-	try 
-	  let song = List.find ( fun s -> s.Song.titre = b ) songs  in
-	    (b,Some song)
-	with
-	  | Not_found -> (b,None)
-      ) book.Book.songs in
-
-      let () = pf "<ul>\n" in
-      let () = 
-	List.iter ( fun (b,song) -> 
-	  match song with
-	    | Some _ -> ()
-	    | None -> 
-		pf "<li>not found : '%s'</li>\n" b 
-	) songs in
-      let () = pf "</ul>\n" in
+      let prefix = Sys.argv.(2) in
 	
-      let () =
-	List.iteri ( fun index (b,song) ->
-	  match song with
-	    | None -> ()
-	    | Some song -> (
-		Write_song.write_song fout song ;
-		pf "<p style=\"page-break-after:always;\"></p>\n" ;
-	      )
-	) songs in
-	pf "
-</body>
-</html>
-" ;
-      close_out fout
-  ) in
+  let (songs,books) = walk ([],[]) Sys.argv.(1) prefix in
 
-
-
-    write_index_letters () ;
-    Write_index.write (prefix//"html") songs ;
     let books = 
       let all = { Book.filename="all.book" ; titre = "all" ; auteur = "yyy" ; id = "xxx" ; 
-		  songs = List.sort ~cmp:Helpers.uppercase_compare (List.map ( fun b -> b.Song.titre ) songs) } in
+		  songs = List.sort ~cmp:Helpers.uppercase_compare (List.map ( fun b -> b.Song.titre ) songs) ;
+		  print_index=true ;} in
       all::books 
     in
-      write_index_books books ;
-      List.iter ( fun b -> write_book_html b songs ) books ;
-      List.iter ( fun b -> printf "book : %s\n" b.Book.filename ;  Write_pdf_song.write_book b songs ) books ;
-      List.iter ( fun l -> write_index_one_letter songs l ) letters ;
+
+
+      List.iter ( fun b -> printf "book : %s (%d songs)\n" b.Book.filename (List.length b.Book.songs) ;  Write_pdf_song.write_book b songs ) books ;
+
       exit 0
   with
   | e -> (

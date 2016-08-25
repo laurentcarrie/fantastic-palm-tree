@@ -63,6 +63,7 @@ module Book = struct
     auteur:string ;
     id:string ;
     songs:string list ;
+    print_index:bool ;
   }
 end
 

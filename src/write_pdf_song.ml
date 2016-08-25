@@ -312,7 +312,7 @@ let write_song fout song = (
 
 
 let write_book book songs = (
-  let fout = open_out "book" ( "tmp" // ("book-"^(Filename.chop_suffix (Filename.basename book.Book.filename) ".book")^".tex")) in
+  let fout = open_out "book" ( ("book-"^(Filename.chop_suffix (Filename.basename book.Book.filename) ".book")^".tex")) in
   let pf fs = ksprintf ( fun s -> fprintf fout "%s" s) fs in
     
   let () = write_preamble fout in
@@ -332,7 +332,8 @@ let write_book book songs = (
 \\begin{document} 
 \\maketitle
 %%\\begin{multicols}{2}
-\\printindex
+" in
+  let () = pf "
 %%\\end{multicolumns}
 %%\\titlecontents{section}[0em]
 %%{\\vskip 0.5ex}%%
@@ -344,6 +345,10 @@ let write_book book songs = (
 \\tableofcontents{}
 \\end{multicols}
 " in
+  let () = if book.Book.print_index then 
+    pf "\\printindex\n" else 
+      pf "%%printindex was not set\n"
+  in
   let songs = List.fold_left ( fun acc b ->
     try 
       let song = List.find ( fun s -> s.Song.titre = b ) songs  in
