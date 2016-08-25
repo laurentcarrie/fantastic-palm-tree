@@ -19,6 +19,8 @@ module Accord = struct
     minor : bool ;
     minor7 : bool ;
     major7 : bool ;
+    diminue : bool ;
+    sus4 : bool ;
   }
 end
 

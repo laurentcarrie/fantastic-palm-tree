@@ -15,6 +15,16 @@ let barlist_of_string (s:string) : Accord.t list list = (
       | '#'::a -> Accord.Sharp,a
       | _ -> Accord.None,a
     in
+    let (sus4,a) = match a with
+      | [] -> false,[]
+      | 's'::'u'::'s'::'4'::a -> true,a
+      | _ -> false,a
+    in
+    let (diminue,a) = match a with
+      | [] -> false,[]
+      | 'd'::'i'::'m'::a -> true,a
+      | _ -> false,a
+    in
     let (minor,a) = match a with
       | [] -> false,[]
       | 'm'::a -> true,a
@@ -26,7 +36,7 @@ let barlist_of_string (s:string) : Accord.t list list = (
       | '7'::a -> true,false,a
       | _ -> false,false,a
     in
-    { Accord.note = note ; minor=minor ; alteration=alteration ; minor7=minor7 ; major7=major7 }
+    { Accord.note = note ; minor=minor ; alteration=alteration ; minor7=minor7 ; major7=major7 ; diminue=diminue ; sus4=sus4}
   in
   let bar_of_string s =
     List.map chord_of_string (String.nsplit s " ")

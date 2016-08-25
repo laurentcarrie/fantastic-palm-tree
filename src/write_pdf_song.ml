@@ -17,10 +17,12 @@ let tex_of_chord (c:Accord.t) = (
     | Accord.Flat -> s ^ "\\textsuperscript{$\\flat$}"
     | Accord.Sharp -> s ^ "\\textsuperscript{$\\sharp$}"
   in
+  let s = if c.Accord.diminue then s^"ø" else s in
   let subscript = "" in
   let subscript = if c.Accord.minor then subscript^"m" else subscript in
   let subscript = if c.Accord.minor7 then subscript^"7" else subscript in
   let subscript = if c.Accord.major7 then subscript^"7M" else subscript in
+  let subscript = if c.Accord.sus4 then subscript^"sus4" else subscript in
   let s = if subscript="" then s else s^"\\textsubscript{"^subscript^"}" in
   let s = if s="%" then "" else ""^s^"" in
   s
@@ -330,6 +332,11 @@ let write_book book songs = (
 \\makeindex
 
 \\begin{document} 
+
+o barré
+
+ø
+
 \\maketitle
 %%\\begin{multicols}{2}
 " in
