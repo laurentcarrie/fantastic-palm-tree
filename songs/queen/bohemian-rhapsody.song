@@ -4,30 +4,40 @@ Bohemian Rhapsody
 \auteur
 Queen
 
-\lyrics2
-Is this the real life?
-Is this just fantasy?
-Caught in a landslide
-No escape from reality
-Open your eyes
-Look up to the skies and see
-I'm just a poor boy, I need no sympathy
-Because I'm easy come, easy go
-A little high, little low
-Anyway the wind blows, doesn't really matter to me, to me
+\grille couplet
+Bb:C7:F7:Bb
+Gm:Bb:Eb:Bb
+Cm:F
 
-\lyrics2
-Mama, just killed a man
-Put a gun against his head
-Pulled my trigger, now he's dead
-Mama, life had just begun
-But now I've gone and thrown it all away
-Mama, ooo
-Didn't mean to make you cry
-If I'm not back again this time tomorrow
-Carry on, carry on, but nothing really matters
+\lyrics2 couplet 1
+[Bb6;Is] this the real life, [C7;Is] this just fantasy? 
+[F7;Caught] in a landslide , No [Bb/F;es]cape from reality 
+[Gm;Open] your eyes, [Bb/F;Look] up to the skies and see [Eb;]
+[Cm;I'm] just a poor boy (Poor boy), [F;I] need no sympathy 
+Because I'm [B;ea]sy [Bb;come], [A;ea]sy [Bb;go]
+[B;Lit]tle [Bb]high, [A;lit]tle [Bb;low]
+[Eb;A]ny way the [Dm;wind] blows 
+[Gdim/Db;Doesn't] really [Cm6;mat]ter to [F;me],[Bbadd9;to] me 
 
-\lyrics2
+
+\lyrics2 
+[Bbadd9;Ma]ma, [Gm;just] killed [add9;a] man
+[Cm;Put] a gun a [add9;gainst] his head
+[Cm;Pul]led my trigger, now [F7;he's] dead
+
+\lyrics2 
+[Bbadd9;Ma]ma, [Gm;li]fe has [add9;just] began
+[Cm;But] now I'v [Eb/B;go]ne and [Eb/Bb;thrown] it  [Eb/A;all]  [Eb/Ab;a][Eb/G;way]
+
+\lyrics2 
+[Eb;Ma]ma, [Dm;ooh] [Cmadd9;]
+[Fm;Di]dn't [Ab;mean] to make you cry
+\
+[Bb;If] I'm not back again this time tomorrow 
+[Eb;Car]ry on, [Dm;car]ry on as [Cm;if] nothing [Eb;real]ly matters 
+
+
+\lyrics2 couplet 2
 Too late, my time has come
 Sends shivers down my spine
 Body's aching all the time
@@ -43,7 +53,7 @@ Scaramouch, scaramouch will you do the fandango
 Thunderbolt and lightning very very frightening me
 Gallileo, Gallileo,
 Gallileo, Gallileo,
-Gallileo Figaro - magnifico
+Gallileo Figaro - magnifi	co
 
 \lyrics2
 But I'm just a poor boy and nobody loves me
