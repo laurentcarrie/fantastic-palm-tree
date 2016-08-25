@@ -2,7 +2,7 @@
 
 .DEFAULT: build
 
-all : png
+
 
 USE_OCAMLFIND = true
 
@@ -40,19 +40,17 @@ src_chord[]=
 	chord
 	make_chord_svg
 
-prog = $(OCamlProgram song-to-html,$(src))
+prog = $(OCamlProgram generate,$(src))
 
 prefix=$(dir $(prefix))
-pngdir=$(dir $(prefix)/png)
+#pngdir=$(dir $(prefix)/png)
 
-build : $(prefix)/bin/song-to-html
+build : $(prefix)/bin/generate
 
 mkdir -p tmp
 mkdir -p $(prefix)/bin
-mkdir -p $(prefix)/html
-mkdir -p $(pngdir)
 
-$(prefix)/bin/song-to-html : song-to-html
+$(prefix)/bin/generate : generate
 	cp $< $@
 
 make_chord = $(OCamlProgram make-chord,$(src_chord))
@@ -62,20 +60,12 @@ chord_list : $(make_chord)
 
 bin : $(make_chord) $(prog)
 
-png_digest.txt : $(make_chord) 
-	./make-chord --prefix $(prefix)
+#png_digest.txt : $(make_chord) 
+#	./make-chord --prefix $(prefix)
 
 
-png : png_digest.txt
+#png : png_digest.txt
 
-make_show =
-	png_files=$(set $(ls $(pngdir)))
-	ret=$(EMPTY)
-	foreach(l,$(png_files))
-		ret=$(concat $(EMPTY),$(ret) $"$(basename $l) $(digest $l)
-")
-		export
-	value $(ret)
 
 check : $(make_chord)
 	section

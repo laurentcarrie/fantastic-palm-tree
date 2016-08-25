@@ -26,39 +26,30 @@ if $(not $(defined prefix))
 println($"prefix is : $(prefix)")
 
 song_files=$(find songs -name *.song)
-songs=$(song_files)
-songs=$(removeprefix songs,$(songs))
-songs=$(removesuffix .song,$(songs))
-songs=$(basename $(songs))
 
-book_files=$(glob songs/*.book)
-books=$(book_files)
-books=$(removeprefix songs,$(books))
-books=$(removesuffix .book,$(books))
-books=$(basename $(books))
-books+= all
-println($"books : $(books)")
+book_files=$(find songs -name *.book)
 
-targets=
-targets+=$(addsuffix .html,$(addprefix $(prefix)/html/,$(songs)))
-targets+=$(addprefix tmp/,$(addsuffix .tex,$(songs)))
-targets+=$(addsuffix .html,$(addprefix $(prefix)/html/book-,$(books)))
-targets+=$(addprefix tmp/,$(addsuffix .tex,$(addprefix book-,$(books))))
+generator=$(prefix)/bin/generate
 
 mkdir -p $(prefix)/pdf
 mkdir -p tmp
 cp song.ist tmp/.
-TEXDEPS+= song.ist
 
-foreach(s,$(songs))
+foreach(src,$(song_files))
+	s=$(removesuffix .song,$(basename $(src)))
+	TEXDEPS+=$(src)
 	pdf : $(prefix)/pdf/$s.pdf
 
 	section
 		cd tmp
+
+		LocalTeXGeneratedFiles($s.tex)
+		$s.tex : $(generator) $(src)
+			$(generator) $(srcdir)/songs $(prefix)
+
 		$(prefix)/pdf/$s.pdf : $s.pdf 
 			cp $< $@
 
-		targets+=$(file $s.tex)
 		pdf : $(LaTeXDocument $s,$s)
 
 		clean :
@@ -66,17 +57,22 @@ foreach(s,$(songs))
 	export
 	export .RULE
 
-foreach(s,$(books))
+foreach(src,$(book_files) all)
+	s=$(removesuffix .book,$(basename $(src)))
+	TEXDEPS+=$(src) 
+	TEXDEPS+= song.ist 
 	s=book-$s
 	pdf : $(prefix)/pdf/$s.pdf
 
 	section
 		cd tmp
 
+		$s.tex : $(generator) $(src)
+			$(generator) $(srcdir)/songs $(prefix)
+
 		$(prefix)/pdf/$s.pdf : $s.pdf
 			cp $< $@
 
-		targets+=$(file $s.tex)
 		pdf : $(LaTeXDocument $s,$s)
 
 		clean :	
@@ -85,9 +81,7 @@ foreach(s,$(books))
 	export
 	export .RULE
 
-generator=$(prefix)/bin/song-to-html
 
-#println("$(targets)")
 
 css[]=
 	song.css
@@ -105,16 +99,6 @@ clean :
 distant : build pdf
 	auto-ftp --hostname $(host) --port $(port) --user $(user) --script script.txt
 
-other_files[]=
-	index.html
-	song.css
-	song-print.css
-	index-letters.html
-	index-books.html
-
-letters= A B C D E F G H I J K L M N O P Q R S T U V W X Y Z
-other_files+=$(addsuffix .html,$(addprefix index-letter-,$(letters)))
-
 foreach(f,$(css))
 	build : $(prefix)/$f
 
@@ -123,19 +107,19 @@ foreach(f,$(css))
 
 	export .RULE
 
-$(targets) : $(generator) $(song_files)
-	$(generator) $(srcdir)/songs $(prefix)
+#$(targets) : $(generator) $(song_files)
+#	$(generator) $(srcdir)/songs $(prefix)
 
 
-build : $(targets)
+#build : $(targets)
 
 
-$(prefix)/ftp-script.txt : $(targets)
-	echo "echo on" > $@	
-	echo "mkdir partoches" >> $@
-	echo "cd partoches" >> $@
-	foreach(f,$(targets) $(addprefix $(prefix)/,$(other_files)))
-		echo "put_no_sha1 $(basename $f)" >> $@
+#$(prefix)/ftp-script.txt : $(targets)
+#	echo "echo on" > $@	
+#	echo "mkdir partoches" >> $@
+#	echo "cd partoches" >> $@
+#	foreach(f,$(targets) $(addprefix $(prefix)/,$(other_files)))
+#			echo "put_no_sha1 $(basename $f)" >> $@
 
 build : $(prefix)/ftp-script.txt
 
