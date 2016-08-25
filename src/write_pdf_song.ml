@@ -111,7 +111,7 @@ let write_lyrics fout l = (
 	    tex_of_chord (List.hd l)
 	  in
 	  let word = Pcre.get_substring s 2 in
-	  let templ = sprintf "\\textsuperscript{%s}\\underline{%s}" chord word in 
+	  let templ = sprintf "\\textsuperscript{\\textcolor{red}{%s}}\\underline{%s}" chord word in 
 	  let line = Pcre.qreplace_first ~rex:reg ~templ:templ line in 
 	  r line
 	with
