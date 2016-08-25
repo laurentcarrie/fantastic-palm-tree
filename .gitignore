@@ -19,6 +19,8 @@ src/make-chord
 src/make-chord.opt
 src/*.png
 src/*.svg
+src/generate
+src/generate.opt
 tmp/
 sd-24571.dedibox.fr.21.laurent
 song-to-html
