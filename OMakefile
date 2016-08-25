@@ -66,8 +66,10 @@ foreach(src,$(book_files) all)
 
 	section
 		cd tmp
-
-		$s.tex : $(generator) $(src)
+		LocalTeXGeneratedFiles($s.tex)
+#		todo : scanner le .book pour avoir les deps
+#		en attendant... on met tout
+		$s.tex : $(generator) $(src) $(song_files)
 			$(generator) $(srcdir)/songs $(prefix)
 
 		$(prefix)/pdf/$s.pdf : $s.pdf
