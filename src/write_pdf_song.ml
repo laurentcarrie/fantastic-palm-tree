@@ -332,11 +332,6 @@ let write_book book songs = (
 \\makeindex
 
 \\begin{document} 
-
-o barré
-
-ø
-
 \\maketitle
 %%\\begin{multicols}{2}
 " in
