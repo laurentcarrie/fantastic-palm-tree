@@ -33,13 +33,27 @@ module Grille = struct
   }
 end
 
+module Tablature = struct
+  type note = {
+    duration:int ;
+    frette:int ;
+    corde:int ;
+  }
+  type bar = note list 
+  type line = bar list
+  type t = {
+    titre : string ;
+    lines : line list ;
+  }
+end
+
 type context =
 | Normal of string
 | Titre of string
 | Auteur of string
 | Grille of Grille.t
 | Lyrics of (int*string*string list)
-| Tab of string list
+| Tab of Tablature.t
 | Mp3 of string
 | Accords of string list
 | Transpose of int

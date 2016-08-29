@@ -1,6 +1,7 @@
 open Datamodel
 open ExtList
 open ExtString
+open Printf
 
 let barlist_of_string (s:string) : Accord.t list list = (
   let chord_of_string s = 
@@ -42,4 +43,27 @@ let barlist_of_string (s:string) : Accord.t list list = (
     List.map chord_of_string (String.nsplit s " ")
   in
   List.map bar_of_string (String.nsplit s ":")
+) ;;
+
+let note_of_string s : Tablature.note = (
+  let s2 = String.nsplit s  " " in
+  let l = List.map int_of_string s2 in
+    match l with
+      | a::b::c::[] -> {Tablature.duration=a;corde=b;frette=c;}
+      | _ -> let msg = sprintf "error for bar : '%s'" s in failwith msg
+) ;;
+
+let bar_of_string s : Tablature.bar = (
+  let s2 = String.nsplit s ";" in
+  let l = List.map note_of_string s2 in 
+    l
+) ;;
+
+let tab_of_string_list lines : Tablature.line list = (
+  let line_of_string_list line : Tablature.line =
+    let a = String.nsplit line "|" in
+    let bars = List.map bar_of_string a in
+      bars
+  in
+    List.map line_of_string_list lines
 ) ;;

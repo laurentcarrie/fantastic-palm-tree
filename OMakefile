@@ -35,6 +35,15 @@ mkdir -p $(prefix)/pdf
 mkdir -p tmp
 cp song.ist tmp/.
 
+#TEXDEPS+= tmp/image.mps
+
+cp src/image.mp tmp/image.mp
+
+section
+	cd tmp
+	mpost image.mp
+	cp image.1 image.mps
+
 foreach(src,$(song_files))
 	s=$(removesuffix .song,$(basename $(src)))
 	TEXDEPS+=$(src)

@@ -16,10 +16,16 @@ let main () =
     let () = OptParse.OptParser.add opt ~long_name:"prefix" ~help:"installation prefix" o in
     o 
   in
+  let opt_tmpdir = 
+    let o = OptParse.Opt.value_option "" None (fun a->a) ( fun e _ -> Printexc.to_string e) in
+    let () = OptParse.OptParser.add opt ~long_name:"tmp-dir" ~help:"tmp dir" o in
+    o 
+  in
   let _ = OptParse.OptParser.parse_argv opt in
 
 
   let prefix = OptParse.Opt.get opt_prefix in
+  let tmpdir = OptParse.Opt.get opt_tmpdir in
   let l_0_11 = List.init 12 (fun i->i) in
 
   let functions = [
@@ -58,8 +64,8 @@ let main () =
   let () = if OptParse.Opt.get opt_show_targets then (
     let fout = open_out "png_digest.txt" in
     List.iter (    fun (i,c) -> 
-      let svg_filename = "tmp" // c.Chord.filename ^ ".svg" in
-      let png_filename = prefix // "png" // (c.Chord.filename ^ ".png") in
+      let svg_filename = tmpdir // c.Chord.filename ^ ".svg" in
+      let png_filename = prefix // (c.Chord.filename ^ ".png") in
       let () = Chord.write_svg svg_filename c in
       let command = sprintf "inkscape --export-png %s --file %s" png_filename svg_filename in
       let () = printf "%s\n" command ; flush stdout ; in

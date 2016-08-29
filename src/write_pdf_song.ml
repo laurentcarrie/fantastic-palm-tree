@@ -132,23 +132,24 @@ let write_lyrics fout l = (
   ()
 ) 
 
-let write_tab  (pf : ('a, unit, string, unit) format4 -> 'a) l = (
+let write_tab  fout tab = (
+  let pf fs = ksprintf ( fun s -> fprintf fout "%s" s) fs in
+  let title = tab.Tablature.titre in
+  let () = pf "{\\commentfont \\hl{%s}} \n" (tex_of_string title) in  
+  let () = List.iter ( fun line ->
+    List.iter ( fun bar ->
+      List.iter ( fun note ->
+	(* pf "%d %d %d" note.Tablature.duration note.Tablature.frette note.Tablature.corde *)
+	pf " "
+      ) bar
+    ) line
+  ) tab.Tablature.lines
+  in
+    pf "
+\\includegraphics{image.mps}
+" ;
+    ()
 )
-(*
-  pf "%s" "<div class=\"tablature\">\n<pre>" ;
-  List.iter ( fun line ->
-    if line="\\" then (
-      pf "%s" "</p>\n<p class=\"tablature\">\n"
-    )  else (
-      let reg = Str.regexp "{\\(.*\\)}" in
-      let line = Str.global_replace reg "((\\underline{\\1}))" line in
-	pf "%s\n" line
-    )
-  ) l ;
-  pf "%s" "</p>\n" ;
-  pf "%s" "</pre></div>\n" ; 
-) 
-*)
 
 let write_accords  fout l = (
 )
@@ -166,16 +167,20 @@ let write_song_body fout song = (
     | Grille g -> () (*write_grille ~transpose:song.Song.transpose fout name (g:Accord.t list list list)*)
     | Lyrics l -> () (* write_lyrics fout l *)
     | Mp3 l -> write_mp3 pf l
-    | Tab l -> write_tab pf l
+    | Tab tab -> () (* write_tab fout tab *)
     | Accords l -> write_accords fout l
     | Transpose i -> ()
     | PageBreak -> pf "\\newpage\n"
   ) song.Song.data in
 
+
   let (grilles:Grille.t list) = List.rev (List.fold_left ( fun acc c -> match c with | Grille g -> g::acc | _ -> acc ) [] song.Song.data) in
   let () = pf "\\begin{multicols}{2}\n" in
   let () = List.iter ( fun g -> write_grille ~transpose:0 fout g ) grilles in
   let () = pf "\\end{multicols}\n" in
+
+  let (tabs:Tablature.t list) = List.rev (List.fold_left ( fun acc c -> match c with | Tab g -> g::acc | _ -> acc ) [] song.Song.data) in
+  let () = List.iter ( fun g -> write_tab fout g ) tabs in
 
   let lyrics = List.rev (List.fold_left ( fun acc c -> match c with | Lyrics l -> l::acc | _ -> acc ) [] song.Song.data) in
   let nbcols = List.fold_left ( fun acc (n,_,_) -> if n>acc then n else acc) 1 lyrics in
@@ -210,6 +215,7 @@ let write_preamble fout  = (
 \\definecolor{grey}{rgb}{0.7,0.7,0.7}
 \\definecolor{grey8}{rgb}{0.8,0.8,0.8}
 \\sethlcolor{grey8}
+\\usepackage[pdftex]{graphicx}
 %%\\usepackage{lmodern}
 %%\\usepackage{textcomp}
 %%\\usepackage{kpfonts}
@@ -229,6 +235,7 @@ let write_preamble fout  = (
 \\usepackage{titletoc}
 \\hypersetup{ pdftitle={}, pdfauthor={},bookmarks=true, bookmarksopen=true,pdftoolbar=true, pdffitwindow=false,colorlinks=false,linkcolor=red, citecolor=red,filecolor=magenta,urlcolor=black }
 %%\\usepackage{bookmark}
+\\usepackage[metapost,truebbox,mplabels]{mfpic}
 " in
 
 (*

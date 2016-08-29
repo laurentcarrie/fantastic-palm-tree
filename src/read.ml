@@ -39,12 +39,17 @@ let read_song filename : document = (
 	| "\\titre" -> r ((Titre (read_string_until_empty_line fin))::acc)
 	| "\\auteur" -> r ((Auteur (read_string_until_empty_line fin))::acc)
 	| "\\grille" -> (
-	  let (l:string list) = read_array_until_empty_line fin in
-	  let lignes = List.map Read_util.barlist_of_string l in
-	  let g = { Grille.titre=arg;lignes=lignes } in
-	  r ((Grille g)::acc)
-	)
-	| "\\tab" -> r ((Tab (read_array_until_empty_line fin))::acc)
+	    let (l:string list) = read_array_until_empty_line fin in
+	    let lignes = List.map Read_util.barlist_of_string l in
+	    let g = { Grille.titre=arg;lignes=lignes } in
+	      r ((Grille g)::acc)
+	  )
+	| "\\tab" -> (
+	    let l = read_array_until_empty_line fin in
+	    let lines = Read_util.tab_of_string_list l in
+	    let tab = { Tablature.titre=arg;lines=lines } in
+	      r ((Tab tab)::acc)
+	  )
 	| "\\lyrics" -> r ((Lyrics (1,arg,(read_array_until_empty_line fin))::acc))
 	| "\\lyrics2" -> r ((Lyrics (2,arg,(read_array_until_empty_line fin))::acc))
 	| "\\lyrics3" -> r ((Lyrics (3,arg,(read_array_until_empty_line fin))::acc))
