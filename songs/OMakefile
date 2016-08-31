@@ -1,4 +1,4 @@
-.PHONY: build all  xxx
+.PHONY: build all  xxx pdf
 
 .DEFAULT: build
 
@@ -10,8 +10,15 @@ USEPDFLATEX=true
 
 		println($"$@: $(deps)")
 
+.SCANNER: scan-book-%.book : %.book $(generator) :value: $(digest $&)
+	section
+		$(generator) --book $< --srcdir $(srcdir)/songs --show-deps
+
 %.tex : %.song :scanner: scan-song-%.song
 	$(generator) --song $< --prefix $(prefix) --tmp-dir .
+
+book-%.tex : %.book :scanner: scan-book-%.book
+	$(generator) --book $< --prefix $(prefix) --tmp-dir . --srcdir $(srcdir)/songs
 
 song_dirs[]=
 	jetlagers
@@ -21,18 +28,36 @@ song_dirs[]=
 	others
 	muse
 	michel-jackson
+	books
 
 
 .SUBDIRS: $(song_dirs)
 	c=$(addprefix $(absname $(srcdir)),$(removeprefix $(absname $(ROOT)),$(absname $(CWD))))
-        println($c)
 	songs = $(find $c -name *.song)
 	songs = $(removeprefix $c/,$(songs))
-	println($"xxxxxxxx $(songs)")
 	songs = $(removesuffix $(songs))
 	xxx : $(addsuffix .tex,$(songs))
 	foreach(s,$(songs))
 		LaTeXDocument($s,$s)
+		xxx : $(addsuffix .pdf,$s)
+		$(prefix)/pdf/$s.pdf : $s.pdf
+			cp $< $@
+		pdf : $(prefix)/pdf/$s.pdf
 		export
-	xxx : $(addsuffix .pdf,$(songs))
+
+.SUBDIRS: $(song_dirs)
+	c=$(addprefix $(absname $(srcdir)),$(removeprefix $(absname $(ROOT)),$(absname $(CWD))))
+        println($c)
+	books = $(find $c -name *.book)
+	books = $(removeprefix $c/,$(books))
+	books = $(removesuffix $(books))
+	println($"books : $(books)")
+	xxx : $(addsuffix .tex,$(books))
+	foreach(s,$(books))
+		LaTeXDocument(book-$s,book-$s)
+		xxx : $(addsuffix .pdf,$s)
+		$(prefix)/pdf/book-$s.pdf : book-$s.pdf
+			cp $< $@
+		pdf : $(prefix)/pdf/book-$s.pdf
+		export
 

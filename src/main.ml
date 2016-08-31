@@ -68,7 +68,7 @@ let _ =
     let () = match makedict,showdeps,song,book,prefix,tmpdir,srcdir with
       | Some filename,false,None,None,None,None,None -> make_dictionary filename args
       | None,true,Some song,None,None,None,None -> Song.print_deps song
-      | None,true,None,Some book,None,None,None -> Book.print_deps book
+      | None,true,None,Some filename,None,None,Some srcdir -> Book.print_deps (Book.read ~filename ~srcdir )
       | None,false,Some filename,None,Some prefix,Some tmpdir,None -> Song.write (Song.read filename) prefix tmpdir
       | None,false,None,Some filename,Some prefix,Some tmpdir,Some srcdir -> Book.write ~book:(Book.read ~filename ~srcdir) ~tmpdir 
       | _ -> failwith "bad args combination"
@@ -77,7 +77,6 @@ let _ =
       exit 0
   with
   | e -> (
-    printf "xxxx %s\n" (Printexc.to_string e) ; 
     Printexc.print_backtrace stdout ;
     exit 1 
   )

@@ -6,11 +6,11 @@ open Printf
 let (//) = Filename.concat
 
 let open_out msg s = 
-  printf "open_out (%s) %s\n" msg s; flush stdout ;
+  (* eprintf "open_out (%s) %s\n" msg s; flush stdout ; *)
   open_out s
 
 let open_in msg s = 
-  printf "open_in (%s) %s\n" msg s ; flush stdout ;
+  (* eprintf "open_in (%s) %s\n" msg s ; flush stdout ; *)
   open_in s
 
 

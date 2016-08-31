@@ -6,7 +6,16 @@ open Read_util
 module D = Datamodel
 
 let print_deps book = (
-  printf "\n" ; flush stdout 
+  let deps = List.fold_left ( fun acc d ->
+    match d with 
+      (* | D.Book.NF s -> acc ^ " " ^ "Not found : " ^ s *)
+      | D.Book.NF _ -> acc
+      | D.Book.S song -> acc ^ " " ^ song.D.Song.filename
+  ) "" book.D.Book.songs in
+    
+  let s = (Filename.chop_extension book.D.Book.filename) ^ ".tex" in
+    eprintf "book-%s: %s\n" s deps  ; flush stderr ;
+    printf "book-%s: %s\n" s deps  ; flush stdout 
 )
 
 
