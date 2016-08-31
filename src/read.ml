@@ -6,73 +6,6 @@ open Datamodel
 
 let (//) = Filename.concat
 
-
-let read_array_until_empty_line fin = (
-  let rec r acc =
-    try
-      let line = input_line fin in
-      let line = String.strip line in
-      if line = "" then ( List.rev acc) else ( r (line::acc))
-    with
-    | End_of_file -> (List.rev acc)
-  in
-  r []
-) ;;
-
-
-let read_string_until_empty_line fin = (
-  let a = read_array_until_empty_line fin in
-  String.join "\n" a
-) ;;
-
-
-let read_song filename : document = (
-  let fin = open_in "read song" filename in
-  let rec r acc  = 
-    try
-      let line = String.strip (input_line fin) in
-      if String.starts_with line "#" then
-	r acc 
-      else (
-	let (word,arg) = try String.split line " " with | ExtString.Invalid_string -> line,"" in
-	match word with
-	| "\\titre" -> r ((Titre (read_string_until_empty_line fin))::acc)
-	| "\\auteur" -> r ((Auteur (read_string_until_empty_line fin))::acc)
-	| "\\grille" -> (
-	    let (l:string list) = read_array_until_empty_line fin in
-	    let lignes = List.map Read_util.barlist_of_string l in
-	    let g = { Grille.titre=arg;lignes=lignes } in
-	      r ((Grille g)::acc)
-	  )
-	| "\\tab" -> (
-	    let l = read_array_until_empty_line fin in
-	    let lines = Read_util.tab_of_string_list l in
-	    let tab = { Tablature.titre=arg;lines=lines } in
-	      r ((Tab tab)::acc)
-	  )
-	| "\\lyrics" -> r ((Lyrics (1,arg,(read_array_until_empty_line fin))::acc))
-	| "\\lyrics2" -> r ((Lyrics (2,arg,(read_array_until_empty_line fin))::acc))
-	| "\\lyrics3" -> r ((Lyrics (3,arg,(read_array_until_empty_line fin))::acc))
-	| "\\mp3" -> r ((Mp3 (read_string_until_empty_line fin))::acc)
-	| "\\transpose" -> r ((Transpose (int_of_string (read_string_until_empty_line fin))::acc))
-	| "\\pagebreak" -> r ((PageBreak :: acc))
-	| "\\chords"
-	| "\\accords" -> 
-	  r ((Accords ((read_array_until_empty_line fin)))::acc)
-	| "" -> r acc
-	| s -> r ((Normal s)::acc)
-      )
-    with
-    | End_of_file -> (
-      close_in fin ;
-      List.rev acc
-    )
-  in
-  let data = r []   in
-  data
-) ;;
-
-
 let manage_book filename book_id = (
   let fin = open_in "manage book" filename in
   let print_index=false in
@@ -91,26 +24,7 @@ let manage_book filename book_id = (
     {Book.filename=filename;titre;auteur="book";id=book_id;songs=songs;print_index=print_index}
 )
 
-
-let manage_song filename fileout_latex song_id = (
-  try
-    let data = read_song filename in
-    let title = List.fold_left ( fun acc d -> match d with | Titre s -> s | _ -> acc ) "???" data in
-    let auteur = List.fold_left ( fun acc d -> match d with | Auteur s -> s | _ -> acc ) "???" data in
-    let transpose = List.fold_left ( fun acc d -> match d with | Transpose h -> h | _ -> acc ) 0 data in
-    let () = assert(title<>"") in
-    let song = {Song.filename=filename;titre=title;auteur=auteur;id=song_id;data=data;transpose=transpose;} in
-    let () =
-      let fout = open_out "manage song latex" (fileout_latex) in
-      let () = Write_pdf_song.write_song fout song in
-      close_out fout ;
-    in
-    song
-  with
-    | e -> failwith (sprintf "ERREUR : %s\n" (Printexc.to_string e) )
-) ;;
-
-
+(*
 let rec walk (songs,books) dirname dirout = (
   printf "enter directory %s\n" dirname ; flush stdout ;
   let entries = Sys.readdir dirname in
@@ -143,26 +57,54 @@ let rec walk (songs,books) dirname dirout = (
   ) (songs,books) entries in
     songs,books
 )
-  
+*)
 
 let _ = 
   try
-    let () = Printexc.record_backtrace true in () ;
-      assert(Array.length Sys.argv > 2) ;
+    let () = Printexc.record_backtrace true in
 
-      let prefix = Sys.argv.(2) in
-	
-  let (songs,books) = walk ([],[]) Sys.argv.(1) prefix in
-
-    let books = 
-      let all = { Book.filename="all.book" ; titre = "all" ; auteur = "yyy" ; id = "xxx" ; 
-		  songs = List.sort ~cmp:Helpers.uppercase_compare (List.map ( fun b -> b.Song.titre ) songs) ;
-		  print_index=true ;} in
-      all::books 
+    let opt = OptParse.OptParser.make () in
+    let opt_showdeps = 
+      let o = OptParse.StdOpt.store_false () in
+      let () = OptParse.OptParser.add opt ~long_name:"show-deps" ~help:"show deps" o  in
+	o
+    in
+    let opt_prefix = 
+      let o = OptParse.Opt.value_option "" None (fun a->a) ( fun e _ -> Printexc.to_string e) in
+      let () = OptParse.OptParser.add opt ~long_name:"prefix" ~help:"installation prefix" o in
+	o 
+    in
+    let opt_song = 
+      let o = OptParse.Opt.value_option "" None (fun a->a) ( fun e _ -> Printexc.to_string e) in
+      let () = OptParse.OptParser.add opt ~long_name:"song" ~help:"song" o in
+	o 
+    in
+    let opt_book = 
+      let o = OptParse.Opt.value_option "" None (fun a->a) ( fun e _ -> Printexc.to_string e) in
+      let () = OptParse.OptParser.add opt ~long_name:"book" ~help:"book" o in
+	o 
+    in
+    let opt_tmpdir = 
+      let o = OptParse.Opt.value_option "" None (fun a->a) ( fun e _ -> Printexc.to_string e) in
+      let () = OptParse.OptParser.add opt ~long_name:"tmp-dir" ~help:"tmp dir" o in
+	o 
     in
 
+    let _ = OptParse.OptParser.parse_argv opt in
 
-      List.iter ( fun b -> printf "book : %s (%d songs)\n" b.Book.filename (List.length b.Book.songs) ;  Write_pdf_song.write_book b songs ) books ;
+    let showdeps = OptParse.Opt.get opt_showdeps in
+    let song = OptParse.Opt.opt opt_song in
+    let book = OptParse.Opt.opt opt_book in
+    let prefix = OptParse.Opt.opt opt_prefix in
+    let tmpdir = OptParse.Opt.opt opt_tmpdir in
+
+    let () = match showdeps,song,book,prefix,tmpdir with
+      | true,Some song,None,None,None -> show_deps_song song
+      | true,None,Some book,None,None -> show_deps_book book
+      | false,Some filename,None,Some prefix,Some tmpdir -> Song.write (Song.read filename) prefix tmpdir
+      | false,None,Some filename,Some prefix,Some tmpdir -> Book.write (Book.read filename) prefix tmpdir
+      | _ -> failwith "bad args combination"
+    in
 
       exit 0
   with

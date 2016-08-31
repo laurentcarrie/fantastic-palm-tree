@@ -1,8 +1,9 @@
 open ExtList
 open ExtString
 open Printf
+open Read_util
 
-open Datamodel
+module D = Datamodel
 
 let (//) = Filename.concat
 
@@ -10,19 +11,19 @@ let write_mp3 (pf : ('a, unit, string, unit) format4 -> 'a) title = (
   (* pf "mp3 file : %s\n" title  *)
 ) ;;
 
-let tex_of_chord (c:Accord.t) = (
-  let s = sprintf "%c" c.Accord.note in
-  let s = match c.Accord.alteration with
-    | Accord.None -> s
-    | Accord.Flat -> s ^ "\\textsuperscript{$\\flat$}"
-    | Accord.Sharp -> s ^ "\\textsuperscript{$\\sharp$}"
+let tex_of_chord (c:D.Accord.t) = (
+  let s = sprintf "%c" c.D.Accord.note in
+  let s = match c.D.Accord.alteration with
+    | D.Accord.None -> s
+    | D.Accord.Flat -> s ^ "\\textsuperscript{$\\flat$}"
+    | D.Accord.Sharp -> s ^ "\\textsuperscript{$\\sharp$}"
   in
-  let s = if c.Accord.diminue then s^"ø" else s in
+  let s = if c.D.Accord.diminue then s^"ø" else s in
   let subscript = "" in
-  let subscript = if c.Accord.minor then subscript^"m" else subscript in
-  let subscript = if c.Accord.minor7 then subscript^"7" else subscript in
-  let subscript = if c.Accord.major7 then subscript^"7M" else subscript in
-  let subscript = if c.Accord.sus4 then subscript^"sus4" else subscript in
+  let subscript = if c.D.Accord.minor then subscript^"m" else subscript in
+  let subscript = if c.D.Accord.minor7 then subscript^"7" else subscript in
+  let subscript = if c.D.Accord.major7 then subscript^"7M" else subscript in
+  let subscript = if c.D.Accord.sus4 then subscript^"sus4" else subscript in
   let s = if subscript="" then s else s^"\\textsubscript{"^subscript^"}" in
   let s = if s="%" then "" else ""^s^"" in
   s
@@ -37,30 +38,30 @@ let tex_of_string c = (
   ]
 )
 
-let write_grille ~transpose fout (g:Grille.t) = (
+let write_grille ~transpose fout (g:D.Grille.t) = (
   let pf fs = ksprintf ( fun s -> fprintf fout "%s" s) fs in
 
   let taille = List.fold_left ( fun t line ->
     let t2 = List.length line in
     if t > t2 then t else t2
-  ) 0 g.Grille.lignes in
+  ) 0 g.D.Grille.lignes in
 
   pf "\
 
   \\centering
 " ;
-  pf "%%\\caption*{%s}\n" (tex_of_string g.Grille.titre) ;
+  pf "%%\\caption*{%s}\n" (tex_of_string g.D.Grille.titre) ;
 
   (* if g.Grille.titre <> "" then pf "{\\lyricstitlefont %s}\\\\\n\n" (tex_of_string g.Grille.titre) else () ; *)
   pf "\\begin{grillefont} \n" ;
   pf "\\begin{tabular}{|%s|}\n" (String.join "|" 
        (List.init taille (fun _ -> "M{2cm}"))
 ) ;
-  let () = pf "\\multicolumn{%d}{c}{\\lyricstitlefont %s} \\\\\n" taille (tex_of_string g.Grille.titre)  in
+  let () = pf "\\multicolumn{%d}{c}{\\lyricstitlefont %s} \\\\\n" taille (tex_of_string g.D.Grille.titre)  in
   let length = List.fold_left ( fun previous_length line ->
     let l = Pervasives.max previous_length (List.length line) in
     pf "\\cline{1-%d}\n" l ;
-    let tex_of_bar (b:Accord.t list) = 
+    let tex_of_bar (b:D.Accord.t list) = 
       let  l = List.map tex_of_chord b in
       let s = match l with
 	| [] -> ""
@@ -76,7 +77,7 @@ let write_grille ~transpose fout (g:Grille.t) = (
     pf "%s" (String.join " & " bars ) ;
     pf "%s" "\\\\\n" ;
     List.length line
-  ) (-1) g.Grille.lignes in
+  ) (-1) g.D.Grille.lignes in
   pf "\
   \\cline{1-%d}
   \\end{tabular}
@@ -134,16 +135,16 @@ let write_lyrics fout l = (
 
 let write_tab  fout tab = (
   let pf fs = ksprintf ( fun s -> fprintf fout "%s" s) fs in
-  let title = tab.Tablature.titre in
+  let title = tab.D.Tablature.titre in
   let () = pf "{\\commentfont \\hl{%s}} \n" (tex_of_string title) in  
   let () = List.iter ( fun line ->
     List.iter ( fun bar ->
       List.iter ( fun note ->
-	(* pf "%d %d %d" note.Tablature.duration note.Tablature.frette note.Tablature.corde *)
+	(* pf "%d %d %d" note.D.Tablature.duration note.D.Tablature.frette note.D.Tablature.corde *)
 	pf " "
       ) bar
     ) line
-  ) tab.Tablature.lines
+  ) tab.D.Tablature.lines
   in
     pf "
 \\includegraphics{image.mps}
@@ -161,28 +162,28 @@ let write_song_body fout song = (
 
   let () = List.iter ( fun c ->
     match c with 
-    | Normal s -> pf "%s\n" s
-    | Titre _ 
-    | Auteur _ -> ()
-    | Grille g -> () (*write_grille ~transpose:song.Song.transpose fout name (g:Accord.t list list list)*)
-    | Lyrics l -> () (* write_lyrics fout l *)
-    | Mp3 l -> write_mp3 pf l
-    | Tab tab -> () (* write_tab fout tab *)
-    | Accords l -> write_accords fout l
-    | Transpose i -> ()
-    | PageBreak -> pf "\\newpage\n"
-  ) song.Song.data in
+    | D.Normal s -> pf "%s\n" s
+    | D.Titre _ 
+    | D.Auteur _ -> ()
+    | D.Grille g -> () (*write_grille ~transpose:song.Song.transpose fout name (g:Accord.t list list list)*)
+    | D.Lyrics l -> () (* write_lyrics fout l *)
+    | D.Mp3 l -> write_mp3 pf l
+    | D.Tab tab -> () (* write_tab fout tab *)
+    | D.Accords l -> write_accords fout l
+    | D.Transpose i -> ()
+    | D.PageBreak -> pf "\\newpage\n"
+  ) song.D.Song.data in
 
 
-  let (grilles:Grille.t list) = List.rev (List.fold_left ( fun acc c -> match c with | Grille g -> g::acc | _ -> acc ) [] song.Song.data) in
+  let (grilles:D.Grille.t list) = List.rev (List.fold_left ( fun acc c -> match c with | D.Grille g -> g::acc | _ -> acc ) [] song.D.Song.data) in
   let () = pf "\\begin{multicols}{2}\n" in
   let () = List.iter ( fun g -> write_grille ~transpose:0 fout g ) grilles in
   let () = pf "\\end{multicols}\n" in
 
-  let (tabs:Tablature.t list) = List.rev (List.fold_left ( fun acc c -> match c with | Tab g -> g::acc | _ -> acc ) [] song.Song.data) in
+  let (tabs:D.Tablature.t list) = List.rev (List.fold_left ( fun acc c -> match c with | D.Tab g -> g::acc | _ -> acc ) [] song.D.Song.data) in
   let () = List.iter ( fun g -> write_tab fout g ) tabs in
 
-  let lyrics = List.rev (List.fold_left ( fun acc c -> match c with | Lyrics l -> l::acc | _ -> acc ) [] song.Song.data) in
+  let lyrics = List.rev (List.fold_left ( fun acc c -> match c with | D.Lyrics l -> l::acc | _ -> acc ) [] song.D.Song.data) in
   let nbcols = List.fold_left ( fun acc (n,_,_) -> if n>acc then n else acc) 1 lyrics in
   let () = if nbcols>1 then pf "\\begin{multicols}{%d}\n" nbcols in
   let () = List.iter ( fun l -> write_lyrics fout l ) lyrics in
@@ -296,12 +297,12 @@ let write_song fout song = (
   let () = write_preamble fout in
   let _ = pf  "\
 \\title{%s}
-" song.Song.titre 
+" song.D.Song.titre 
   in
-  let () = pf "\\author{%s}\n" song.Song.auteur in
+  let () = pf "\\author{%s}\n" song.D.Song.auteur in
 
-  let () = pf "\\fancyhead[L]{{\\titlefont %s} } \n"  song.Song.titre in 
-  let () = pf "\\fancyhead[R]{{\\authorfont %s}} \n"  song.Song.auteur in
+  let () = pf "\\fancyhead[L]{{\\titlefont %s} } \n"  song.D.Song.titre in 
+  let () = pf "\\fancyhead[R]{{\\authorfont %s}} \n"  song.D.Song.auteur in
   let () = pf "\\fancyhead[C]{} \n" in
 
   let () = pf "
@@ -320,14 +321,14 @@ let write_song fout song = (
 )
 
 
-let write_book book songs = (
-  let fout = open_out "book" ( ("book-"^(Filename.chop_suffix (Filename.basename book.Book.filename) ".book")^".tex")) in
+let write_book ~book ~songs ~tmpdir  = (
+  let fout = open_out "book" ( tmpdir // ("book-"^(Filename.chop_suffix (Filename.basename book.D.Book.filename) ".book")^".tex")) in
   let pf fs = ksprintf ( fun s -> fprintf fout "%s" s) fs in
     
   let () = write_preamble fout in
   let _ = pf  "\
 \\title{%s}
-" (Filename.basename book.Book.titre)
+" (Filename.basename book.D.Book.titre)
   in
 
   let () = pf "
@@ -354,30 +355,21 @@ let write_book book songs = (
 \\tableofcontents{}
 \\end{multicols}
 " in
-  let () = if book.Book.print_index then 
+  let () = if book.D.Book.print_index then 
     pf "\\printindex\n" else 
       pf "%%printindex was not set\n"
   in
-  let songs = List.fold_left ( fun acc b ->
-    try 
-      let song = List.find ( fun s -> s.Song.titre = b ) songs  in
-      (b,Some song)::acc
-    with
-    | Not_found -> (b,None)::acc
-  ) [] book.Book.songs in
-  let songs = List.rev songs in
-
   let () = List.iter ( fun (name,song) ->
     match song with
     | Some song -> (
       let () = pf "\\clearpage\n" in
-      let () = pf "\\index{%s!%s}" song.Song.auteur song.Song.titre in
-      let () = pf "%%\\pdfbookmark[1]{%s}{%s}\n" song.Song.titre song.Song.titre in
-      let () = pf "%%\\invisiblesection{%s}\n" song.Song.titre in
+      let () = pf "\\index{%s!%s}" song.D.Song.auteur song.D.Song.titre in
+      let () = pf "%%\\pdfbookmark[1]{%s}{%s}\n" song.D.Song.titre song.D.Song.titre in
+      let () = pf "%%\\invisiblesection{%s}\n" song.D.Song.titre in
       let () = pf "\\fancyhead[L]{{\\invisiblesection{%s (%s)} \\titlefont %s} } \n" 
-	song.Song.titre song.Song.auteur
-	song.Song.titre in 
-      let () = pf "\\fancyhead[R]{{\\authorfont %s}} \n"  song.Song.auteur in
+	song.D.Song.titre song.D.Song.auteur
+	song.D.Song.titre in 
+      let () = pf "\\fancyhead[R]{{\\authorfont %s}} \n"  song.D.Song.auteur in
       let () = pf "\\fancyhead[C]{} \n" in
       write_song_body fout song
     )

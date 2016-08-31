@@ -10,6 +10,7 @@ u=0.2cm ;
 %draw (i*u,j*u); 
 %endfor
 %endfor
+  pickup pencircle scaled 0.2pt ;
   for i=0 upto 5 :
     draw (0,i*1u) -- (nb*b,i*1u) ;
   endfor

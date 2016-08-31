@@ -44,6 +44,8 @@ section
 	mpost image.mp
 	cp image.1 image.mps
 
+tmpdir=$(dir tmp)
+
 foreach(src,$(song_files))
 	s=$(removesuffix .song,$(basename $(src)))
 	TEXDEPS+=$(src)
@@ -54,7 +56,7 @@ foreach(src,$(song_files))
 
 		LocalTeXGeneratedFiles($s.tex)
 		$s.tex : $(generator) $(src)
-			$(generator) $(srcdir)/songs $(prefix)
+			$(generator) --song $(src) --prefix $(prefix) --tmp-dir $(tmpdir)
 
 		$(prefix)/pdf/$s.pdf : $s.pdf 
 			cp $< $@
@@ -66,7 +68,13 @@ foreach(src,$(song_files))
 	export
 	export .RULE
 
-foreach(src,$(book_files) all)
+#dictionary = $(tmpdir)/dictionary.txt
+#$(dictionary) : $(generator) $(song_files)
+#	$(generator) --make-dictionary $@ $(song_files)
+
+songs_srcdir = $(absname $(ROOT)/songs)
+
+foreach(src,$(book_files) )
 	s=$(removesuffix .book,$(basename $(src)))
 	TEXDEPS+=$(src) 
 	TEXDEPS+= song.ist 
@@ -79,7 +87,7 @@ foreach(src,$(book_files) all)
 #		todo : scanner le .book pour avoir les deps
 #		en attendant... on met tout
 		$s.tex : $(generator) $(src) $(song_files)
-			$(generator) $(srcdir)/songs $(prefix)
+			$(generator) --book $(src) --prefix $(prefix) --tmp-dir $(tmpdir) --srcdir $(songs_srcdir)
 
 		$(prefix)/pdf/$s.pdf : $s.pdf
 			cp $< $@

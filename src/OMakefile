@@ -27,14 +27,17 @@ OCAMLFLAGS    += -g -warn-error A
 # OCAML_NATIVE_LINK_FLAGS +=
 
 src[]=
-	read
+	song
+	book
+#	read
 	datamodel
 	helpers
-	write_index
+#	write_index
 #	write_song
 	write_pdf_song
 	chord
 	read_util
+	main
 
 src_chord[]=
 	chord

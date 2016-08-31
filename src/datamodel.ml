@@ -67,7 +67,6 @@ module Song = struct
     filename:string ;
     titre:string ;
     auteur:string ;
-    id:string ;
     data:context list ;
   }
 end
@@ -77,18 +76,9 @@ module Book = struct
     filename:string ;
     titre:string ;
     auteur:string ;
-    id:string ;
     songs:string list ;
     print_index:bool ;
   }
 end
 
 
-
-let open_out msg s = 
-  printf "open_out (%s) %s\n" msg s; flush stdout ;
-  open_out s
-
-let open_in msg s = 
-  printf "open_in (%s) %s\n" msg s ; flush stdout ;
-  open_in s

@@ -3,6 +3,17 @@ open ExtList
 open ExtString
 open Printf
 
+let (//) = Filename.concat
+
+let open_out msg s = 
+  printf "open_out (%s) %s\n" msg s; flush stdout ;
+  open_out s
+
+let open_in msg s = 
+  printf "open_in (%s) %s\n" msg s ; flush stdout ;
+  open_in s
+
+
 let barlist_of_string (s:string) : Accord.t list list = (
   let chord_of_string s = 
     let s = String.strip s in
@@ -67,3 +78,26 @@ let tab_of_string_list lines : Tablature.line list = (
   in
     List.map line_of_string_list lines
 ) ;;
+
+
+
+let read_array_until_empty_line fin = (
+  let rec r acc =
+    try
+      let line = input_line fin in
+      let line = String.strip line in
+      if line = "" then ( List.rev acc) else ( r (line::acc))
+    with
+    | End_of_file -> (List.rev acc)
+  in
+  r []
+) ;;
+
+
+let read_string_until_empty_line fin = (
+  let a = read_array_until_empty_line fin in
+  String.join "\n" a
+) ;;
+
+
+
