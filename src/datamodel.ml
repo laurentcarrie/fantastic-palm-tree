@@ -72,11 +72,14 @@ module Song = struct
 end
 
 module Book = struct
+  type s =
+      | NF of string (* not found *)
+      | S of Song.t
   type t = {
     filename:string ;
     titre:string ;
     auteur:string ;
-    songs:string list ;
+    songs:s list ;
     print_index:bool ;
   }
 end

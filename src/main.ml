@@ -70,7 +70,7 @@ let _ =
       | None,true,Some song,None,None,None,None -> Song.print_deps song
       | None,true,None,Some book,None,None,None -> Book.print_deps book
       | None,false,Some filename,None,Some prefix,Some tmpdir,None -> Song.write (Song.read filename) prefix tmpdir
-      | None,false,None,Some filename,Some prefix,Some tmpdir,Some srcdir -> Book.write ~book:(Book.read ~filename) ~prefix ~tmpdir ~srcdir
+      | None,false,None,Some filename,Some prefix,Some tmpdir,Some srcdir -> Book.write ~book:(Book.read ~filename ~srcdir) ~tmpdir 
       | _ -> failwith "bad args combination"
     in
 

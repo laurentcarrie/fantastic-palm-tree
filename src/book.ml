@@ -10,7 +10,7 @@ let print_deps book = (
 )
 
 
-let read ~filename   = (
+let read ~filename ~srcdir  = (
   let fin = open_in "manage book" filename in
   let print_index=false in
   let rec r print_index acc =
@@ -25,24 +25,19 @@ let read ~filename   = (
   let (print_index,songs) = r print_index [] in 
   let titre = Filename.basename filename in
   let () = assert (titre <> "" ) in
+  let songs = List.map ( fun  filename ->
+    try
+      let s = Song.read (srcdir // filename) in
+	D.Book.S s
+    with
+      | _ -> (
+	D.Book.NF  (filename)
+	)
+  )  songs in
     {D.Book.filename=filename;titre;auteur="book";songs=songs;print_index=print_index}
 )
 
 
-let write ~book ~prefix ~tmpdir ~srcdir = (
-  let songs = List.fold_left ( fun acc filename ->
-    let (name,song) =
-      try
-	let s = Song.read (srcdir // filename) in
-	  s.D.Song.titre , Some s
-      with
-	| _ -> (
-	    printf "XXXXXXXXXXXXXXXXXXXXXXXXX '%s'\n" (srcdir//filename) ;
-	    (srcdir//filename),None
-	  )
-    in
-      (name,song)::acc
-  ) [] book.D.Book.songs in
-  let songs = List.rev songs in
-    Write_pdf_song.write_book ~book ~songs ~tmpdir 
+let write ~book  ~tmpdir  = (
+  Write_pdf_song.write_book ~book ~tmpdir 
 )

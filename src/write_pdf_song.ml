@@ -321,7 +321,7 @@ let write_song fout song = (
 )
 
 
-let write_book ~book ~songs ~tmpdir  = (
+let write_book ~book ~tmpdir  = (
   let fout = open_out "book" ( tmpdir // ("book-"^(Filename.chop_suffix (Filename.basename book.D.Book.filename) ".book")^".tex")) in
   let pf fs = ksprintf ( fun s -> fprintf fout "%s" s) fs in
     
@@ -359,9 +359,9 @@ let write_book ~book ~songs ~tmpdir  = (
     pf "\\printindex\n" else 
       pf "%%printindex was not set\n"
   in
-  let () = List.iter ( fun (name,song) ->
+  let () = List.iter ( fun song ->
     match song with
-    | Some song -> (
+    | D.Book.S song -> (
       let () = pf "\\clearpage\n" in
       let () = pf "\\index{%s!%s}" song.D.Song.auteur song.D.Song.titre in
       let () = pf "%%\\pdfbookmark[1]{%s}{%s}\n" song.D.Song.titre song.D.Song.titre in
@@ -373,18 +373,18 @@ let write_book ~book ~songs ~tmpdir  = (
       let () = pf "\\fancyhead[C]{} \n" in
       write_song_body fout song
     )
-    | None -> (
+    | D.Book.NF filename -> (
       let () = pf "\\clearpage\n" in 
 
-      let () = pf "\\section{%s (non trouvé)}\n" name in
-      let () = pf "\\fancyhead[L]{{\\titlefont %s} } \n"  name in
+      let () = pf "\\section{%s (non trouvé)}\n" filename in
+      let () = pf "\\fancyhead[L]{{\\titlefont %s} } \n"  filename in
       let () = pf "\\fancyhead[R]{{\\authorfont %s}} \n"  "" in 
       let () = pf "\\fancyhead[C]{} \n" in
 
-      let () = pf "no such song : '%s'\n" name in
+      let () = pf "no such song : '%s'\n" filename in
       ()
     )
-  ) songs in
+  ) book.D.Book.songs in
 
   let () = pf "
 \\end{document}
