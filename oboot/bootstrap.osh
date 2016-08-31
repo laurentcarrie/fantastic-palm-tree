@@ -1,0 +1,100 @@
+open configure/Configure
+
+default_prefix = install
+
+
+ConfMsgChecking($"whether variable 'prefix' was specified on the command-line")
+prefix =
+	try
+#		# Pour attraper le cas prefix= sur la ligne de commande
+		if $(equal $(string-length $(string $(prefix))), 0)
+			raise Exception
+		ConfMsgResult($(string $(prefix)))
+		value $(string $(prefix))
+	default
+		ConfMsgResult(no)
+		print($">prefix ")
+		prefix = $(input-line $(stdin))
+		if $(equal $(string-length $(prefix)), 0)
+			prefix = $(default_prefix)
+			export prefix
+		println($(EMPTY))
+		value $(prefix)
+
+
+srcdir = $(absname $(dirname $(nth 0, $(argv))))
+default_settings_file = $(absname $(srcdir)/host_settings.default)
+host = $(lowercase $(rootname $(rootname $(HOST))))
+user_settings_file = $(absname $(HOME)/.omake/hosts/$(host).om)
+
+
+println($"--- Building rebootstrap_and_reconfigure script")
+if $(equal $(OSTYPE), Win32)
+	echo $"""
+@del /F $(srcdir)\*.omc *.omc local\*.omc
+@osh --force-dotomake $(srcdir)/bootstrap.osh %* prefix=$(quote $(prefix))
+""" > rebootstrap_and_reconfigure.cmd
+	chmod(u+x, rebootstrap_and_reconfigure.cmd)
+else
+	echo $"""#! /bin/sh
+rm -f $(srcdir)/*.omc *.omc local/*.omc
+osh --force-dotomake $(srcdir)/bootstrap.osh $(string \$)* prefix=$(quote $(prefix))
+""" > rebootstrap_and_reconfigure
+	chmod(u+x, rebootstrap_and_reconfigure)
+
+
+# Nous recopions l'ensemble des fichiers requis pour un build
+println($"--- Copying files from $(srcdir)")
+echo $"""# These values were automatically prepended by $(srcdir)/bootstrap.osh
+srcdir = $(dirname $(srcdir))
+builddir = .
+prefix = $(string \$)(string $(prefix))
+
+# Followed by the contents of $(srcdir)/OMakeroot.default""" > OMakeroot
+cat $(srcdir)/OMakeroot.default >> OMakeroot
+
+cat $(srcdir)/OMakefile.default > OMakefile
+cat $(srcdir)/success.ascii.root > success.ascii
+cat $(srcdir)/fail.ascii.root > fail.ascii
+mkdir -p local
+cat $(srcdir)/local/Configure.om > local/Configure.om
+cat $(srcdir)/local/Distribute.om > local/Distribute.om
+cat $(srcdir)/local/C.om > local/C.om
+cat $(srcdir)/local/Compatibility.om > local/Compatibility.om
+cat $(srcdir)/local/LaTeX.om > local/LaTeX.om
+cat $(srcdir)/local/OCaml.om > local/OCaml.om
+cat $(srcdir)/local/Song.om > local/Song.om
+
+
+# Recuperation de la configuration de la machine
+# Ce fichier fournit les flags de compilation
+# ainsi que l'emplacement des divers COTS
+if $(test -f $(user_settings_file))
+        println($"--- Copying $(homename $(user_settings_file)) locally.")
+        cat $(user_settings_file) > $(host).om
+else
+	println($"--- Copying $(default_settings_file) as $(host).om")
+        cat $(default_settings_file) > $(host).om
+        println($"""
+You'll probably need to edit $(host).om at least to adapt COTS
+locations. When done, you can save it as
+
+	$(homename $(user_settings_file))
+
+This way it will be automatically picked up whenever you'll bootstrap
+this project again on this host.
+""")
+
+
+# Recapitulatif
+println($"""--- Configuration summary:
+
+
+	Source directory ...... $(dirname $(srcdir))
+	Build directory ....... $(absname .)
+	Installation prefix ... $(absname $(prefix))
+
+""")
+
+
+

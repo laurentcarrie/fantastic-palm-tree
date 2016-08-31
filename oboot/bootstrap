@@ -1,0 +1,4 @@
+#! /bin/sh
+rm -f $(dirname $0)/*.omc
+exec osh --force-dotomake $(dirname $0)/bootstrap.osh $*
+

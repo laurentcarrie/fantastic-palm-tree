@@ -1,0 +1,75 @@
+# Histoire d'avoir des repertoires relatifs par la suite
+public.srcdir   = $(dir $(srcdir))
+public.builddir = $(dir $(builddir))
+public.includedir = $(dir $(prefix)/include)
+
+# On se donne les droits d'ecriture sur toute l'arborescence
+# locale, histoire d'eviter des pbs d'ecritures lorsque
+# l'on a vmount des fichiers readonly
+chmod -r u+w .
+
+# On monte l'arborescence des sources en recreant
+# les repertoires au vol
+CREATE_SUBDIRS = true
+vmount(-c, $(srcdir), .)
+
+
+
+# On reference ces fichiers afin qu'ils soient automatiquement
+# synchronises avant meme l'execution de la suite
+bootstrap_files[] =
+	oboot/VERSION
+	oboot/BRANCH
+
+
+.PHONY: bootstrap
+bootstrap: $(bootstrap_files)
+
+open local/Configure
+open local/Distribute
+open local/C
+open local/LaTeX
+open local/OCaml
+open local/Song.om
+
+# Ceci est fourni avec omake,... plus maintenant, a cause de camlp4
+# open build/OCaml
+
+
+# On demande a omake d'importer toutes les variables
+# qui ont ete definies sur la ligne de commande
+DefineCommandVars()
+
+
+
+
+
+# Ces variables doivent etre definies avant l'inclusion
+# du fichier .om de l'utilisateur sans quoi impossible
+# de switcher sur la version ou la branche
+public.prefix = $(dir $(prefix))
+public.branch = $(gets oboot/BRANCH)
+public.version = $(string $(gets oboot/VERSION).$(branch))
+
+
+# Pour que les scripts custom puissent faire des tests
+# sur la version du produit, on predefinit les
+# variables suivantes
+private.version_numbers = $(split ., $(version))
+public.major_number = $(int $(nth 0, $(version_numbers)))
+public.minor_number = $(int $(nth 1, $(version_numbers)))
+public.release_number = $(int $(nth 2, $(version_numbers)))
+public.branch_number = $(int $(nth 3, $(version_numbers)))
+
+
+
+#host = $(lowercase $(rootname $(rootname $(HOST))))
+#println($"--- Loading $(HOST) specific configuration... ($(host).om)")
+#include $(host).om
+
+
+
+# Et on embraye sur tous les sous repertoires
+.SUBDIRS: .
+
+

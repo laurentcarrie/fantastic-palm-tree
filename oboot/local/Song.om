@@ -1,0 +1,13 @@
+USEPDFLATEX= true
+
+generator=$(absname $(prefix))/bin/generate
+
+songs_srcdir=$(absname $(srcdir)/songs)
+
+
+%.tex : %.song $(generator)
+      $(generator) --song $< --prefix $(prefix) --tmp-dir .
+
+      
+book-%.tex : %.book $(generator)
+       $(generator) --book $< --prefix $(prefix) --tmp-dir . --srcdir $(songs_srcdir)

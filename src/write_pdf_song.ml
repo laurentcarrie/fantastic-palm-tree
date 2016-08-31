@@ -147,7 +147,6 @@ let write_tab  fout tab = (
   ) tab.D.Tablature.lines
   in
     pf "
-\\includegraphics{image.mps}
 " ;
     ()
 )

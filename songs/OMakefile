@@ -1,0 +1,38 @@
+.PHONY: build all  xxx
+
+.DEFAULT: build
+
+USEPDFLATEX=true
+
+.SCANNER: scan-song-%.song : %.song $(generator) :value: $(digest $&)
+	section
+		deps[]=
+
+		println($"$@: $(deps)")
+
+%.tex : %.song :scanner: scan-song-%.song
+	$(generator) --song $< --prefix $(prefix) --tmp-dir .
+
+song_dirs[]=
+	jetlagers
+	queen
+	rhcp
+	u2
+	others
+	muse
+	michel-jackson
+
+
+.SUBDIRS: $(song_dirs)
+	c=$(addprefix $(absname $(srcdir)),$(removeprefix $(absname $(ROOT)),$(absname $(CWD))))
+        println($c)
+	songs = $(find $c -name *.song)
+	songs = $(removeprefix $c/,$(songs))
+	println($"xxxxxxxx $(songs)")
+	songs = $(removesuffix $(songs))
+	xxx : $(addsuffix .tex,$(songs))
+	foreach(s,$(songs))
+		LaTeXDocument($s,$s)
+		export
+	xxx : $(addsuffix .pdf,$(songs))
+

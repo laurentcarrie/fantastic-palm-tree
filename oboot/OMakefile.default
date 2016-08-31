@@ -1,5 +1,7 @@
 .PHONY: build clean pdf help distant clean-pdf dropbox all
 
+.SUBDIRS: songs src
+
 .DEFAULT: help
 
 help :
@@ -15,17 +17,14 @@ dropbox
 
 
 USEPDFLATEX=true
-MAKEINDEX=makeindex -s song.ist
+#MAKEINDEX=makeindex -s $(srcdir)/song.ist
 
-srcdir = $(absname $(dir $(CWD)))
-
-if $(not $(defined prefix))
-	prefix = $(srcdir)/install
-	export
-
+println($"srcdir is : $(srcdir)")
 println($"prefix is : $(prefix)")
 
-song_files=$(find songs -name *.song)
+song_files=$(find $(srcdir)/songs -name *.song)
+song_files=$(removeprefix $(srcdir)/,$(song_files))
+tex_files=$(replacesuffixes .song,.tex,$(song_files))
 
 book_files=$(find songs -name *.book)
 
@@ -33,16 +32,16 @@ generator=$(prefix)/bin/generate
 
 mkdir -p $(prefix)/pdf
 mkdir -p tmp
-cp song.ist tmp/.
+#cp song.ist tmp/.
 
 #TEXDEPS+= tmp/image.mps
 
-cp src/image.mp tmp/image.mp
+#cp src/image.mp tmp/image.mp
 
-section
-	cd tmp
-	mpost image.mp
-	cp image.1 image.mps
+#section
+#	cd tmp
+#	mpost image.mp
+#	cp image.1 image.mps
 
 tmpdir=$(dir tmp)
 
@@ -72,7 +71,8 @@ foreach(src,$(song_files))
 #$(dictionary) : $(generator) $(song_files)
 #	$(generator) --make-dictionary $@ $(song_files)
 
-songs_srcdir = $(absname $(ROOT)/songs)
+songs_srcdir = $(absname $(srcdir)/songs)
+println($"songs_srcdir = $(songs_srcdir)")
 
 foreach(src,$(book_files) )
 	s=$(removesuffix .book,$(basename $(src)))
@@ -140,15 +140,15 @@ foreach(f,$(css))
 #	foreach(f,$(targets) $(addprefix $(prefix)/,$(other_files)))
 #			echo "put_no_sha1 $(basename $f)" >> $@
 
-build : $(prefix)/ftp-script.txt
+#build : $(prefix)/ftp-script.txt
 
 
-build : $(HOME)/Dropbox/book-all.pdf
+#build : $(HOME)/Dropbox/book-all.pdf
 
-$(HOME)/Dropbox/book-all.pdf : $(prefix)/pdf/book-all.pdf
-	cp $< $@
+#$(HOME)/Dropbox/book-all.pdf : $(prefix)/pdf/book-all.pdf
+#	cp $< $@
 
-dropbox : $(HOME)/Dropbox/book-all.pdf
+#dropbox : $(HOME)/Dropbox/book-all.pdf
 
 clean :
 	rm -f $(filter-proper-targets $(ls R,.))
@@ -158,3 +158,4 @@ clean :
 clean-pdf :
 	rm -rf $(prefix)/pdf
 	rm -rf tmp
+
