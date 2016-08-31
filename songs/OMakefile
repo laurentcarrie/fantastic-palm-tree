@@ -4,11 +4,10 @@
 
 USEPDFLATEX=true
 
-.SCANNER: scan-song-%.song : %.song $(generator) :value: $(digest $&)
+.SCANNER: scan-song-%.song : %.song $(generator) 
 	section
-		deps[]=
+		$(generator) --song $< --show-deps
 
-		println($"$@: $(deps)")
 
 .SCANNER: scan-book-%.book : %.book $(generator) :value: $(digest $&)
 	section
@@ -19,6 +18,12 @@ USEPDFLATEX=true
 
 book-%.tex : %.book :scanner: scan-book-%.book
 	$(generator) --book $< --prefix $(prefix) --tmp-dir . --srcdir $(srcdir)/songs
+
+%.1 : %.mp
+	mpost $<
+
+%.mps : %.1
+	cp $< $@
 
 song_dirs[]=
 	jetlagers

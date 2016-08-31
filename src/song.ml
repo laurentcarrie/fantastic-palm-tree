@@ -5,29 +5,8 @@ open ExtString
 open Read_util
 
 
-(*
-let manage_song filename fileout_latex song_id = (
-  try
-    let data = read_song filename in
-    let title = List.fold_left ( fun acc d -> match d with | Titre s -> s | _ -> acc ) "???" data in
-    let auteur = List.fold_left ( fun acc d -> match d with | Auteur s -> s | _ -> acc ) "???" data in
-    let transpose = List.fold_left ( fun acc d -> match d with | Transpose h -> h | _ -> acc ) 0 data in
-    let () = assert(title<>"") in
-    let song = {Datamodel.Song.filename=filename;titre=title;auteur=auteur;id=song_id;data=data;transpose=transpose;} in
-    let () =
-      let fout = open_out "manage song latex" (fileout_latex) in
-      let () = Write_pdf_song.write_song fout song in
-      close_out fout ;
-    in
-    song
-  with
-    | e -> failwith (sprintf "ERREUR : %s\n" (Printexc.to_string e) )
-) ;;
-*)
 
-
-
-let read filename  = (
+let read ~filename  = (
   let fin = open_in "read song" filename in
   let rec r acc  = 
     try
@@ -81,8 +60,20 @@ let read filename  = (
 
 
 let print_deps song = (
-  printf "\n" ; flush stdout
-  
+  let name = (Filename.chop_extension song.D.Song.filename) in
+  let (_,deps) = List.fold_left ( fun (count,acc) data ->
+    match data with 
+      | D.Tab tab -> (
+	  Write_pdf_song.write_mp song name count ;
+	  let acc = sprintf "%s %s-%d.mps" acc name count in 
+	    count+1,acc
+	)
+      | _ -> (count,acc)
+  ) (0,"") song.D.Song.data in
+    
+    eprintf "DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD %s.tex: %s\n" name deps  ; flush stderr ;
+    printf "%s.pdf: %s\n" name deps  ; flush stdout 
+    
 )
 
 
