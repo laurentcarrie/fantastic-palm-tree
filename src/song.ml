@@ -65,14 +65,16 @@ let print_deps song = (
     match data with 
       | D.Tab tab -> (
 	  Write_pdf_song.write_mp song name count ;
-	  let acc = sprintf "%s %s-%d.mps" acc name count in 
+	  let acc = sprintf "%s\n%s.tex: %s-%d.mps" acc name name count in
+	  let acc = sprintf "%s\n%s.tex: %s-%d.mp" acc name name count in
+	  let acc = sprintf "%s\n%s.tex: %s-%d.1" acc name name count in
 	    count+1,acc
 	)
       | _ -> (count,acc)
   ) (0,"") song.D.Song.data in
     
-    eprintf "DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD %s.tex: %s\n" name deps  ; flush stderr ;
-    printf "%s.pdf: %s\n" name deps  ; flush stdout 
+    eprintf "DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD %s\n" deps  ; flush stderr ;
+    printf "%s\n" deps  ; flush stdout 
     
 )
 
