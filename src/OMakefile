@@ -37,6 +37,7 @@ src[]=
 	write_pdf_song
 	chord
 	read_util
+	make_all
 	main
 
 src_chord[]=

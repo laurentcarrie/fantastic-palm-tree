@@ -4,12 +4,12 @@
 
 USEPDFLATEX=true
 
+song_ist=$(file song.ist)
+MAKEINDEX=makeindex -s $(song_ist)
+
 .SCANNER: scan-song-%.song : %.song $(generator) 
 	section
 		$(generator) --song $< --show-deps --top-build-dir $(ROOT)/songs
-
-
-println($"ROOT is $(absname $(ROOT))")
 
 .SCANNER: scan-book-%.book : %.book $(generator)
 	section
@@ -34,7 +34,7 @@ song_dirs[]=
 	u2
 	others
 	muse
-	michel-jackson
+	michael-jackson
 	books
 
 
@@ -55,7 +55,6 @@ song_dirs[]=
 
 .SUBDIRS: $(song_dirs)
 	c=$(addprefix $(absname $(srcdir)),$(removeprefix $(absname $(ROOT)),$(absname $(CWD))))
-        println($"c is $c")
 	books = $(find $c -name *.book)
 	books = $(removeprefix $c/,$(books))
 	books = $(removesuffix $(books))
@@ -69,3 +68,13 @@ song_dirs[]=
 		pdf : $(prefix)/pdf/book-$s.pdf
 		export
 
+songs=$(find $(srcdir)/songs -name *.song)
+#println($"songs : $(songs)")
+
+all.book : $(generator) :value: $(songs)
+	$(generator) --make-all $@ --top-src-dir $(srcdir)/songs
+
+LaTeXDocument(book-all,book-all)
+$(prefix)/pdf/book-all.pdf : book-all.pdf
+	cp $< $@
+pdf : $(prefix)/pdf/book-all.pdf

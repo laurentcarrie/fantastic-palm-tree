@@ -16,7 +16,6 @@ let tabs_of_song song = (
 
 
 let read ~filename  = (
-  let () = eprintf "RRRRRRRRRRRRRRRead %s\n" filename in
   let fin = open_in "read song" filename in
   let rec r acc  = 
     try

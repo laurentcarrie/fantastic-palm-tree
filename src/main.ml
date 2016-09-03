@@ -24,9 +24,9 @@ let _ =
       let () = OptParse.OptParser.add opt ~long_name:"show-deps" ~help:"show deps" o  in
 	o
     in
-    let opt_makedict = 
+    let opt_makeall = 
       let o = OptParse.Opt.value_option "" None (fun a->a) ( fun e _ -> Printexc.to_string e) in
-      let () = OptParse.OptParser.add opt ~long_name:"make-dictionary" ~help:"make dictionary" o  in
+      let () = OptParse.OptParser.add opt ~long_name:"make-all" ~help:"make book all" o  in
 	o
     in
     let opt_prefix = 
@@ -55,9 +55,9 @@ let _ =
 	o 
     in
 
-    let args = OptParse.OptParser.parse_argv opt in
+    let _ = OptParse.OptParser.parse_argv opt in
 
-    let makedict = OptParse.Opt.opt opt_makedict in
+    let makeall = OptParse.Opt.opt opt_makeall in
     let showdeps = OptParse.Opt.get opt_showdeps in
     let song = OptParse.Opt.opt opt_song in
     let book = OptParse.Opt.opt opt_book in
@@ -65,8 +65,8 @@ let _ =
     let top_build_dir = OptParse.Opt.opt opt_top_build_dir in
     let top_src_dir = OptParse.Opt.opt opt_top_src_dir in
 
-    let () = match makedict,showdeps,song,book,prefix,top_build_dir,top_src_dir with
-      | Some filename,false,None,None,None,None,None -> make_dictionary filename args
+    let () = match makeall,showdeps,song,book,prefix,top_build_dir,top_src_dir with
+      | Some filename,false,None,None,None,None,Some top_src_dir -> Make_all.make ~filename ~top_src_dir
       | None,true,Some filename,None,None,Some top_build_dir,None -> Song.print_deps ~song:(Song.read ~filename:filename) ~top_build_dir
       | None,true,None,Some filename,None,Some top_build_dir,Some top_src_dir -> Book.print_deps ~book:(Book.read ~filename ~top_src_dir ) ~top_build_dir ~top_src_dir
       | None,false,Some filename,None,Some prefix,None,None -> Song.write (Song.read ~filename) prefix 
