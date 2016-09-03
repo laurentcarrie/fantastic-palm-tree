@@ -44,14 +44,14 @@ let _ =
       let () = OptParse.OptParser.add opt ~long_name:"book" ~help:"book" o in
 	o 
     in
-    let opt_tmpdir = 
+    let opt_top_build_dir = 
       let o = OptParse.Opt.value_option "" None (fun a->a) ( fun e _ -> Printexc.to_string e) in
-      let () = OptParse.OptParser.add opt ~long_name:"tmp-dir" ~help:"tmp dir" o in
+      let () = OptParse.OptParser.add opt ~long_name:"top-build-dir" ~help:"top build dir" o in
 	o 
     in
-    let opt_srcdir = 
+    let opt_top_src_dir = 
       let o = OptParse.Opt.value_option "" None (fun a->a) ( fun e _ -> Printexc.to_string e) in
-      let () = OptParse.OptParser.add opt ~long_name:"srcdir" ~help:"srcdir" o in
+      let () = OptParse.OptParser.add opt ~long_name:"top-src-dir" ~help:"top src dir" o in
 	o 
     in
 
@@ -62,15 +62,15 @@ let _ =
     let song = OptParse.Opt.opt opt_song in
     let book = OptParse.Opt.opt opt_book in
     let prefix = OptParse.Opt.opt opt_prefix in
-    let tmpdir = OptParse.Opt.opt opt_tmpdir in
-    let srcdir = OptParse.Opt.opt opt_srcdir in
+    let top_build_dir = OptParse.Opt.opt opt_top_build_dir in
+    let top_src_dir = OptParse.Opt.opt opt_top_src_dir in
 
-    let () = match makedict,showdeps,song,book,prefix,tmpdir,srcdir with
+    let () = match makedict,showdeps,song,book,prefix,top_build_dir,top_src_dir with
       | Some filename,false,None,None,None,None,None -> make_dictionary filename args
-      | None,true,Some filename,None,None,None,None -> Song.print_deps (Song.read ~filename:filename)
-      | None,true,None,Some filename,None,None,Some srcdir -> Book.print_deps (Book.read ~filename ~srcdir )
-      | None,false,Some filename,None,Some prefix,Some tmpdir,None -> Song.write (Song.read ~filename) prefix tmpdir
-      | None,false,None,Some filename,Some prefix,Some tmpdir,Some srcdir -> Book.write ~book:(Book.read ~filename ~srcdir) ~tmpdir 
+      | None,true,Some filename,None,None,Some top_build_dir,None -> Song.print_deps ~song:(Song.read ~filename:filename) ~top_build_dir
+      | None,true,None,Some filename,None,Some top_build_dir,Some top_src_dir -> Book.print_deps ~book:(Book.read ~filename ~top_src_dir ) ~top_build_dir ~top_src_dir
+      | None,false,Some filename,None,Some prefix,None,None -> Song.write (Song.read ~filename) prefix 
+      | None,false,None,Some filename,Some prefix,Some top_build_dir,Some top_src_dir -> Book.write ~book:(Book.read ~filename ~top_src_dir) 
       | _ -> failwith "bad args combination"
     in
 

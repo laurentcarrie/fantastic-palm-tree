@@ -8,7 +8,7 @@ module D = Datamodel
 let (//) = Filename.concat
 
 let  write_mp song name count  = 
-  let filename = sprintf  "%s-%d" name count in
+  let filename = sprintf  "%s-%d" (Filename.basename name) count in
   let fout = open_out "mp" (filename ^ ".mp") in
   let pf fs = ksprintf ( fun s -> fprintf fout "%s" s) fs in
   let () = pf "%s" "
@@ -179,7 +179,7 @@ let write_tab  song fout tab name count = (
 *)
     pf "
 \\includegraphics{%s-%d.mps}
-" name count ;
+" (Filename.basename name) count ;
     ()
 )
 
@@ -356,8 +356,8 @@ let write_song fout song = (
 )
 
 
-let write_book ~book ~tmpdir  = (
-  let fout = open_out "book" ( tmpdir // ("book-"^(Filename.chop_suffix (Filename.basename book.D.Book.filename) ".book")^".tex")) in
+let write_book ~book   = (
+  let fout = open_out "book" ( ("book-"^(Filename.chop_suffix (Filename.basename book.D.Book.filename) ".book")^".tex")) in
   let pf fs = ksprintf ( fun s -> fprintf fout "%s" s) fs in
     
   let () = write_preamble fout in

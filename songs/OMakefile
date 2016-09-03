@@ -6,18 +6,20 @@ USEPDFLATEX=true
 
 .SCANNER: scan-song-%.song : %.song $(generator) 
 	section
-		$(generator) --song $< --show-deps
+		$(generator) --song $< --show-deps --top-build-dir $(ROOT)/songs
 
 
-.SCANNER: scan-book-%.book : %.book $(generator) :value: $(digest $&)
+println($"ROOT is $(absname $(ROOT))")
+
+.SCANNER: scan-book-%.book : %.book $(generator)
 	section
-		$(generator) --book $< --srcdir $(srcdir)/songs --show-deps
+		$(generator) --book $< --top-src-dir $(srcdir)/songs --show-deps --top-build-dir $(ROOT)/songs
 
 %.tex : %.song :scanner: scan-song-%.song
-	$(generator) --song $< --prefix $(prefix) --tmp-dir .
+	$(generator) --song $< --prefix $(prefix) 
 
 book-%.tex : %.book :scanner: scan-book-%.book
-	$(generator) --book $< --prefix $(prefix) --tmp-dir . --srcdir $(srcdir)/songs
+	$(generator) --book $< --prefix $(prefix) --top-build-dir $(ROOT)/songs --top-src-dir $(srcdir)/songs
 
 %.1 : %.mp
 	mpost $<
@@ -43,6 +45,7 @@ song_dirs[]=
 	songs = $(removesuffix $(songs))
 	xxx : $(addsuffix .tex,$(songs))
 	foreach(s,$(songs))
+		LocalTeXGeneratedFiles($s)
 		LaTeXDocument($s,$s)
 		xxx : $(addsuffix .pdf,$s)
 		$(prefix)/pdf/$s.pdf : $s.pdf
@@ -52,12 +55,12 @@ song_dirs[]=
 
 .SUBDIRS: $(song_dirs)
 	c=$(addprefix $(absname $(srcdir)),$(removeprefix $(absname $(ROOT)),$(absname $(CWD))))
-        println($c)
+        println($"c is $c")
 	books = $(find $c -name *.book)
 	books = $(removeprefix $c/,$(books))
 	books = $(removesuffix $(books))
-	println($"books : $(books)")
-	xxx : $(addsuffix .tex,$(books))
+#	println($"books : $(books)")
+#	xxx : $(addsuffix .tex,$(books))
 	foreach(s,$(books))
 		LaTeXDocument(book-$s,book-$s)
 		xxx : $(addsuffix .pdf,$s)

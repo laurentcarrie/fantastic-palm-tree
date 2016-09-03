@@ -5,8 +5,18 @@ open ExtString
 open Read_util
 
 
+let tabs_of_song song = (
+  let tabs = List.fold_left ( fun acc d ->
+    match d with
+      | D.Tab t -> t::acc
+      | _ -> acc
+  ) [] song.D.Song.data in
+    List.rev tabs
+)
+
 
 let read ~filename  = (
+  let () = eprintf "RRRRRRRRRRRRRRRead %s\n" filename in
   let fin = open_in "read song" filename in
   let rec r acc  = 
     try
@@ -59,7 +69,7 @@ let read ~filename  = (
 ) ;;
 
 
-let print_deps song = (
+let print_deps ~song ~top_build_dir = (
   let name = (Filename.chop_extension song.D.Song.filename) in
   let (_,deps) = List.fold_left ( fun (count,acc) data ->
     match data with 
@@ -73,15 +83,15 @@ let print_deps song = (
       | _ -> (count,acc)
   ) (0,"") song.D.Song.data in
     
-    eprintf "DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD %s\n" deps  ; flush stderr ;
+    eprintf "%s\n" deps  ; flush stderr ;
     printf "%s\n" deps  ; flush stdout 
     
 )
 
 
-let write song prefix tmpdir = (
+let write ~song ~prefix = (
   let f = Filename.basename song.D.Song.filename in
   let f = Filename.chop_suffix f ".song" in
-  let fout = open_out "write_pdf_song" ( tmpdir // ( f ^ ".tex" )) in
+  let fout = open_out "write_pdf_song" ( ( f ^ ".tex" )) in
     Write_pdf_song.write_song fout song
 )
