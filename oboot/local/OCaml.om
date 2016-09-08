@@ -1,7 +1,7 @@
 #
 # Required version of omake
 #
-OMakeVersion(0.9.8.6, 0.9.8.6)
+#OMakeVersion(0.9.8.6, 0.9.8.6)
 
 ########################################################################
 # Building OCaml programs.

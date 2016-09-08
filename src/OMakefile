@@ -61,33 +61,33 @@ mkdir -p $(prefix)/bin
 $(prefix)/bin/generate : generate
 	cp $< $@
 
-make_chord = $(OCamlProgram make-chord,$(src_chord))
+#make_chord = $(OCamlProgram make-chord,$(src_chord))
 
-make_tab = $(OCamlProgram make-tab,$(src_tab))
+#make_tab = $(OCamlProgram make-tab,$(src_tab))
 
-chord_list : $(make_chord)
-	./make-chord --prefix $(tmpdir) --show-targets > $@
+#chord_list : $(make_chord)
+#	./make-chord --prefix $(tmpdir) --show-targets > $@
 
-bin : $(make_chord) $(prog)
+#bin : $(make_chord) $(prog)
 
-png_digest.txt : $(make_chord) 
-	./make-chord --prefix $(tmpdir) --tmp-dir $(tmpdir)
-
-
-png : png_digest.txt
+#png_digest.txt : $(make_chord) 
+#	./make-chord --prefix $(tmpdir) --tmp-dir $(tmpdir)
 
 
-check : $(make_chord)
-	section
-		v1=$(make_show)
-		v2=$(cat png_digest.pristine.txt)
-		if $(not $(equal $"$(v1)",$"$(v2)"))
-			println($"v1 and v2 are different")
-			./make-chord --prefix $(tmpdir)
-		else
-			println($"v1 and v2 are the same")
+#png : png_digest.txt
 
-		println($"done")
+
+# check : $(make_chord)
+# 	section
+# 		v1=$(make_show)
+# 		v2=$(cat png_digest.pristine.txt)
+# 		if $(not $(equal $"$(v1)",$"$(v2)"))
+# 			println($"v1 and v2 are different")
+# 			./make-chord --prefix $(tmpdir)
+# 		else
+# 			println($"v1 and v2 are the same")
+
+# 		println($"done")
 
 
 #.SCANNER: png_digest.txt : $(make_chord) :value: $(digest-in-path-optional $(prefix)/png , $&)

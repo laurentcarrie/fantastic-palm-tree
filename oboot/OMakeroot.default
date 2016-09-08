@@ -33,7 +33,8 @@ open local/OCaml
 open local/Song.om
 
 # Ceci est fourni avec omake,... plus maintenant, a cause de camlp4
-# open build/OCaml
+open build/OCaml
+open build/LaTeX
 
 
 # On demande a omake d'importer toutes les variables
