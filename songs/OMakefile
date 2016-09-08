@@ -40,6 +40,7 @@ song_dirs[]=
 
 .SUBDIRS: $(song_dirs)
 	c=$(addprefix $(absname $(srcdir)),$(removeprefix $(absname $(ROOT)),$(absname $(CWD))))
+	rel_srcdir=$(removeprefix $(absname $(ROOT))/songs/,$(absname $(CWD)))
 	songs = $(find $c -name *.song)
 	songs = $(removeprefix $c/,$(songs))
 	songs = $(removesuffix $(songs))
@@ -48,13 +49,16 @@ song_dirs[]=
 		LocalTeXGeneratedFiles($s)
 		LaTeXDocument($s,$s)
 		xxx : $(addsuffix .pdf,$s)
-		$(prefix)/pdf/$s.pdf : $s.pdf
+		target = $(prefix)/pdf/$(rel_srcdir)/$s.pdf 
+		mkdir -p $(dirname $(target))
+		$(target) : $s.pdf
 			cp $< $@
-		pdf : $(prefix)/pdf/$s.pdf
+		pdf : $(target)
 		export
 
 .SUBDIRS: $(song_dirs)
 	c=$(addprefix $(absname $(srcdir)),$(removeprefix $(absname $(ROOT)),$(absname $(CWD))))
+	rel_srcdir=$(removeprefix $(absname $(ROOT))/songs/,$(absname $(CWD)))
 	books = $(find $c -name *.book)
 	books = $(removeprefix $c/,$(books))
 	books = $(removesuffix $(books))
@@ -63,9 +67,11 @@ song_dirs[]=
 	foreach(s,$(books))
 		LaTeXDocument(book-$s,book-$s)
 		xxx : $(addsuffix .pdf,$s)
-		$(prefix)/pdf/book-$s.pdf : book-$s.pdf
+		target = $(prefix)/pdf/$(rel_srcdir)/book-$s.pdf 
+		mkdir -p $(dirname $(target))
+		$(target) : book-$s.pdf
 			cp $< $@
-		pdf : $(prefix)/pdf/book-$s.pdf
+		pdf : $(target)
 		export
 
 songs=$(find $(srcdir)/songs -name *.song)
