@@ -77,7 +77,7 @@ let _ =
       exit 0
   with
   | e -> (
-      eprintf "Exception caught\n" ;
+      eprintf "Exception caught : %s\n" (Printexc.to_string e);
       Printexc.print_backtrace stderr ;
       exit 1 
   )

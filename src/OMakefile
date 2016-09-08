@@ -34,6 +34,7 @@ src[]=
 	helpers
 #	write_index
 #	write_song
+	write_mp_tab
 	write_pdf_song
 	chord
 	read_util

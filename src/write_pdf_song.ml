@@ -7,32 +7,6 @@ module D = Datamodel
 
 let (//) = Filename.concat
 
-let  write_mp song name count  = 
-  let filename = sprintf  "%s-%d" (Filename.basename name) count in
-  let fout = open_out "mp" (filename ^ ".mp") in
-  let pf fs = ksprintf ( fun s -> fprintf fout "%s" s) fs in
-  let () = pf "%s" "
-beginfig(1) ;
-u=0.2cm ;
-  b=10*u ;
-  nb=6 ;
-
-  pickup pencircle scaled 0.2pt ;
-  for i=0 upto 5 :
-    draw (0,i*1u) -- (nb*b,i*1u) ;
-  endfor
-  for i=0 upto nb :
-    draw (i*b,0*1u) -- (i*b,5*1u) ;
-  endfor
-endfig ;
-bye
-" in
-  let () = close_out fout 
-    in
-    ()
-
-
-
 let write_mp3 (pf : ('a, unit, string, unit) format4 -> 'a) title = (
   (* pf "mp3 file : %s\n" title  *)
 ) ;;
@@ -163,9 +137,14 @@ let write_tab  song fout tab name count = (
   let pf fs = ksprintf ( fun s -> fprintf fout "%s" s) fs in
 
   let title = tab.D.Tablature.titre in
-  let () = pf "{\\commentfont \\hl{%s}} \n" (tex_of_string title) in  
+  let () = pf "
+\\begin{tabular}{c}
+\\\\
+{\\commentfont \\hl{%s}}
+\\\\
+" (tex_of_string title) in
 
-  let () = write_mp song name count in
+  let () = Write_mp_tab.write_mp song name tab count in
 (*
   let () = List.iter ( fun line ->
     List.iter ( fun bar ->
@@ -179,6 +158,7 @@ let write_tab  song fout tab name count = (
 *)
     pf "
 \\includegraphics{%s-%d.mps}
+\\end{tabular}
 " (Filename.basename name) count ;
     ()
 )
@@ -213,9 +193,11 @@ let write_song_body fout song = (
 
   let (tabs:D.Tablature.t list) = List.rev (List.fold_left ( fun acc c -> match c with | D.Tab g -> g::acc | _ -> acc ) [] song.D.Song.data) in
   let () = 
-    let () = printf "nb tabs : %d\n" (List.length tabs) ; flush stdout ; in
+    let () = pf "\\begin{multicols}{2}\n" in
     let name = Filename.chop_extension song.D.Song.filename in
-    let () = List.iteri ( fun index g -> write_tab song fout g name index ) tabs in ()
+    let () = List.iteri ( fun index tab -> write_tab song fout tab name index ) tabs in 
+    let () = pf "\\end{multicols}\n" in
+      ()
   in
 
   let lyrics = List.rev (List.fold_left ( fun acc c -> match c with | D.Lyrics l -> l::acc | _ -> acc ) [] song.D.Song.data) in

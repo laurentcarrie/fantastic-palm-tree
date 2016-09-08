@@ -15,17 +15,18 @@ MAKEINDEX=makeindex -s $(song_ist)
 	section
 		$(generator) --book $< --top-src-dir $(srcdir)/songs --show-deps --top-build-dir $(ROOT)/songs
 
-%.tex : %.song :scanner: scan-song-%.song
+%.tex : %.song $(generator) :scanner: scan-song-%.song
 	$(generator) --song $< --prefix $(prefix) 
 
-book-%.tex : %.book :scanner: scan-book-%.book
+book-%.tex : %.book $(generator) :scanner: scan-book-%.book
 	$(generator) --book $< --prefix $(prefix) --top-build-dir $(ROOT)/songs --top-src-dir $(srcdir)/songs
 
-%.1 : %.mp
-	mpost $<
+#%.1 : %.mp
+#	mpost $<
 
 %.mps : %.1
 	cp $< $@
+
 
 song_dirs[]=
 	jetlagers

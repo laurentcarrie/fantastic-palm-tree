@@ -39,7 +39,7 @@ module Tablature = struct
     frette:int ;
     corde:int ;
   }
-  type bar = note list 
+  type bar = (int*note list) list 
   type line = bar list
   type t = {
     titre : string ;
@@ -69,6 +69,17 @@ module Song = struct
     auteur:string ;
     data:context list ;
   }
+
+  let tabs_of_song song = (
+    let tabs = List.fold_left ( fun acc d ->
+      match d with
+	| Tab t -> t::acc
+	| _ -> acc
+    ) [] song.data in
+      List.rev tabs
+  )
+
+
 end
 
 module Book = struct

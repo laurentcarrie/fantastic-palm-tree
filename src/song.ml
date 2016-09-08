@@ -5,14 +5,6 @@ open ExtString
 open Read_util
 
 
-let tabs_of_song song = (
-  let tabs = List.fold_left ( fun acc d ->
-    match d with
-      | D.Tab t -> t::acc
-      | _ -> acc
-  ) [] song.D.Song.data in
-    List.rev tabs
-)
 
 
 let read ~filename  = (
@@ -36,6 +28,7 @@ let read ~filename  = (
 	| "\\tab" -> (
 	    let l = read_array_until_empty_line fin in
 	    let lines = Read_util.tab_of_string_list l in
+	    let lines = List.rev lines in
 	    let tab = { D.Tablature.titre=arg;lines=lines } in
 	      r ((D.Tab tab)::acc)
 	  )
@@ -73,17 +66,19 @@ let print_deps ~song ~top_build_dir = (
   let (_,deps) = List.fold_left ( fun (count,acc) data ->
     match data with 
       | D.Tab tab -> (
-	  Write_pdf_song.write_mp song name count ;
+	  Write_mp_tab.write_mp song name tab count ;
+	  (*
 	  let acc = sprintf "%s\n%s.tex: %s-%d.mps" acc name name count in
 	  let acc = sprintf "%s\n%s.tex: %s-%d.mp" acc name name count in
 	  let acc = sprintf "%s\n%s.tex: %s-%d.1" acc name name count in
-	    count+1,acc
+	  *)
+	  count+1,acc
 	)
       | _ -> (count,acc)
   ) (0,"") song.D.Song.data in
     
-    eprintf "%s\n" deps  ; flush stderr ;
-    printf "%s\n" deps  ; flush stdout 
+    eprintf "%s\n" deps  ; flush stderr 
+    (* printf "%s\n" deps  ; flush stdout  *)
     
 )
 

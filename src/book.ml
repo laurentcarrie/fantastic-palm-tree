@@ -22,13 +22,13 @@ let print_deps ~book ~top_src_dir ~top_build_dir = (
 	  let acc = sprintf "%s\nbook-%s : %s.song\n" acc tex_name (top_build_dir // s2) in 
 	  let song_tex = Filename.basename song_tex in
 	    (* let () = Song.print_deps ~song ~top_build_dir in  *)
-	  let (_,acc) = List.fold_left ( fun (count,acc) _ ->
-	    let () = Write_pdf_song.write_mp song song_tex count in
-	    let acc = sprintf "%s\nbook-%s : %s-%d.mps\n" acc tex_name song_tex count in
-	    let acc = sprintf "%s\nbook-%s : %s-%d.mp\n" acc tex_name song_tex count in
+	  let (_,acc) = List.fold_left ( fun (count,acc) tab ->
+	    let () = Write_mp_tab.write_mp song song_tex tab count in
+	    let acc = sprintf "%s\nbook-%s : %s-%d.mps\n" acc tex_name song_tex count in	
 	    let acc = sprintf "%s\nbook-%s : %s-%d.1\n" acc tex_name song_tex count in
+	    let acc = sprintf "%s\nbook-%s : %s-%d.mp\n" acc tex_name song_tex count in
 	      (count+1,acc)
-	  ) (0,acc) (Song.tabs_of_song song) in
+	  ) (0,acc) (D.Song.tabs_of_song song) in
 	    acc
 	)
   ) "" book.D.Book.songs in
