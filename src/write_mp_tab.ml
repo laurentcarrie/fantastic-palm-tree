@@ -42,11 +42,9 @@ pickup pencircle scaled 0.15bp ;
 " n.D.Tablature.corde  n.D.Tablature.frette ;
       ) notes  ;
 
-      let (lowest_note: int option) = List.fold_left ( fun acc (n:D.Tablature.note) ->
-	match acc with
-	  | None -> Some n.D.Tablature.corde
-          | Some c -> Some (if c > n.D.Tablature.corde then c else n.D.Tablature.corde)
-      ) None notes in
+      let (lowest_note: int ) = List.fold_left ( fun acc (n:D.Tablature.note) ->
+	if acc > n.D.Tablature.corde then acc else n.D.Tablature.corde
+      ) 1 notes in
 
     let print_tail c = (
       match p.D.Tablature.duration with
@@ -71,7 +69,7 @@ pickup pencircle scaled 0.15bp ;
 	| _ -> ()
 
     ) in
-    let () = Option.may print_tail lowest_note in
+    let () = print_tail lowest_note in
       pos + 1
   ) 1 bar in
 
