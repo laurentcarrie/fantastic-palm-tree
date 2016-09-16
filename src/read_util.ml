@@ -56,36 +56,35 @@ let barlist_of_string (s:string) : Accord.t list list = (
   List.map bar_of_string (String.nsplit s ":")
 ) ;;
 
-let note_of_string s : (int*(Tablature.note)) = (
+let note_of_string s : (Tablature.note) = (
   let s2 = String.nsplit s  " " in
-    match s2 with 
-      | position::"s"::d::[] ->
-	  (int_of_string position),{Tablature.duration=int_of_string d;note=Tablature.S}
-      | s2 -> (
-	  let l = List.map int_of_string s2 in
-	    match l with
-	      | position::duration::corde::frette::[] -> (
-		  if corde<1 || corde>6 then (
-		    let msg = sprintf "in %s, bad string : %d" s corde in failwith msg
-		  ) ;
-		  if frette<0 || frette>20 then (
+    (
+      let l = List.map int_of_string s2 in
+	match l with
+	  | corde::frette::[] -> (
+	      if corde<1 || corde>6 then (
+		let msg = sprintf "in %s, bad string : %d" s corde in failwith msg
+	      ) ;
+	      if frette<0 || frette>20 then (
 		    let msg = sprintf "in %s, bad frette : %d" s frette in failwith msg
-		  ) ;
-		  position,{Tablature.duration=duration;note=Tablature.N {Tablature.corde=corde;frette=frette}}
-		)
-	      | _ -> let msg = sprintf "error for bar : '%s'" s in failwith msg
-	)
+	      ) ;
+	      {Tablature.corde=corde;frette=frette}
+	    )
+	  | _ -> let msg = sprintf "error for bar : '%s'" s in failwith msg
+    )
 ) ;;
 
+let paquet_of_string s : Tablature.paquet = (
+  let s2 = String.nsplit s "," in
+  let s2 = List.map String.strip s2 in
+  let duration = int_of_string(List.hd s2) in
+  let notes = List.map note_of_string (List.tl s2) in
+    { Tablature.duration=duration ; notes=notes }
+)
+
 let bar_of_string s : Tablature.bar = (
-  let init = [] (*List.init 4 (fun i -> (2*i+1),[])*) in
   let s2 = String.nsplit s ";" in
-    List.fold_left ( fun acc s ->
-      let (pos,note) = note_of_string s in
-      let old = try List.assoc pos acc with | Not_found -> [] in
-      let acc = List.remove_assoc pos acc in
-	(pos,(note::old))::acc
-    )  init s2
+    List.map paquet_of_string s2
 ) ;;
 
 let tab_of_string_list lines : Tablature.line list = (

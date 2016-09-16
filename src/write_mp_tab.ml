@@ -7,7 +7,7 @@ module D = Datamodel
 
 let (//) = Filename.concat
 
-let write_bar fout (bar:(int*D.Tablature.note list)list) = (
+let write_bar fout bar = (
   let pf fs = ksprintf ( fun s -> fprintf fout "%s" s) fs in
   let () = pf "
 %% write bar
@@ -25,7 +25,8 @@ pickup pencircle scaled 0.15bp ;
   ) (List.init 4 ( fun i -> 2*i+1 ))
   in
 
-  let () = List.iter ( fun (pos,(notes:D.Tablature.note list)) ->
+  let _ = List.fold_left( fun pos p ->
+    let notes = p.D.Tablature.notes in
     pf "
 %% position %d, %d notes
 xi := x0+%d*u ;
@@ -33,63 +34,48 @@ pickup pencircle scaled 0.02bp ;
 %%draw(xi,base_line) -- (xi,base_line+5*1u) ;
 pickup pencircle scaled 0.15bp ;
 " pos (List.length notes) pos ;
-    List.iter ( fun n ->
-      match n.D.Tablature.note with
-	| D.Tablature.N n -> (
+      List.iter ( fun n ->
       pf "
   ynote := base_line+(6-%d)*u ;
   label(\"%d\" infont defaultfont scaled 0.6,(xi,ynote)) ;
 %%  draw(xi,ynote-u) -- (xi,base_line-u) ;
-" n.D.Tablature.corde  n.D.Tablature.frette
-	  )
-	| D.Tablature.S _ -> (
-      pf "
-  ynote := base_line - u  ;
-  label(\"s\" infont defaultfont scaled 0.6,(xi,ynote)) ;
-"
-	  )
-    ) notes ;
-    
-    let (lowest_note:((int*D.Tablature.rnote) option)) = List.fold_left ( fun acc (nn:D.Tablature.note) ->
-      match (acc,nn.D.Tablature.note) with
-	| _                         , (D.Tablature.S _) -> acc
-	| None                      , (D.Tablature.N n) -> Some (nn.D.Tablature.duration,n)
-	| Some (d,r)    , (D.Tablature.N n) -> (
-	    if n.D.Tablature.corde > r.D.Tablature.corde then 
-	      Some (nn.D.Tablature.duration,n)
-	    else
-	      Some (d,r)
-	  )
-    ) None notes in
-    let print_tail (d,n) = (
-      match d with
+" n.D.Tablature.corde  n.D.Tablature.frette ;
+      ) notes  ;
+
+      let (lowest_note: int option) = List.fold_left ( fun acc (n:D.Tablature.note) ->
+	match acc with
+	  | None -> Some n.D.Tablature.corde
+          | Some c -> Some (if c > n.D.Tablature.corde then c else n.D.Tablature.corde)
+      ) None notes in
+
+    let print_tail c = (
+      match p.D.Tablature.duration with
 	| 1 ->
 	    (*  croche *)
       pf "
   ynote := base_line+(6-%d)*u ;
   draw(xi,ynote-0.5*u) -- (xi,base_line-1*u) ;
   draw(xi,base_line-1*u) -- (xi+0.5*u,base_line-1*u) ;
-" n.D.Tablature.corde
+" c
 	| 2 ->
 	    (* noire *)
       pf "
   ynote := base_line+(6-%d)*u ;
   draw(xi,ynote-0.5*u) -- (xi,base_line-1*u) ;
-" n.D.Tablature.corde
+" c
 	| 4 ->
       pf "
   ynote := base_line+(6-%d)*u ;
   draw(xi,ynote-0.5*u) -- (xi,base_line-1*u) ;
-" n.D.Tablature.corde
+" c
 	| _ -> ()
 
     ) in
-      Option.may print_tail lowest_note
+    let () = Option.may print_tail lowest_note in
+      pos + 1
+  ) 1 bar in
 
-
-
-  ) bar in
-  let () = pf "%s" "
+    let () = pf "%s" "
 for i=0 upto 5 :
    draw (x0,base_line+i*1u) -- (x1,base_line+i*1u) ;
   endfor

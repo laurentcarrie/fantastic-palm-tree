@@ -8,7 +8,7 @@ let int_of_string s =
   try
     int_of_string s
   with
-    | _ -> failwith ("not a string : " ^ s)
+    | _ -> failwith ("not a string : '" ^ s ^ "'")
 
 
 module Accord = struct
@@ -34,16 +34,12 @@ module Grille = struct
 end
 
 module Tablature = struct
-  type silence
-  type rnote = {
+  type note = {
     frette:int ;
     corde:int ;
   }
-  type snote = 
-      | N of rnote
-      | S 
-  type note = { duration:int ; note:snote }
-  type bar = (int * note list) list 
+  type paquet = { duration:int ; notes:note list}
+  type bar = paquet list 
   type line = bar list
   type t = {
     titre : string ;

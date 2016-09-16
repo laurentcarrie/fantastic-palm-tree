@@ -6,6 +6,10 @@ open Read_util
 
 
 
+let check_bar song = (
+  ()
+)
+
 
 let read ~filename  = (
   let fin = open_in "read song" filename in
@@ -56,6 +60,7 @@ let read ~filename  = (
   let transpose = List.fold_left ( fun acc d -> match d with | D.Transpose h -> h | _ -> acc ) 0 data in
   let () = assert(title<>"") in
   let song = {D.Song.filename=filename;titre=title;auteur=auteur;data=data;transpose=transpose;} in
+  let () = check_bar song in
 
       song
 ) ;;
