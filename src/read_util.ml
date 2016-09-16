@@ -56,20 +56,25 @@ let barlist_of_string (s:string) : Accord.t list list = (
   List.map bar_of_string (String.nsplit s ":")
 ) ;;
 
-let note_of_string s : (int*Tablature.note) = (
+let note_of_string s : (int*(Tablature.note)) = (
   let s2 = String.nsplit s  " " in
-  let l = List.map int_of_string s2 in
-    match l with
-      | position::duration::corde::frette::[] -> (
-	  if corde<1 || corde>6 then (
-	    let msg = sprintf "in %s, bad string : %d" s corde in failwith msg
-	  ) ;
-	  if frette<0 || frette>20 then (
-	    let msg = sprintf "in %s, bad frette : %d" s frette in failwith msg
-	  ) ;
-	  position,{Tablature.duration=duration;corde=corde;frette=frette}
+    match s2 with 
+      | position::"s"::d::[] ->
+	  (int_of_string position),{Tablature.duration=int_of_string d;note=Tablature.S}
+      | s2 -> (
+	  let l = List.map int_of_string s2 in
+	    match l with
+	      | position::duration::corde::frette::[] -> (
+		  if corde<1 || corde>6 then (
+		    let msg = sprintf "in %s, bad string : %d" s corde in failwith msg
+		  ) ;
+		  if frette<0 || frette>20 then (
+		    let msg = sprintf "in %s, bad frette : %d" s frette in failwith msg
+		  ) ;
+		  position,{Tablature.duration=duration;note=Tablature.N {Tablature.corde=corde;frette=frette}}
+		)
+	      | _ -> let msg = sprintf "error for bar : '%s'" s in failwith msg
 	)
-      | _ -> let msg = sprintf "error for bar : '%s'" s in failwith msg
 ) ;;
 
 let bar_of_string s : Tablature.bar = (

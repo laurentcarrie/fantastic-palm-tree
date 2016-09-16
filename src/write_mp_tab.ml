@@ -7,7 +7,7 @@ module D = Datamodel
 
 let (//) = Filename.concat
 
-let write_bar fout bar = (
+let write_bar fout (bar:(int*D.Tablature.note list)list) = (
   let pf fs = ksprintf ( fun s -> fprintf fout "%s" s) fs in
   let () = pf "
 %% write bar
@@ -19,13 +19,13 @@ draw(x0,base_line) -- (x0,base_line+5*1u) ;
 pf "
 xii := x0 + %d*u ;
 pickup pencircle scaled 0.02bp ;
-draw(xii,base_line) -- (xii,base_line+5*1u) ;
+%%draw(xii,base_line) -- (xii,base_line+5*1u) ;
 pickup pencircle scaled 0.15bp ;
 " i
   ) (List.init 4 ( fun i -> 2*i+1 ))
   in
 
-  let () = List.iter ( fun (pos,notes) ->
+  let () = List.iter ( fun (pos,(notes:D.Tablature.note list)) ->
     pf "
 %% position %d, %d notes
 xi := x0+%d*u ;
@@ -34,10 +34,60 @@ pickup pencircle scaled 0.02bp ;
 pickup pencircle scaled 0.15bp ;
 " pos (List.length notes) pos ;
     List.iter ( fun n ->
+      match n.D.Tablature.note with
+	| D.Tablature.N n -> (
       pf "
-  label(\"%d\" infont defaultfont scaled 0.6,(xi,base_line+(6-%d)*u)) ;
-" n.D.Tablature.frette n.D.Tablature.corde 
-    ) notes
+  ynote := base_line+(6-%d)*u ;
+  label(\"%d\" infont defaultfont scaled 0.6,(xi,ynote)) ;
+%%  draw(xi,ynote-u) -- (xi,base_line-u) ;
+" n.D.Tablature.corde  n.D.Tablature.frette
+	  )
+	| D.Tablature.S _ -> (
+      pf "
+  ynote := base_line - u  ;
+  label(\"s\" infont defaultfont scaled 0.6,(xi,ynote)) ;
+"
+	  )
+    ) notes ;
+    
+    let (lowest_note:((int*D.Tablature.rnote) option)) = List.fold_left ( fun acc (nn:D.Tablature.note) ->
+      match (acc,nn.D.Tablature.note) with
+	| _                         , (D.Tablature.S _) -> acc
+	| None                      , (D.Tablature.N n) -> Some (nn.D.Tablature.duration,n)
+	| Some (d,r)    , (D.Tablature.N n) -> (
+	    if n.D.Tablature.corde > r.D.Tablature.corde then 
+	      Some (nn.D.Tablature.duration,n)
+	    else
+	      Some (d,r)
+	  )
+    ) None notes in
+    let print_tail (d,n) = (
+      match d with
+	| 1 ->
+	    (*  croche *)
+      pf "
+  ynote := base_line+(6-%d)*u ;
+  draw(xi,ynote-0.5*u) -- (xi,base_line-1*u) ;
+  draw(xi,base_line-1*u) -- (xi+0.5*u,base_line-1*u) ;
+" n.D.Tablature.corde
+	| 2 ->
+	    (* noire *)
+      pf "
+  ynote := base_line+(6-%d)*u ;
+  draw(xi,ynote-0.5*u) -- (xi,base_line-1*u) ;
+" n.D.Tablature.corde
+	| 4 ->
+      pf "
+  ynote := base_line+(6-%d)*u ;
+  draw(xi,ynote-0.5*u) -- (xi,base_line-1*u) ;
+" n.D.Tablature.corde
+	| _ -> ()
+
+    ) in
+      Option.may print_tail lowest_note
+
+
+
   ) bar in
   let () = pf "%s" "
 for i=0 upto 5 :

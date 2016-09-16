@@ -34,12 +34,16 @@ module Grille = struct
 end
 
 module Tablature = struct
-  type note = {
-    duration:int ;
+  type silence
+  type rnote = {
     frette:int ;
     corde:int ;
   }
-  type bar = (int*note list) list 
+  type snote = 
+      | N of rnote
+      | S 
+  type note = { duration:int ; note:snote }
+  type bar = (int * note list) list 
   type line = bar list
   type t = {
     titre : string ;
