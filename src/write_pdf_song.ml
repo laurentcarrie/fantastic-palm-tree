@@ -2,6 +2,8 @@ open ExtList
 open ExtString
 open Printf
 open Read_util
+open Write_util
+
 
 module D = Datamodel
 
@@ -11,23 +13,6 @@ let write_mp3 (pf : ('a, unit, string, unit) format4 -> 'a) title = (
   (* pf "mp3 file : %s\n" title  *)
 ) ;;
 
-let tex_of_chord (c:D.Accord.t) = (
-  let s = sprintf "%c" c.D.Accord.note in
-  let s = match c.D.Accord.alteration with
-    | D.Accord.None -> s
-    | D.Accord.Flat -> s ^ "\\textsuperscript{$\\flat$}"
-    | D.Accord.Sharp -> s ^ "\\textsuperscript{$\\sharp$}"
-  in
-  let s = if c.D.Accord.diminue then s^"ø" else s in
-  let subscript = "" in
-  let subscript = if c.D.Accord.minor then subscript^"m" else subscript in
-  let subscript = if c.D.Accord.minor7 then subscript^"7" else subscript in
-  let subscript = if c.D.Accord.major7 then subscript^"7M" else subscript in
-  let subscript = if c.D.Accord.sus4 then subscript^"sus4" else subscript in
-  let s = if subscript="" then s else s^"\\textsubscript{"^subscript^"}" in
-  let s = if s="%" then "" else ""^s^"" in
-  s
-)
 
 let tex_of_string c = (
   List.fold_left ( fun c (sub,by) ->
@@ -132,6 +117,24 @@ let write_lyrics fout l = (
   let () = pf "\n" in
   ()
 ) 
+let write_grille  song fout g name count = (
+  let pf fs = ksprintf ( fun s -> fprintf fout "%s" s) fs in
+
+  let title = g.D.Grille.titre in
+  let () = pf "
+\\begin{tabular}{c}
+\\\\
+{\\commentfont \\hl{%s}}
+\\\\
+" (tex_of_string title) in
+
+  let () = Write_mp_grille.write_mp song name g count in
+    pf "
+\\includegraphics{%s-grille-%d.mps}
+\\end{tabular}
+" (Filename.basename name) count ;
+    ()
+)
 
 let write_tab  song fout tab name count = (
   let pf fs = ksprintf ( fun s -> fprintf fout "%s" s) fs in
@@ -188,7 +191,8 @@ let write_song_body fout song = (
 
   let (grilles:D.Grille.t list) = List.rev (List.fold_left ( fun acc c -> match c with | D.Grille g -> g::acc | _ -> acc ) [] song.D.Song.data) in
   let () = pf "\\begin{multicols}{2}\n" in
-  let () = List.iter ( fun g -> write_grille ~transpose:0 fout g ) grilles in
+  let name = Filename.chop_extension song.D.Song.filename in
+  let () = List.iteri ( fun index g -> write_grille song fout g name index ) grilles in
   let () = pf "\\end{multicols}\n" in
 
   let (tabs:D.Tablature.t list) = List.rev (List.fold_left ( fun acc c -> match c with | D.Tab g -> g::acc | _ -> acc ) [] song.D.Song.data) in
