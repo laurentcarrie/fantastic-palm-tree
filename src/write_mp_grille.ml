@@ -17,16 +17,19 @@ draw(x0,base_line) -- (x0,base_line+5*1uy) ;
 " (* (List.length bar) *) 8  in
 
   let () = match (List.map mp_of_chord bar) with
-    | (a,sa)::[] ->  (
-	pf "label(btex %s etex scaled schord,((x1+x0)/2,base_line+2.5*uy)) ;\n" a ;
-	pf "label(btex %s etex scaled sschord,(x0+uy+(x1+x0)/2,base_line+1.5*uy)) ;\n" sa ; 
+    | (a,sa,usa)::[] ->  (
+	pf "label(btex %s etex scaled schord,(x0+(x1-x0)*1/2,base_line+2.5*uy)) ;\n" a ;
+	pf "label.rt(btex %s etex scaled sschord,(x0+0*ux+(x1-x0)*1/2,base_line+1.5*uy)) ;\n" sa ; 
+	pf "label.rt(btex %s etex scaled sschord,(x0+0*ux+(x1-x0)*1/2,base_line+3.5*uy)) ;\n" usa ; 
       )
-    | (a,sa)::(b,sb)::[] -> (
+    | (a,sa,usa)::(b,sb,usb)::[] -> (
 	pf "label(btex %s etex scaled schord,(x0+(x1-x0)*1/3,base_line+2.5*uy)) ;\n" a ;
-	pf "label(btex %s etex scaled sschord,(x0+uy+(x1-x0)*1/3,base_line+1.5*uy)) ;\n" sa ; 
+	pf "label.rt(btex %s etex scaled sschord,(x0+0*ux+(x1-x0)*1/3,base_line+1.5*uy)) ;\n" sa ; 
+	pf "label.rt(btex %s etex scaled sschord,(x0+0*ux+(x1-x0)*1/3,base_line+3.5*uy)) ;\n" usa ; 
 
 	pf "label(btex %s etex scaled schord,(x0+(x1-x0)*2/3,base_line+2.5*uy)) ;\n" b ;
-	pf "label(btex %s etex scaled sschord,(x0+uy+(x1-x0)*2/3,base_line+1.5*uy)) ;\n" sb ; 
+	pf "label.rt(btex %s etex scaled sschord,(x0+0*ux+(x1-x0)*2/3,base_line+1.5*uy)) ;\n" sb ; 
+	pf "label.rt(btex %s etex scaled sschord,(x0+0*ux+(x1-x0)*2/3,base_line+3.5*uy)) ;\n" usb ; 
       )
     | _ -> (
 	pf "label(\"not managed\",((x1+x0)*2/3,base_line+2.5*uy)) ;\n" ;
@@ -53,7 +56,7 @@ let write_line fout line = (
 
   let () = pf "%s" "
 draw(x1,base_line) -- (x1,base_line+5*1uy) ;
-base_line := base_line + 6*ux ;
+base_line := base_line - 6*ux ;
 " in
     ()
 )
@@ -64,7 +67,9 @@ let  write_mp song name grille count  = (
   let fout = open_out "mp" (filename ^ ".mp") in
   let pf fs = ksprintf ( fun s -> fprintf fout "%s" s) fs in
   let () = pf "%s" "
-%%input TEX ;
+input TEX;
+TEXPRE(\"%%&latex\" & char(10) & \"\\documentclass{article}\\begin{document}\\\\usepackage[utf8]{inputenc}\");
+TEXPOST(\"\\end{document}\") ;
 beginfig(1) ;
   uy=0.2cm ;
   ux=0.25cm ;
@@ -77,7 +82,6 @@ beginfig(1) ;
 %% scale pour le susbcript chord
   sschord=1 ;
   pickup pencircle scaled 0.15bp ;
-  fill fullcircle scaled ux withcolor red;
   "  
   in 
 

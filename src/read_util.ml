@@ -80,7 +80,7 @@ let paquet_of_string s : Tablature.paquet = (
   let duration = int_of_string(List.hd s2) in
   let notes = List.map note_of_string (List.tl s2) in
     { Tablature.duration=duration ; notes=notes }
-)
+) ;;
 
 let bar_of_string s : Tablature.bar = (
   let s2 = String.nsplit s ";" in
