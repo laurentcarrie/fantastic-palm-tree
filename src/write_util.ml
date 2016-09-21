@@ -26,12 +26,14 @@ let tex_of_chord (c:D.Accord.t) = (
 
 let mp_of_chord (c:D.Accord.t) : (string*string*string) = (
   let s = sprintf "%c" c.D.Accord.note in
-  let upperscript = match c.D.Accord.alteration with
+  let fb = match c.D.Accord.alteration with
     | D.Accord.None -> ""
     | D.Accord.Flat -> "$\\flat$"
     | D.Accord.Sharp ->"$\\sharp$"
   in
-  let s = if c.D.Accord.diminue then s^"ø" else s in
+  let s = s ^ fb in
+  let upperscript = "" in
+  let s = if c.D.Accord.diminue then s^"\\o" else s in
   let subscript = "" in
   let subscript = if c.D.Accord.minor then subscript^"m" else subscript in
   let subscript = if c.D.Accord.minor7 then subscript^"7" else subscript in

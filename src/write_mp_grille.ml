@@ -18,18 +18,20 @@ draw(x0,base_line) -- (x0,base_line+5*1uy) ;
 
   let () = match (List.map mp_of_chord bar) with
     | (a,sa,usa)::[] ->  (
-	pf "label(btex %s etex scaled schord,(x0+(x1-x0)*1/2,base_line+2.5*uy)) ;\n" a ;
-	pf "label.rt(btex %s etex scaled sschord,(x0+0*ux+(x1-x0)*1/2,base_line+1.5*uy)) ;\n" sa ; 
-	pf "label.rt(btex %s etex scaled sschord,(x0+0*ux+(x1-x0)*1/2,base_line+3.5*uy)) ;\n" usa ; 
+	pf "label(btex %s\\rlap{\\textsuperscript{%s}}{\\textsubscript{%s}} etex,(x0+(x1-x0)*1/2,base_line+2.5*uy)) ;\n" a usa sa ;
+(*
+	pf "label.rt(btex %s etex,(x0+0*ux+(x1-x0)*1/2,base_line+1.5*uy)) ;\n" sa ; 
+	pf "label.rt(btex %s etex,(x0+0*ux+(x1-x0)*1/2,base_line+3.5*uy)) ;\n" usa ; 
+*)
       )
     | (a,sa,usa)::(b,sb,usb)::[] -> (
-	pf "label(btex %s etex scaled schord,(x0+(x1-x0)*1/3,base_line+2.5*uy)) ;\n" a ;
-	pf "label.rt(btex %s etex scaled sschord,(x0+0*ux+(x1-x0)*1/3,base_line+1.5*uy)) ;\n" sa ; 
-	pf "label.rt(btex %s etex scaled sschord,(x0+0*ux+(x1-x0)*1/3,base_line+3.5*uy)) ;\n" usa ; 
+	pf "label(btex %s etex,((x0+(x1-x0)*1/3,base_line+2.5*uy))) ;\n" a ;
+	pf "label.rt(btex %s etex,((x0+0*ux+(x1-x0)*1/3,base_line+1.5*uy))) ;\n" sa ; 
+	pf "label.rt(btex %s etex,((x0+0*ux+(x1-x0)*1/3,base_line+3.5*uy))) ;\n" usa ; 
 
-	pf "label(btex %s etex scaled schord,(x0+(x1-x0)*2/3,base_line+2.5*uy)) ;\n" b ;
-	pf "label.rt(btex %s etex scaled sschord,(x0+0*ux+(x1-x0)*2/3,base_line+1.5*uy)) ;\n" sb ; 
-	pf "label.rt(btex %s etex scaled sschord,(x0+0*ux+(x1-x0)*2/3,base_line+3.5*uy)) ;\n" usb ; 
+	pf "label(btex %s etex,((x0+(x1-x0)*2/3,base_line+2.5*uy))) ;\n" b ;
+	pf "label.rt(btex %s etex,((x0+0*ux+(x1-x0)*2/3,base_line+1.5*uy))) ;\n" sb ; 
+	pf "label.rt(btex %s etex,((x0+0*ux+(x1-x0)*2/3,base_line+3.5*uy))) ;\n" usb ; 
       )
     | _ -> (
 	pf "label(\"not managed\",((x1+x0)*2/3,base_line+2.5*uy)) ;\n" ;
@@ -67,9 +69,13 @@ let  write_mp song name grille count  = (
   let fout = open_out "mp" (filename ^ ".mp") in
   let pf fs = ksprintf ( fun s -> fprintf fout "%s" s) fs in
   let () = pf "%s" "
-input TEX;
-TEXPRE(\"%%&latex\" & char(10) & \"\\documentclass{article}\\begin{document}\\\\usepackage[utf8]{inputenc}\");
-TEXPOST(\"\\end{document}\") ;
+verbatimtex 
+%&latex
+\\documentclass[12pt]{article}
+\\usepackage{fixltx2e}
+\\begin{document}
+etex
+
 beginfig(1) ;
   uy=0.2cm ;
   ux=0.25cm ;
@@ -92,6 +98,7 @@ beginfig(1) ;
     
   let () = pf "
 endfig ;
+\\end{document}
 bye
 " in
   let () = close_out fout 
