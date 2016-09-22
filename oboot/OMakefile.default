@@ -43,8 +43,9 @@ mkdir -p $(prefix)/pdf
 #	cp image.1 image.mps
 
 
+
 .PHONY: dist
 
 dist : 
-	tar cvzf fantastic-palm-tree.tar.gz -C $(srcdir) .git
+	tar czf fantastic-palm-tree.tar.gz -C $(srcdir) .git
 	cp fantastic-palm-tree.tar.gz $(prefix)/.
