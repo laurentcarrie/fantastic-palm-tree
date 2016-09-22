@@ -4,11 +4,18 @@ lonely day
 \auteur
 system of a down
 
+\nb-croches 
+12
+
 \grille couplet
-Am:F:C:E
+Am F:C E:Am F:C E
 
 \grille refrain
 F:E:G:Am
+
+\tab couplet
+|[Am],2,5 0;2,4 2;2,3 2;2,2 1;2,3 2;2,4 0;[F],2,6 1;2,4 0;2,3 2;2,2 1;2,3 2;2,4 0|
+
 
 \lyrics couplet
 [Am;Such] a [F;lo]nely day
