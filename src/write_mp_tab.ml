@@ -9,11 +9,11 @@ let (//) = Filename.concat
 
 let write_bar fout bar = (
   let pf fs = ksprintf ( fun s -> fprintf fout "%s" s) fs in
-  let () = pf "
+  let () = pf "%s" "
 %% write bar
-x1 := x0 + 2*ux + %d*ux ;
-draw(x0,base_line) -- (x0,base_line+5*1uy) ;
-" (* (List.length bar) *) 8  in
+x1 := x0 + width ;
+draw(x0,base_line) -- (x0,base_line+height) ;
+" (* (List.length bar) *) in
     
   let () = List.iter ( fun i ->
 pf "
@@ -26,14 +26,22 @@ pickup pencircle scaled 0.15bp ;
   in
 
   let _ = List.fold_left( fun pos p ->
+    let chord = match p.D.Tablature.chord with
+      | None -> ""
+      | Some chord -> (
+	  let (a,usa,sa) = Write_util.mp_of_chord chord in
+	    sprintf "label.top(btex %s\\rlap{\\textsuperscript{%s}}{\\textsubscript{%s}} etex,(xi,base_line+height)) ;\n" a usa sa 
+	)
+    in
     let notes = p.D.Tablature.notes in
     pf "
 %% position %d, %d notes
 xi := x0+%d*ux ;
 pickup pencircle scaled 0.02bp ;
 %%draw(xi,base_line) -- (xi,base_line+5*1uy) ;
+%s
 pickup pencircle scaled 0.15bp ;
-" pos (List.length notes) pos ;
+" pos (List.length notes) pos chord ;
       List.iter ( fun n ->
       pf "
   ynote := base_line+(6-%d)*uy ;
@@ -116,19 +124,29 @@ base_line := base_line + 6*ux ;
 )
 
 let  write_mp song name tab count  = (
-  let filename = sprintf  "%s-%d" (Filename.basename name) count in
+  let filename = sprintf  "%s-tab-%d" (Filename.basename name) count in
   let fout = open_out "mp" (filename ^ ".mp") in
   let pf fs = ksprintf ( fun s -> fprintf fout "%s" s) fs in
-  let () = pf "%s" "
+  let () = pf "
+verbatimtex 
+%%&latex
+\\documentclass[12pt]{article}
+\\usepackage{fixltx2e}
+\\begin{document}
+etex
+
 beginfig(1) ;
   uy=0.2cm ;
-  ux=0.25cm ;
   unote=0.1cm ;
   b=10*u ;
   base_line=0*u ;
-  line_offset=10*u ;
+  gap_base_line = 0*uy ;
+  height        = 5*uy ;
+  width         = 3cm ;
+  nb_croches    = %d ;
+  ux            = width/(nb_croches+1) ;
   pickup pencircle scaled 0.15bp ;
-  "  
+  "  song.D.Song.nb_croches
 in 
 
   let () = List.iter ( fun l -> write_bar_line fout l ) tab.D.Tablature.lines in
@@ -136,19 +154,20 @@ in
   
   let () = pf "
 endfig ;
+\\end{document}
 bye
 " in
   let () = close_out fout 
   in
-  let command = sprintf "mpost %s-%d.mp > /dev/null " (Filename.basename name) count in
+  let command = sprintf "mpost %s-tab-%d.mp > /dev/null " (Filename.basename name) count in
   let ret = Unix.system command in
   let () = match ret with
     | Unix.WEXITED 0 -> ()
     | _ -> failwith "mpost failed"
   in
-  let target = sprintf "%s-%d.1" (Filename.basename name) count in
+  let target = sprintf "%s-tab-%d.1" (Filename.basename name) count in
   let () = if Sys.file_exists target then (
-    let target2 =  sprintf "%s-%d.mps" (Filename.basename name) count  in
+    let target2 =  sprintf "%s-tab-%d.mps" (Filename.basename name) count  in
       Sys.rename target target2
   )
     else

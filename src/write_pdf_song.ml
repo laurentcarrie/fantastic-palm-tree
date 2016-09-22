@@ -160,7 +160,7 @@ let write_tab  song fout tab name count = (
   in
 *)
     pf "
-\\includegraphics{%s-%d.mps}
+\\includegraphics{%s-tab-%d.mps}
 \\end{tabular}
 " (Filename.basename name) count ;
     ()
@@ -185,6 +185,7 @@ let write_song_body fout song = (
     | D.Tab tab -> () (* write_tab fout tab *)
     | D.Accords l -> write_accords fout l
     | D.Transpose i -> ()
+    | D.Nb_croches _ -> ()
     | D.PageBreak -> pf "\\newpage\n"
   ) song.D.Song.data in
 

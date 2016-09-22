@@ -41,6 +41,9 @@ let read ~filename  = (
 	| "\\lyrics3" -> r ((D.Lyrics (3,arg,(read_array_until_empty_line fin))::acc))
 	| "\\mp3" -> r ((D.Mp3 (read_string_until_empty_line fin))::acc)
 	| "\\transpose" -> r ((D.Transpose (int_of_string (read_string_until_empty_line fin))::acc))
+	| "\\nb-croches" 
+	| "\\nb_croches" 
+	  -> r ((D.Nb_croches (int_of_string (read_string_until_empty_line fin))::acc))
 	| "\\pagebreak" -> r ((D.PageBreak :: acc))
 	| "\\chords"
 	| "\\accords" -> 
@@ -58,8 +61,9 @@ let read ~filename  = (
   let title = List.fold_left ( fun acc d -> match d with | D.Titre s -> s | _ -> acc ) "???" data in
   let auteur = List.fold_left ( fun acc d -> match d with | D.Auteur s -> s | _ -> acc ) "???" data in
   let transpose = List.fold_left ( fun acc d -> match d with | D.Transpose h -> h | _ -> acc ) 0 data in
+  let nb_croches = List.fold_left ( fun acc d -> match d with | D.Nb_croches i -> i | _ -> acc ) 8 data in
   let () = assert(title<>"") in
-  let song = {D.Song.filename=filename;titre=title;auteur=auteur;data=data;transpose=transpose;} in
+  let song = {D.Song.filename=filename;titre=title;auteur=auteur;data=data;transpose=transpose;nb_croches=nb_croches} in
   let () = check_bar song in
 
       song

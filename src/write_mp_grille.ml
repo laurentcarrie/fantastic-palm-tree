@@ -10,15 +10,15 @@ let (//) = Filename.concat
 
 let write_bar fout bar = (
   let pf fs = ksprintf ( fun s -> fprintf fout "%s" s) fs in
-  let () = pf "
+  let () = pf "%s" "
 %% write bar
-x1 := x0 + 2*ux + %d*ux ;
-draw(x0,base_line) -- (x0,base_line+5*1uy) ;
-" (* (List.length bar) *) 8  in
+x1 := x0 + width ;
+draw(x0,base_line) -- (x0,base_line+height) ;
+" (* (List.length bar) *)   in
 
   let () = match (List.map mp_of_chord bar) with
     | (a,sa,usa)::[] ->  (
-	pf "label(btex %s\\rlap{\\textsuperscript{%s}}{\\textsubscript{%s}} etex,(x0+(x1-x0)*1/2,base_line+2.5*uy)) ;\n" a usa sa ;
+	pf "label(btex %s\\rlap{\\textsuperscript{%s}}{\\textsubscript{%s}} etex,(x0+(x1-x0)*1/2,base_line+height/2)) ;\n" a usa sa ;
 (*
 	pf "label.rt(btex %s etex,(x0+0*ux+(x1-x0)*1/2,base_line+1.5*uy)) ;\n" sa ; 
 	pf "label.rt(btex %s etex,(x0+0*ux+(x1-x0)*1/2,base_line+3.5*uy)) ;\n" usa ; 
@@ -39,11 +39,9 @@ draw(x0,base_line) -- (x0,base_line+5*1uy) ;
   in
 
   let () = pf "%s" "
-   i:=0 ;
-   draw (x0,base_line+i*1uy) -- (x1,base_line+i*1uy) ;
-   i:=5 ;
-   draw (x0,base_line+i*1uy) -- (x1,base_line+i*1uy) ;
-x0:=x1 ;
+   draw (x0,base_line) -- (x1,base_line) ;
+   draw (x0,base_line+height) -- (x1,base_line+height) ;
+   x0:=x1 ;
 " in
     ()
 )
@@ -57,8 +55,8 @@ let write_line fout line = (
   let () = List.iter ( fun b -> write_bar fout b ) line in
 
   let () = pf "%s" "
-draw(x1,base_line) -- (x1,base_line+5*1uy) ;
-base_line := base_line - 6*ux ;
+draw(x1,base_line) -- (x1,base_line+height) ;
+base_line := base_line - gap_base_line - height ;
 " in
     ()
 )
@@ -80,9 +78,11 @@ beginfig(1) ;
   uy=0.2cm ;
   ux=0.25cm ;
   unote=0.1cm ;
-  b=10*u ;
-  base_line=0*u ;
-  line_offset=10*u ;
+%%  b=10*uy ;
+  base_line     = 0*uy ;
+  gap_base_line = 0*uy ;
+  height        = 4*uy ;
+  width         = 3cm ;
 %% scale pour le normal chord
   schord=1.3
 %% scale pour le susbcript chord

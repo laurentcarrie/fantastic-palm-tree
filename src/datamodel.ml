@@ -38,7 +38,7 @@ module Tablature = struct
     frette:int ;
     corde:int ;
   }
-  type paquet = { duration:int ; notes:note list}
+  type paquet = { duration:int ; notes:note list ; chord:Accord.t option}
   type bar = paquet list 
   type line = bar list
   type t = {
@@ -57,6 +57,7 @@ type context =
 | Mp3 of string
 | Accords of string list
 | Transpose of int
+| Nb_croches of int
 | PageBreak
     
 type document = context list 
@@ -68,6 +69,7 @@ module Song = struct
     titre:string ;
     auteur:string ;
     data:context list ;
+    nb_croches : int ; (* nombre de croches par mesure : 4/4 -> 8 ; 4/6 -> 12 *)
   }
 
   let tabs_of_song song = (

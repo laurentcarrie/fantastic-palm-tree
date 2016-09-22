@@ -14,42 +14,43 @@ let open_in msg s =
   open_in s
 
 
-let barlist_of_string (s:string) : Accord.t list list = (
-  let chord_of_string s = 
-    let s = String.strip s in
-    let a = String.explode s in 
-    let (note,a) = match a with
-      | [] -> failwith "empty bar"
-      | note::a -> note,a  in
-    let (alteration,a) = match a with
-      | [] -> Accord.None,[]
-      | 'b'::a -> Accord.Flat,a
-      | '#'::a -> Accord.Sharp,a
-      | _ -> Accord.None,a
-    in
-    let (sus4,a) = match a with
-      | [] -> false,[]
-      | 's'::'u'::'s'::'4'::a -> true,a
-      | _ -> false,a
-    in
-    let (diminue,a) = match a with
-      | [] -> false,[]
-      | 'd'::'i'::'m'::a -> true,a
-      | _ -> false,a
-    in
-    let (minor,a) = match a with
-      | [] -> false,[]
-      | 'm'::a -> true,a
-      | _ -> false,a
-    in
-    let (minor7,major7,a) = match a with
-      | [] -> false,false,[]
-      | '7'::'M'::a -> false,true,a
-      | '7'::a -> true,false,a
-      | _ -> false,false,a
-    in
-    { Accord.note = note ; minor=minor ; alteration=alteration ; minor7=minor7 ; major7=major7 ; diminue=diminue ; sus4=sus4}
+let chord_of_string s = (
+  let s = String.strip s in
+  let a = String.explode s in 
+  let (note,a) = match a with
+    | [] -> failwith "empty bar"
+    | note::a -> note,a  in
+  let (alteration,a) = match a with
+    | [] -> Accord.None,[]
+    | 'b'::a -> Accord.Flat,a
+    | '#'::a -> Accord.Sharp,a
+    | _ -> Accord.None,a
   in
+  let (sus4,a) = match a with
+    | [] -> false,[]
+    | 's'::'u'::'s'::'4'::a -> true,a
+    | _ -> false,a
+  in
+  let (diminue,a) = match a with
+    | [] -> false,[]
+    | 'd'::'i'::'m'::a -> true,a
+    | _ -> false,a
+  in
+  let (minor,a) = match a with
+    | [] -> false,[]
+    | 'm'::a -> true,a
+    | _ -> false,a
+  in
+  let (minor7,major7,a) = match a with
+    | [] -> false,false,[]
+    | '7'::'M'::a -> false,true,a
+    | '7'::a -> true,false,a
+    | _ -> false,false,a
+  in
+    { Accord.note = note ; minor=minor ; alteration=alteration ; minor7=minor7 ; major7=major7 ; diminue=diminue ; sus4=sus4}
+)
+
+let barlist_of_string (s:string) : Accord.t list list = (
   let bar_of_string s =
     List.map chord_of_string (String.nsplit s " ")
   in
@@ -76,10 +77,20 @@ let note_of_string s : (Tablature.note) = (
 
 let paquet_of_string s : Tablature.paquet = (
   let s2 = String.nsplit s "," in
+  let (s2,chord) = 
+    let c = List.hd s2 in
+    let c = String.strip c in
+      if String.starts_with c "[" && String.ends_with c "]" then (
+	let l = String.length c in
+	let c = String.slice c ~first:1 ~last:(l-1) in
+	  (List.tl s2,Some (chord_of_string c))
+      ) else
+	(s2,None)
+  in
   let s2 = List.map String.strip s2 in
   let duration = int_of_string(List.hd s2) in
   let notes = List.map note_of_string (List.tl s2) in
-    { Tablature.duration=duration ; notes=notes }
+    { Tablature.duration=duration ; notes=notes ; chord=chord }
 ) ;;
 
 let bar_of_string s : Tablature.bar = (
