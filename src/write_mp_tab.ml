@@ -30,7 +30,7 @@ pickup pencircle scaled 0.15bp ;
       | None -> ""
       | Some chord -> (
 	  let (a,usa,sa) = Write_util.mp_of_chord chord in
-	    sprintf "label.top(btex %s\\rlap{\\textsuperscript{%s}}{\\textsubscript{%s}} etex,(xi,base_line+height)) ;\n" a usa sa 
+	    sprintf "label.top(btex %s\\rlap{\\textsuperscript{%s}}{\\textsubscript{%s}} etex scaled 0.5,(xi,base_line+height)) ;\n" a usa sa 
 	)
     in
     let notes = p.D.Tablature.notes in

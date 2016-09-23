@@ -71,6 +71,7 @@ verbatimtex
 %&latex
 \\documentclass[12pt]{article}
 \\usepackage{fixltx2e}
+\\usepackage{amssymb}
 \\begin{document}
 etex
 

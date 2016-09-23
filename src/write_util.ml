@@ -37,7 +37,7 @@ let mp_of_chord (c:D.Accord.t) : (string*string*string) = (
   let subscript = "" in
   let subscript = if c.D.Accord.minor then subscript^"m" else subscript in
   let subscript = if c.D.Accord.minor7 then subscript^"7" else subscript in
-  let subscript = if c.D.Accord.major7 then subscript^"7M" else subscript in
+  let subscript = if c.D.Accord.major7 then subscript^"$\\bigtriangleup$" else subscript in
   let subscript = if c.D.Accord.sus4 then subscript^"sus4" else subscript in
     s,subscript,upperscript
 )
