@@ -12,6 +12,7 @@ clean-pdf : supprime les pdfs
 build   : construction des binaires et des png
 pdf     : construction des pdfs
 distant : port=... host=... copie sur une autre machine
+dist    : zippe le .git et le range dans $(prefix)/fantastic-palm-tree.tar.gz
 dropbox
 ")
 
