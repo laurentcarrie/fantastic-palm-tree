@@ -7,7 +7,7 @@ module D = Datamodel
 
 let (//) = Filename.concat
 
-let write_bar fout bar = (
+let write_bar fout (bar:D.Tablature.bar) = (
   let pf fs = ksprintf ( fun s -> fprintf fout "%s" s) fs in
   let () = pf "%s" "
 %% write bar
@@ -26,7 +26,7 @@ pickup pencircle scaled 0.15bp ;
   in
 
   let _ = List.fold_left( fun pos p ->
-    let chord = match p.D.Tablature.chord with
+    let chord = match p.D.Tablature.chord.D.Accord.chord with
       | None -> ""
       | Some chord -> (
 	  let (a,usa,sa) = Write_util.mp_of_chord chord in
@@ -61,7 +61,7 @@ pickup pencircle scaled 0.15bp ;
       in
 
       let print_tail c = (
-      match p.D.Tablature.duration with
+	match p.D.Tablature.chord.D.Accord.duration with
 	| 1 ->
 	    (*  double croche *)
       pf "
@@ -97,9 +97,9 @@ pickup pencircle scaled 0.15bp ;
     ) in
     let () = print_tail lowest_note in
       pos + 1
-  ) 1 bar in
+  ) 1 bar.D.Tablature.paquets in
 
-    let () = pf "%s" "
+  let () = pf "%s" "
 for i=0 upto 5 :
    draw (x0,base_line+i*1uy) -- (x1,base_line+i*1uy) ;
   endfor
@@ -108,13 +108,13 @@ x0:=x1 ;
     ()
 )
 
-let write_bar_line fout line = (
+let write_bar_line fout (line:D.Tablature.line) = (
   let pf fs = ksprintf ( fun s -> fprintf fout "%s" s) fs in
   let () = pf "%s" "
   x0:=0 ;
 
 "  in
-  let () = List.iter ( fun b -> write_bar fout b ) line in
+  let () = List.iter ( fun b -> write_bar fout b ) line.D.Tablature.bars in
 
   let () = pf "%s" "
 draw(x1,base_line) -- (x1,base_line+5*1uy) ;

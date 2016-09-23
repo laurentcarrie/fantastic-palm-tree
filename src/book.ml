@@ -5,6 +5,8 @@ open Read_util
 
 module D = Datamodel
 
+let (//) = Filename.concat
+
 let print_deps ~book ~top_src_dir ~top_build_dir = (
   let () = eprintf "top_build_dir : '%s'\n" top_build_dir in
   let () = eprintf "top_src_dir : '%s'\n" top_src_dir in

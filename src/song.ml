@@ -25,15 +25,13 @@ let read ~filename  = (
 	| "\\auteur" -> r ((D.Auteur (read_string_until_empty_line fin))::acc)
 	| "\\grille" -> (
 	    let (l:string list) = read_array_until_empty_line fin in
-	    let lignes = List.map Read_util.barlist_of_string l in
+	    let lignes = List.map ( fun l -> { D.Grille.bars = Read_util.Grille.bars_of_string l} ) l  in
 	    let g = { D.Grille.titre=arg;lignes=lignes } in
 	      r ((D.Grille g)::acc)
 	  )
 	| "\\tab" -> (
 	    let l = read_array_until_empty_line fin in
-	    let lines = Read_util.tab_of_string_list l in
-	    let lines = List.rev lines in
-	    let tab = { D.Tablature.titre=arg;lines=lines } in
+	    let tab = Read_util.tablature_of_string_list l in
 	      r ((D.Tab tab)::acc)
 	  )
 	| "\\lyrics" -> r ((D.Lyrics (1,arg,(read_array_until_empty_line fin))::acc))

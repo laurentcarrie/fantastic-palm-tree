@@ -8,7 +8,7 @@ module D = Datamodel
 
 let (//) = Filename.concat
 
-let write_bar fout bar = (
+let write_bar fout (bar:D.Grille.bar) = (
   let pf fs = ksprintf ( fun s -> fprintf fout "%s" s) fs in
   let () = pf "%s" "
 %% write bar
@@ -16,7 +16,13 @@ x1 := x0 + width ;
 draw(x0,base_line) -- (x0,base_line+height) ;
 " (* (List.length bar) *)   in
 
-  let () = match (List.map mp_of_chord bar) with
+  let e_of_chord c = 
+    match c.D.Accord.chord with
+      | Some a -> mp_of_chord a
+      | None   -> "\\textdagger","" ,"" 
+  in
+
+  let () = match (List.map e_of_chord bar.D.Grille.chords) with
     | (a,sa,usa)::[] ->  (
 	pf "label(btex %s\\rlap{\\textsuperscript{%s}}{\\textsubscript{%s}} etex,(x0+(x1-x0)*1/2,base_line+height/2)) ;\n" a usa sa ;
 (*
@@ -33,8 +39,11 @@ draw(x0,base_line) -- (x0,base_line+height) ;
 	pf "label.rt(btex %s etex,((x0+0*ux+(x1-x0)*2/3,base_line+1.5*uy))) ;\n" sb ; 
 	pf "label.rt(btex %s etex,((x0+0*ux+(x1-x0)*2/3,base_line+3.5*uy))) ;\n" usb ; 
       )
-    | _ -> (
-	pf "label(\"not managed\",((x1+x0)*2/3,base_line+2.5*uy)) ;\n" ;
+    | [] -> (
+	pf "%%empty bar\n" ; 
+      )
+    | l -> (
+	pf "label(\"not managed %d\",((x1+x0)*2/3,base_line+2.5*uy)) ;\n" (List.length l) ;
       )
   in
 
@@ -46,13 +55,13 @@ draw(x0,base_line) -- (x0,base_line+height) ;
     ()
 )
 
-let write_line fout line = (
+let write_line fout (line:D.Grille.ligne) = (
   let pf fs = ksprintf ( fun s -> fprintf fout "%s" s) fs in
   let () = pf "%s" "
 %% write line
   x0:=0 ;
 "  in
-  let () = List.iter ( fun b -> write_bar fout b ) line in
+  let () = List.iter ( fun b -> write_bar fout b ) line.D.Grille.bars in
 
   let () = pf "%s" "
 draw(x1,base_line) -- (x1,base_line+height) ;
@@ -72,6 +81,7 @@ verbatimtex
 \\documentclass[12pt]{article}
 \\usepackage{fixltx2e}
 \\usepackage{amssymb}
+\\usepackage{wasysym}
 \\begin{document}
 etex
 

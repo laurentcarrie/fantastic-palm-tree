@@ -22,7 +22,7 @@ let tex_of_string c = (
     "#","$\\sharp$" ;
   ]
 )
-
+(*
 let write_grille ~transpose fout (g:D.Grille.t) = (
   let pf fs = ksprintf ( fun s -> fprintf fout "%s" s) fs in
 
@@ -46,17 +46,23 @@ let write_grille ~transpose fout (g:D.Grille.t) = (
   let length = List.fold_left ( fun previous_length line ->
     let l = Pervasives.max previous_length (List.length line) in
     pf "\\cline{1-%d}\n" l ;
-    let tex_of_bar (b:D.Accord.t list) = 
-      let  l = List.map tex_of_chord b in
-      let s = match l with
-	| [] -> ""
-	| s::[] -> s
-	| a::b::[] -> 
-	  (* sprintf "\\diagbox[dir=NE]{%s}{%s}" a b *)
-	  sprintf "%s %s" a b
-	| l -> String.join " " l in
-      (* "\\tabbox[c]{" ^ s ^ "}"   *)
-      s
+    let tex_of_bar (b:D.Grille.e list) = 
+      match b with 
+	| D.Grille.A b -> (
+	    let  l = List.map tex_of_chord b in
+	    let s = match l with
+	      | [] -> ""
+	      | s::[] -> s
+	      | a::b::[] -> 
+		  (* sprintf "\\diagbox[dir=NE]{%s}{%s}" a b *)
+		  sprintf "%s %s" a b
+	      | l -> String.join " " l in
+	      (* "\\tabbox[c]{" ^ s ^ "}"   *)
+	      s
+	  )
+	| D.Grille.S -> (
+	    "S"
+	  )
     in
     let bars = List.map tex_of_bar line in
     pf "%s" (String.join " & " bars ) ;
@@ -72,6 +78,7 @@ let write_grille ~transpose fout (g:D.Grille.t) = (
 " length ;
 
 ) ;;
+*)
 
 let write_lyrics fout l = (
   let pf fs = ksprintf ( fun s -> fprintf fout "%s" s) fs in
@@ -92,11 +99,8 @@ let write_lyrics fout l = (
 	  let reg = Pcre.regexp "\\[(.*?);(.*?)\\]" in 
 	  let s = Pcre.exec ~rex:reg ~pos:0 line in
 	  let chord = 
-	    let l = Read_util.barlist_of_string (Pcre.get_substring s 1) in
-	    let () = assert(List.length l>0) in
-	    let l = List.hd l in 
-	    let () = assert(List.length l>0) in
-	    tex_of_chord (List.hd l)
+	    let l = Read_util.duration_and_silence_or_chord_of_string (Pcre.get_substring s 1) in
+	      tex_of_chord l
 	  in
 	  let word = Pcre.get_substring s 2 in
 	  let templ = sprintf "\\textsuperscript{\\textcolor{red}{%s}}\\underline{%s}" chord word in 

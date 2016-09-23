@@ -14,12 +14,11 @@ let open_in msg s =
   open_in s
 
 
-let chord_of_string s = (
-  let s = String.strip s in
+let chord_of_string s : Accord.c = (
   let a = String.explode s in 
   let (note,a) = match a with
     | [] -> failwith "empty bar"
-    | note::a -> note,a  in
+	| note::a -> note,a  in
   let (alteration,a) = match a with
     | [] -> Accord.None,[]
     | 'b'::a -> Accord.Flat,a
@@ -47,15 +46,31 @@ let chord_of_string s = (
     | '7'::a -> true,false,a
     | _ -> false,false,a
   in
-    { Accord.note = note ; minor=minor ; alteration=alteration ; minor7=minor7 ; major7=major7 ; diminue=diminue ; sus4=sus4}
+    { Accord.note = note ; minor=minor ; alteration=alteration ; minor7=minor7 ; major7=major7 ; diminue=diminue ; sus4=sus4 }
 )
 
-let barlist_of_string (s:string) : Accord.t list list = (
-  let bar_of_string s =
-    List.map chord_of_string (String.nsplit s " ")
+let duration_and_silence_or_chord_of_string s : Accord.t = (
+  let a = String.nsplit s "," in
+  let a = List.map String.strip a in
+    match a with
+      | [] -> failwith "erreur de format"
+      | "s"::[] -> { Accord.duration=noire ; chord = None }
+      | "s"::d::[] -> { Accord.duration=1 ; chord = None }
+      | hd::[] -> { Accord.duration=noire ; chord=Some (chord_of_string hd) }
+      | _ -> let msg = sprintf "not managed : '%s'" s in failwith msg
+)
+
+module Grille = struct
+  open Datamodel.Grille
+
+  let bars_of_string (s:string) = (
+    let bar_of_string s =
+      { chords = List.map duration_and_silence_or_chord_of_string (String.nsplit s " ") }
   in
-  List.map bar_of_string (String.nsplit s ":")
-) ;;
+      List.map bar_of_string (String.nsplit s ":") 
+  ) ;;
+
+end
 
 let note_of_string s : (Tablature.note) = (
   let s2 = String.nsplit s  " " in
@@ -77,7 +92,7 @@ let note_of_string s : (Tablature.note) = (
 
 let paquet_of_string s : Tablature.paquet = (
   let s2 = String.nsplit s "," in
-  let (s2,chord) = 
+  let (s2,(chord:Accord.c option)) = 
     let c = List.hd s2 in
     let c = String.strip c in
       if String.starts_with c "[" && String.ends_with c "]" then (
@@ -88,24 +103,24 @@ let paquet_of_string s : Tablature.paquet = (
 	(s2,None)
   in
   let s2 = List.map String.strip s2 in
-  let duration = int_of_string(List.hd s2) in
+  let duration = int_of_string(List.hd s2) in 
   let notes = List.map note_of_string (List.tl s2) in
-    { Tablature.duration=duration ; notes=notes ; chord=chord }
+    { Tablature.notes=notes ; chord={Accord.duration=duration;chord=chord }}
 ) ;;
 
-let bar_of_string s : Tablature.bar = (
+let bar_of_string s = (
   let s2 = String.nsplit s ";" in
-    List.map paquet_of_string s2
+    { Datamodel.Tablature.paquets = List.map paquet_of_string s2 }
 ) ;;
 
-let tab_of_string_list lines : Tablature.line list = (
+let tablature_of_string_list lines = (
   let line_of_string_list line : Tablature.line =
     let a = String.nsplit line "|" in
     let a = List.filter ( fun s -> s <> "") a in
-    let bars = List.map bar_of_string a in
+    let bars = { Datamodel.Tablature.bars = List.map bar_of_string a } in
       bars
   in
-    List.map line_of_string_list lines
+    { Tablature.titre="XXXX" ; lines = List.map line_of_string_list lines }
 ) ;;
 
 
