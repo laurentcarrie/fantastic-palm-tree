@@ -14,10 +14,10 @@ Am F:C E:Am F:C E
 F:E:G:Am
 
 \tab couplet
-|[Am],2,5 0;2,4 2;2,3 2;2,2 1;2,3 2;2,4 0;[F],2,6 1;2,4 0;2,3 2;2,2 1;2,3 2;2,4 0|
+|[Am],2,5 0;2,4 2;2,3 2;2,2 1;2,3 2;2,4 0;[F],2,6 1;2,4 0;2,3 2;2,2 1;2,3 2;2,4 0|[C],2,5 3;2,4 2;2,3 0;2,2 1;2,3 0;2,4 0;[E],2,6 0;2,4 2;2,3 1;2,2 0;2,3 1;2,4 2|
 
 
-\lyrics couplet
+\lyrics2 couplet
 [Am;Such] a [F;lo]nely day
 [C;And] it's [E;mi]ne
 The most loneliest day of my life
