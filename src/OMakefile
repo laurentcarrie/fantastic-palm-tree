@@ -29,7 +29,6 @@ OCAMLFLAGS    += -g -warn-error A
 src[]=
 	song
 	book
-#	read
 	datamodel
 	helpers
 #	write_index
