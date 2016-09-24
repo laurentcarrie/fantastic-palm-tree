@@ -24,7 +24,7 @@ draw(x0,base_line) -- (x0,base_line+height) ;
 
   let () = match (List.map e_of_chord bar.D.Grille.chords) with
     | (a,sa,usa)::[] ->  (
-	pf "label(btex %s\\rlap{\\textsuperscript{%s}}{\\textsubscript{%s}} etex,(x0+(x1-x0)*1/2,base_line+height/2)) ;\n" a usa sa ;
+	pf "label(btex %s\\rlap{\\textsuperscript{\\small{%s}}}{\\textsubscript{\\small{%s}}} etex,(x0+(x1-x0)*1/2,base_line+height/2)) ;\n" a usa sa ;
 (*
 	pf "label.rt(btex %s etex,(x0+0*ux+(x1-x0)*1/2,base_line+1.5*uy)) ;\n" sa ; 
 	pf "label.rt(btex %s etex,(x0+0*ux+(x1-x0)*1/2,base_line+3.5*uy)) ;\n" usa ; 
@@ -32,12 +32,12 @@ draw(x0,base_line) -- (x0,base_line+height) ;
       )
     | (a,sa,usa)::(b,sb,usb)::[] -> (
 	pf "label(btex %s etex,((x0+(x1-x0)*1/3,base_line+2.5*uy))) ;\n" a ;
-	pf "label.rt(btex %s etex,((x0+0*ux+(x1-x0)*1/3,base_line+1.5*uy))) ;\n" sa ; 
-	pf "label.rt(btex %s etex,((x0+0*ux+(x1-x0)*1/3,base_line+3.5*uy))) ;\n" usa ; 
+	pf "label.rt(btex \\small{%s} etex,((x0+0*ux+(x1-x0)*1/3,base_line+1.5*uy))) ;\n" sa ; 
+	pf "label.rt(btex \\small{%s} etex,((x0+0*ux+(x1-x0)*1/3,base_line+3.5*uy))) ;\n" usa ; 
 
 	pf "label(btex %s etex,((x0+(x1-x0)*2/3,base_line+2.5*uy))) ;\n" b ;
-	pf "label.rt(btex %s etex,((x0+0*ux+(x1-x0)*2/3,base_line+1.5*uy))) ;\n" sb ; 
-	pf "label.rt(btex %s etex,((x0+0*ux+(x1-x0)*2/3,base_line+3.5*uy))) ;\n" usb ; 
+	pf "label.rt(btex \\small{%s} etex,((x0+0*ux+(x1-x0)*2/3,base_line+1.5*uy))) ;\n" sb ; 
+	pf "label.rt(btex \\small{%s} etex,((x0+0*ux+(x1-x0)*2/3,base_line+3.5*uy))) ;\n" usb ; 
       )
     | [] -> (
 	pf "%%empty bar\n" ; 
