@@ -144,12 +144,15 @@ let write_tab  song fout tab name count = (
   let pf fs = ksprintf ( fun s -> fprintf fout "%s" s) fs in
 
   let title = tab.D.Tablature.titre in
+    
   let () = pf "
 \\begin{tabular}{c}
 \\\\
+" in 
+  let () = if title<>"" then pf"
 {\\commentfont \\hl{%s}}
 \\\\
-" (tex_of_string title) in
+" (tex_of_string title) else () in
 
   let () = Write_mp_tab.write_mp song name tab count in
 (*

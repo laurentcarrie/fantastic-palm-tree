@@ -14,11 +14,18 @@ let open_in msg s =
   open_in s
 
 
+let check_note a =
+  match a with
+    | 'A' | 'B' | 'C' | 'D' | 'E' | 'F' | 'G' -> ()
+    | a -> let msg = sprintf "not a note : '%c'" a in failwith msg
+
+
 let chord_of_string s : Accord.c = (
   let a = String.explode s in 
   let (note,a) = match a with
     | [] -> failwith "empty bar"
 	| note::a -> note,a  in
+  let () = check_note note in
   let (alteration,a) = match a with
     | [] -> Accord.None,[]
     | 'b'::a -> Accord.Flat,a
@@ -113,14 +120,14 @@ let bar_of_string s = (
     { Datamodel.Tablature.paquets = List.map paquet_of_string s2 }
 ) ;;
 
-let tablature_of_string_list lines = (
+let tablature_of_string_list titre lines = (
   let line_of_string_list line : Tablature.line =
     let a = String.nsplit line "|" in
     let a = List.filter ( fun s -> s <> "") a in
     let bars = { Datamodel.Tablature.bars = List.map bar_of_string a } in
       bars
   in
-    { Tablature.titre="XXXX" ; lines = List.map line_of_string_list lines }
+    { Tablature.titre=titre ; lines = List.map line_of_string_list lines }
 ) ;;
 
 

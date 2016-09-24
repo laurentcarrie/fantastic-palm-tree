@@ -16,31 +16,37 @@ x1 := x0 + width ;
 draw(x0,base_line) -- (x0,base_line+height) ;
 " (* (List.length bar) *)   in
 
-  let e_of_chord c = 
+  let e_of_chord c n nb = 
     match c.D.Accord.chord with
-      | Some a -> mp_of_chord a
-      | None   -> "\\textdagger","" ,"" 
+      | Some a -> 
+	  let (a,sa,usa) = mp_of_chord a in
+	  let rlap = match sa,usa with
+	    | "","" ->  ""
+	    | sa,"" ->  sprintf "\\rlap{}{\\textsubscript{\\small{%s}}}" sa 
+	    | "",usa ->  sprintf "\\rlap{\\textsuperscript{\\small{%s}}}{}" usa
+	    | sa,usa -> sprintf "\\rlap{\\textsubscript{\\small{%s}}}{\\textsuperscript{\\small{%s}}}" sa usa
+	  in
+	    sprintf "label(btex %s%s etex,(x0+(x1-x0)*%d/%d,base_line+height/2)) ; \n" a rlap n nb
+      | None   -> 
+	  sprintf "label(btex \\textdagger etex,((x0+(x1-x0)*%d/%d,base_line+height/2))) ; \n" n nb
   in
 
-  let () = match (List.map e_of_chord bar.D.Grille.chords) with
-    | (a,sa,usa)::[] ->  (
-	pf "label(btex %s\\rlap{\\textsuperscript{\\small{%s}}}{\\textsubscript{\\small{%s}}} etex,(x0+(x1-x0)*1/2,base_line+height/2)) ;\n" a usa sa ;
-(*
-	pf "label.rt(btex %s etex,(x0+0*ux+(x1-x0)*1/2,base_line+1.5*uy)) ;\n" sa ; 
-	pf "label.rt(btex %s etex,(x0+0*ux+(x1-x0)*1/2,base_line+3.5*uy)) ;\n" usa ; 
-*)
-      )
-    | (a,sa,usa)::(b,sb,usb)::[] -> (
-	pf "label(btex %s etex,((x0+(x1-x0)*1/3,base_line+2.5*uy))) ;\n" a ;
-	pf "label.rt(btex \\small{%s} etex,((x0+0*ux+(x1-x0)*1/3,base_line+1.5*uy))) ;\n" sa ; 
-	pf "label.rt(btex \\small{%s} etex,((x0+0*ux+(x1-x0)*1/3,base_line+3.5*uy))) ;\n" usa ; 
-
-	pf "label(btex %s etex,((x0+(x1-x0)*2/3,base_line+2.5*uy))) ;\n" b ;
-	pf "label.rt(btex \\small{%s} etex,((x0+0*ux+(x1-x0)*2/3,base_line+1.5*uy))) ;\n" sb ; 
-	pf "label.rt(btex \\small{%s} etex,((x0+0*ux+(x1-x0)*2/3,base_line+3.5*uy))) ;\n" usb ; 
-      )
+  let () = match bar.D.Grille.chords with
     | [] -> (
 	pf "%%empty bar\n" ; 
+      )
+    | c::[] -> (
+	pf "%s" (e_of_chord c 1  2)
+      )
+    | c1::c2::[] -> (
+	pf "%s" (e_of_chord c1 1  3) ;
+	pf "%s" (e_of_chord c2 2  3)
+      )
+    | c1::c2::c3::c4::[] -> (
+	pf "%s" (e_of_chord c1 1  5) ;
+	pf "%s" (e_of_chord c2 2  5) ;
+	pf "%s" (e_of_chord c3 3  5) ;
+	pf "%s" (e_of_chord c4 4  5)
       )
     | l -> (
 	pf "label(\"not managed %d\",((x1+x0)*2/3,base_line+2.5*uy)) ;\n" (List.length l) ;
@@ -118,7 +124,7 @@ bye
   let ret = Unix.system command in
   let () = match ret with
     | Unix.WEXITED 0 -> ()
-    | _ -> failwith "mpost failed"
+    | _ -> let msg = sprintf "%s\nfailed" command in failwith msg
   in
   let target = sprintf "%s-grille-%d.1" (Filename.basename name) count in
   let () = if Sys.file_exists target then (

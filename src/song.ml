@@ -16,44 +16,44 @@ let read ~filename  = (
   let rec r acc  = 
     try
       let line = String.strip (input_line fin) in
-      if String.starts_with line "#" then
-	r acc 
-      else (
-	let (word,arg) = try String.split line " " with | ExtString.Invalid_string -> line,"" in
-	match word with
-	| "\\titre" -> r ((D.Titre (read_string_until_empty_line fin))::acc)
-	| "\\auteur" -> r ((D.Auteur (read_string_until_empty_line fin))::acc)
-	| "\\grille" -> (
-	    let (l:string list) = read_array_until_empty_line fin in
-	    let lignes = List.map ( fun l -> { D.Grille.bars = Read_util.Grille.bars_of_string l} ) l  in
-	    let g = { D.Grille.titre=arg;lignes=lignes } in
-	      r ((D.Grille g)::acc)
-	  )
-	| "\\tab" -> (
-	    let l = read_array_until_empty_line fin in
-	    let tab = Read_util.tablature_of_string_list l in
-	      r ((D.Tab tab)::acc)
-	  )
-	| "\\lyrics" -> r ((D.Lyrics (1,arg,(read_array_until_empty_line fin))::acc))
-	| "\\lyrics2" -> r ((D.Lyrics (2,arg,(read_array_until_empty_line fin))::acc))
-	| "\\lyrics3" -> r ((D.Lyrics (3,arg,(read_array_until_empty_line fin))::acc))
-	| "\\mp3" -> r ((D.Mp3 (read_string_until_empty_line fin))::acc)
-	| "\\transpose" -> r ((D.Transpose (int_of_string (read_string_until_empty_line fin))::acc))
-	| "\\nb-croches" 
-	| "\\nb_croches" 
-	  -> r ((D.Nb_croches (int_of_string (read_string_until_empty_line fin))::acc))
-	| "\\pagebreak" -> r ((D.PageBreak :: acc))
-	| "\\chords"
-	| "\\accords" -> 
-	  r ((D.Accords ((read_array_until_empty_line fin)))::acc)
-	| "" -> r acc
-	| s -> r ((D.Normal s)::acc)
-      )
+	if String.starts_with line "#" then
+	  r acc 
+	else (
+	  let (word,arg) = try String.split line " " with | ExtString.Invalid_string -> line,"" in
+	    match word with
+	      | "\\titre" -> r ((D.Titre (read_string_until_empty_line fin))::acc)
+	      | "\\auteur" -> r ((D.Auteur (read_string_until_empty_line fin))::acc)
+	      | "\\grille" -> (
+		  let (l:string list) = read_array_until_empty_line fin in
+		  let lignes = List.map ( fun l -> { D.Grille.bars = Read_util.Grille.bars_of_string l} ) l  in
+		  let g = { D.Grille.titre=arg;lignes=lignes } in
+		    r ((D.Grille g)::acc)
+		)
+	      | "\\tab" -> (
+		  let l = read_array_until_empty_line fin in
+		  let tab = Read_util.tablature_of_string_list arg l in
+		    r ((D.Tab tab)::acc)
+		)
+	      | "\\lyrics" -> r ((D.Lyrics (1,arg,(read_array_until_empty_line fin))::acc))
+	      | "\\lyrics2" -> r ((D.Lyrics (2,arg,(read_array_until_empty_line fin))::acc))
+	      | "\\lyrics3" -> r ((D.Lyrics (3,arg,(read_array_until_empty_line fin))::acc))
+	      | "\\mp3" -> r ((D.Mp3 (read_string_until_empty_line fin))::acc)
+	      | "\\transpose" -> r ((D.Transpose (int_of_string (read_string_until_empty_line fin))::acc))
+	      | "\\nb-croches" 
+	      | "\\nb_croches" 
+		-> r ((D.Nb_croches (int_of_string (read_string_until_empty_line fin))::acc))
+	      | "\\pagebreak" -> r ((D.PageBreak :: acc))
+	      | "\\chords"
+	      | "\\accords" -> 
+		  r ((D.Accords ((read_array_until_empty_line fin)))::acc)
+	      | "" -> r acc
+	      | s -> r ((D.Normal s)::acc)
+	)
     with
-    | End_of_file -> (
-      close_in fin ;
-      List.rev acc
-    )
+      | End_of_file -> (
+	  close_in fin ;
+	  List.rev acc
+	)
   in
   let data = r []   in
   let title = List.fold_left ( fun acc d -> match d with | D.Titre s -> s | _ -> acc ) "???" data in
@@ -64,7 +64,7 @@ let read ~filename  = (
   let song = {D.Song.filename=filename;titre=title;auteur=auteur;data=data;transpose=transpose;nb_croches=nb_croches} in
   let () = check_bar song in
 
-      song
+    song
 ) ;;
 
 
@@ -75,9 +75,9 @@ let print_deps ~song ~top_build_dir = (
       | D.Tab tab -> (
 	  Write_mp_tab.write_mp song name tab count ;
 	  (*
-	  let acc = sprintf "%s\n%s.tex: %s-%d.mps" acc name name count in
-	  let acc = sprintf "%s\n%s.tex: %s-%d.mp" acc name name count in
-	  let acc = sprintf "%s\n%s.tex: %s-%d.1" acc name name count in
+	    let acc = sprintf "%s\n%s.tex: %s-%d.mps" acc name name count in
+	    let acc = sprintf "%s\n%s.tex: %s-%d.mp" acc name name count in
+	    let acc = sprintf "%s\n%s.tex: %s-%d.1" acc name name count in
 	  *)
 	  count+1,acc
 	)
@@ -85,8 +85,8 @@ let print_deps ~song ~top_build_dir = (
   ) (0,"") song.D.Song.data in
     
     eprintf "%s\n" deps  ; flush stderr 
-    (* printf "%s\n" deps  ; flush stdout  *)
-    
+      (* printf "%s\n" deps  ; flush stdout  *)
+      
 )
 
 
