@@ -20,7 +20,7 @@ pf "
 xii := x0 + %d*u ;
 pickup pencircle scaled 0.02bp ;
 draw(xii,base_line) -- (xii,base_line+5*1u) ;
-pickup pencircle scaled 0.15bp ;
+pickup pencircle scaled 0.3bp ;
 " i
   ) (List.init 4 ( fun i -> 2*i+1 ))
   in
@@ -31,11 +31,11 @@ pickup pencircle scaled 0.15bp ;
 xi := x0+%d*u ;
 pickup pencircle scaled 0.02bp ;
 %%draw(xi,base_line) -- (xi,base_line+5*1u) ;
-pickup pencircle scaled 0.15bp ;
+pickup pencircle scaled 0.3bp ;
 " pos (List.length notes) pos ;
     List.iter ( fun n ->
       pf "
-  label(\"%d\" infont defaultfont scaled 0.6,(xi,base_line+(6-%d)*u)) ;
+  label(\"%d\" infont defaultfont scaled 1,(xi,base_line+(6-%d)*u)) ;
 " n.D.Tablature.frette n.D.Tablature.corde 
     ) notes
   ) bar in
@@ -69,11 +69,11 @@ let  write_mp song name tab count  = (
   let pf fs = ksprintf ( fun s -> fprintf fout "%s" s) fs in
   let () = pf "%s" "
 beginfig(1) ;
-  u=0.2cm ;
+  u=0.3cm ;
   b=10*u ;
   base_line=0*u ;
   line_offset=10*u ;
-  pickup pencircle scaled 0.15bp ;
+  pickup pencircle scaled 0.3bp ;
   "  
 in 
 
