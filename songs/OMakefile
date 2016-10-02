@@ -1,4 +1,4 @@
-.PHONY: build all  xxx pdf
+.PHONY: build all  xxx pdf no-book
 
 .DEFAULT: build
 
@@ -54,7 +54,7 @@ song_dirs[]=
 		mkdir -p $(dirname $(target))
 		$(target) : $s.pdf
 			cp $< $@
-		pdf : $(target)
+		pdf no-book : $(target)
 		export
 
 .SUBDIRS: $(song_dirs)

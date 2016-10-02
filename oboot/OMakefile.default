@@ -23,11 +23,11 @@ USEPDFLATEX=true
 println($"srcdir is : $(srcdir)")
 println($"prefix is : $(prefix)")
 
-song_files=$(find $(srcdir)/songs -name *.song)
-song_files=$(removeprefix $(srcdir)/,$(song_files))
-tex_files=$(replacesuffixes .song,.tex,$(song_files))
+#song_files=$(find $(srcdir)/songs -name *.song)
+#song_files=$(removeprefix $(srcdir)/,$(song_files))
+#tex_files=$(replacesuffixes .song,.tex,$(song_files))
 
-book_files=$(find songs -name *.book)
+#book_files=$(find songs -name *.book)
 
 generator=$(prefix)/bin/generate
 

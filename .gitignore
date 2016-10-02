@@ -1,8 +1,3 @@
 *~
-*.html
 *.swp
-src/*.png
-src/*.svg
-tmp/
-sd-24571.dedibox.fr.21.laurent
 build/
