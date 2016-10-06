@@ -9,6 +9,10 @@ let noire = 4
 let blanche = 2
 let ronde = 1
 
+let tex_silence = 
+  (* "\\textdagger" *)
+  "."
+
 let int_of_string s = 
   try
     int_of_string s

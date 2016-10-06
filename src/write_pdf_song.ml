@@ -22,63 +22,6 @@ let tex_of_string c = (
     "#","$\\sharp$" ;
   ]
 )
-(*
-let write_grille ~transpose fout (g:D.Grille.t) = (
-  let pf fs = ksprintf ( fun s -> fprintf fout "%s" s) fs in
-
-  let taille = List.fold_left ( fun t line ->
-    let t2 = List.length line in
-    if t > t2 then t else t2
-  ) 0 g.D.Grille.lignes in
-
-  pf "\
-
-  \\centering
-" ;
-  pf "%%\\caption*{%s}\n" (tex_of_string g.D.Grille.titre) ;
-
-  (* if g.Grille.titre <> "" then pf "{\\lyricstitlefont %s}\\\\\n\n" (tex_of_string g.Grille.titre) else () ; *)
-  pf "\\begin{grillefont} \n" ;
-  pf "\\begin{tabular}{|%s|}\n" (String.join "|" 
-       (List.init taille (fun _ -> "M{2cm}"))
-) ;
-  let () = pf "\\multicolumn{%d}{c}{\\lyricstitlefont %s} \\\\\n" taille (tex_of_string g.D.Grille.titre)  in
-  let length = List.fold_left ( fun previous_length line ->
-    let l = Pervasives.max previous_length (List.length line) in
-    pf "\\cline{1-%d}\n" l ;
-    let tex_of_bar (b:D.Grille.e list) = 
-      match b with 
-	| D.Grille.A b -> (
-	    let  l = List.map tex_of_chord b in
-	    let s = match l with
-	      | [] -> ""
-	      | s::[] -> s
-	      | a::b::[] -> 
-		  (* sprintf "\\diagbox[dir=NE]{%s}{%s}" a b *)
-		  sprintf "%s %s" a b
-	      | l -> String.join " " l in
-	      (* "\\tabbox[c]{" ^ s ^ "}"   *)
-	      s
-	  )
-	| D.Grille.S -> (
-	    "S"
-	  )
-    in
-    let bars = List.map tex_of_bar line in
-    pf "%s" (String.join " & " bars ) ;
-    pf "%s" "\\\\\n" ;
-    List.length line
-  ) (-1) g.D.Grille.lignes in
-  pf "\
-  \\cline{1-%d}
-  \\end{tabular}
-  \\end{grillefont}
-
-
-" length ;
-
-) ;;
-*)
 
 let write_lyrics fout l = (
   let pf fs = ksprintf ( fun s -> fprintf fout "%s" s) fs in
@@ -229,7 +172,7 @@ let write_preamble fout  = (
 
     
   let _ = pf  "\
-\\documentclass[a4paper,landscape]{article}
+\\documentclass[a4paper,portrait]{article}
 \\usepackage[utf8]{inputenc}
 \\usepackage[T1]{fontenc}
 %%\\usepackage{wasysym}
@@ -259,13 +202,25 @@ let write_preamble fout  = (
 \\renewcommand{\\arraystretch}{1.2}
 \\usepackage{multicol}
 %%\\usepackage{french}
-\\setlength{\\columnseprule}{0.5pt}
+\\setlength{\\columnseprule}{1pt}
+\\setlength{\\columnsep}{0cm}
 \\usepackage{lastpage}
 \\usepackage{needspace}
 \\usepackage{titletoc}
 \\hypersetup{ pdftitle={}, pdfauthor={},bookmarks=true, bookmarksopen=true,pdftoolbar=true, pdffitwindow=false,colorlinks=false,linkcolor=red, citecolor=red,filecolor=magenta,urlcolor=black }
 %%\\usepackage{bookmark}
 \\usepackage[metapost,truebbox,mplabels]{mfpic}
+
+%% de la doc de multicols
+%%\\setlength{\\textwidth}{39pc}
+%%\\setlength{\\textheight}{54pc}
+%%\\setlength{\\parindent}{1em}
+%%\\setlength{\\parskip}{0pt plus 1pt}
+%%\\setlength{\\oddsidemargin}{0pc}
+%%\\setlength{\\marginparwidth}{0pc}
+%%\\setlength{\\topmargin}{-2.5pc}
+%%\\setlength{\\headsep}{20pt}
+
 " in
 
 (*
@@ -289,7 +244,7 @@ in
   let () = pf "\\newcommand*{\\titlefont}{\\fontfamily{ptm}\\fontsize{30}{35}\\fontshape{it}\\selectfont} \n" in
   let () = pf "\\newcommand*{\\commentfont}{\\fontfamily{ptm}\\fontsize{12}{15}\\fontshape{it}\\selectfont} \n" in
   let () = pf "\\newcommand*{\\lyricstitlefont}{\\color{black}\\fontfamily{ptm}\\fontsize{15}{15}\\fontshape{it}\\selectfont} \n" in
-  let () = pf "\\newenvironment{lyricsfont}{\\fontfamily{ptm}\\fontsize{15}{15}\\selectfont}{} \n" in
+  let () = pf "\\newenvironment{lyricsfont}{\\fontfamily{ptm}\\fontsize{12}{12}\\selectfont}{} \n" in
   let () = pf "\\newenvironment{grillefont}{\\color{blue}\\fontfamily{ptm}\\fontsize{15}{15}\\selectfont}{} \n" in 
   let () = pf "\\newcommand*{\\tabbox}[2][t]{%%
     \\vspace{0pt}\\parbox[#1][3.7\\baselineskip]{0.5cm}{\\strut#2\\strut}}\n" in
@@ -312,7 +267,7 @@ in
   let () = pf "\\def\\mystrut(#1,#2){\\vrule height #1 depth #2 width 0pt}\n" in
   (* let () = pf "\\newcolumntype{C}{>{\\lower 2ex\\hbox to 6ex\\bgroup\\hss}c<{\\hss\\egroup}}\n" in *)
   let () = pf "\\newcolumntype{C}[1]{%%
-   >{\\mystrut(3ex,2ex)\\centering}%%
+   >{\\mystrut(10ex,10ex)\\centering}%%
    p{#1}%%
    <{}}  \n" in
   ()
@@ -376,7 +331,7 @@ let write_book ~book   = (
 %%\\end{multicolumns}
 %%\\titlecontents{section}[0em]
 %%{\\vskip 0.5ex}%%
-%%{}%% numbered sections formattin
+%%{}%% numbered sections formatting
 %%{}%% unnumbered sections formatting
 %%{}%%
 

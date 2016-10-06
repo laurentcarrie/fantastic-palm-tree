@@ -28,7 +28,7 @@ draw(x0,base_line) -- (x0,base_line+height) ;
 	  in
 	    sprintf "label(btex %s%s etex,(x0+(x1-x0)*%d/%d,base_line+height/2)) ; \n" a rlap n nb
       | None   -> 
-	  sprintf "label(btex \\textdagger etex,((x0+(x1-x0)*%d/%d,base_line+height/2))) ; \n" n nb
+	  sprintf "label(btex %s etex,((x0+(x1-x0)*%d/%d,base_line+height/2))) ; \n" D.tex_silence n nb
   in
 
   let () = match bar.D.Grille.chords with
@@ -93,13 +93,13 @@ etex
 
 beginfig(1) ;
   uy=0.2cm ;
-  ux=0.25cm ;
+%%  ux=0.15cm ;
   unote=0.1cm ;
 %%  b=10*uy ;
   base_line     = 0*uy ;
   gap_base_line = 0*uy ;
   height        = 4*uy ;
-  width         = 3cm ;
+  width         = 2cm ;
 %% scale pour le normal chord
   schord=1.3
 %% scale pour le susbcript chord
