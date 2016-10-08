@@ -29,15 +29,16 @@ OCAMLFLAGS    += -g -warn-error A
 src[]=
 	song
 	book
-#	read
 	datamodel
 	helpers
 #	write_index
 #	write_song
 	write_mp_tab
+	write_mp_grille
 	write_pdf_song
 	chord
 	read_util
+	write_util
 	make_all
 	main
 

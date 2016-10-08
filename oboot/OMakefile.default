@@ -12,6 +12,7 @@ clean-pdf : supprime les pdfs
 build   : construction des binaires et des png
 pdf     : construction des pdfs
 distant : port=... host=... copie sur une autre machine
+dist    : zippe le .git et le range dans $(prefix)/fantastic-palm-tree.tar.gz
 dropbox
 ")
 
@@ -22,11 +23,11 @@ USEPDFLATEX=true
 println($"srcdir is : $(srcdir)")
 println($"prefix is : $(prefix)")
 
-song_files=$(find $(srcdir)/songs -name *.song)
-song_files=$(removeprefix $(srcdir)/,$(song_files))
-tex_files=$(replacesuffixes .song,.tex,$(song_files))
+#song_files=$(find $(srcdir)/songs -name *.song)
+#song_files=$(removeprefix $(srcdir)/,$(song_files))
+#tex_files=$(replacesuffixes .song,.tex,$(song_files))
 
-book_files=$(find songs -name *.book)
+#book_files=$(find songs -name *.book)
 
 generator=$(prefix)/bin/generate
 
@@ -42,3 +43,10 @@ mkdir -p $(prefix)/pdf
 #	mpost image.mp
 #	cp image.1 image.mps
 
+
+
+.PHONY: dist
+
+dist : 
+	tar czf fantastic-palm-tree.tar.gz -C $(srcdir) .git
+	cp fantastic-palm-tree.tar.gz $(prefix)/.

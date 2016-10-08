@@ -4,16 +4,21 @@ open Printf
 
 let (//) = Filename.concat
 
+let croche = 8
+let noire = 4
+let blanche = 2
+let ronde = 1
+
 let int_of_string s = 
   try
     int_of_string s
   with
-    | _ -> failwith ("not a string : " ^ s)
+    | _ -> failwith ("not a string : '" ^ s ^ "'")
 
 
 module Accord = struct
   type alteration = | None | Flat | Sharp
-  type t = {
+  type c = {
     note : char ;
     alteration : alteration ;
     minor : bool ;
@@ -22,11 +27,15 @@ module Accord = struct
     diminue : bool ;
     sus4 : bool ;
   }
+  type t = {
+    duration : int ;
+    chord : c option ;
+  }
 end
 
 module Grille = struct
-  type case = Accord.t list
-  type ligne = case list
+  type bar = { chords : Accord.t list }
+  type ligne = { bars : bar list }
   type t = {
     titre : string ;
     lignes : ligne list ;
@@ -35,12 +44,12 @@ end
 
 module Tablature = struct
   type note = {
-    duration:int ;
     frette:int ;
     corde:int ;
   }
-  type bar = (int*note list) list 
-  type line = bar list
+  type paquet = { notes:note list ; chord:Accord.t }
+  type bar = { paquets : paquet list }
+  type line = { bars : bar list }
   type t = {
     titre : string ;
     lines : line list ;
@@ -57,6 +66,7 @@ type context =
 | Mp3 of string
 | Accords of string list
 | Transpose of int
+| Nb_croches of int
 | PageBreak
     
 type document = context list 
@@ -68,6 +78,7 @@ module Song = struct
     titre:string ;
     auteur:string ;
     data:context list ;
+    nb_croches : int ; (* nombre de croches par mesure : 4/4 -> 8 ; 4/6 -> 12 *)
   }
 
   let tabs_of_song song = (

@@ -2,6 +2,8 @@ open ExtList
 open ExtString
 open Printf
 open Read_util
+open Write_util
+
 
 module D = Datamodel
 
@@ -11,23 +13,6 @@ let write_mp3 (pf : ('a, unit, string, unit) format4 -> 'a) title = (
   (* pf "mp3 file : %s\n" title  *)
 ) ;;
 
-let tex_of_chord (c:D.Accord.t) = (
-  let s = sprintf "%c" c.D.Accord.note in
-  let s = match c.D.Accord.alteration with
-    | D.Accord.None -> s
-    | D.Accord.Flat -> s ^ "\\textsuperscript{$\\flat$}"
-    | D.Accord.Sharp -> s ^ "\\textsuperscript{$\\sharp$}"
-  in
-  let s = if c.D.Accord.diminue then s^"ø" else s in
-  let subscript = "" in
-  let subscript = if c.D.Accord.minor then subscript^"m" else subscript in
-  let subscript = if c.D.Accord.minor7 then subscript^"7" else subscript in
-  let subscript = if c.D.Accord.major7 then subscript^"7M" else subscript in
-  let subscript = if c.D.Accord.sus4 then subscript^"sus4" else subscript in
-  let s = if subscript="" then s else s^"\\textsubscript{"^subscript^"}" in
-  let s = if s="%" then "" else ""^s^"" in
-  s
-)
 
 let tex_of_string c = (
   List.fold_left ( fun c (sub,by) ->
@@ -37,7 +22,7 @@ let tex_of_string c = (
     "#","$\\sharp$" ;
   ]
 )
-
+(*
 let write_grille ~transpose fout (g:D.Grille.t) = (
   let pf fs = ksprintf ( fun s -> fprintf fout "%s" s) fs in
 
@@ -61,17 +46,23 @@ let write_grille ~transpose fout (g:D.Grille.t) = (
   let length = List.fold_left ( fun previous_length line ->
     let l = Pervasives.max previous_length (List.length line) in
     pf "\\cline{1-%d}\n" l ;
-    let tex_of_bar (b:D.Accord.t list) = 
-      let  l = List.map tex_of_chord b in
-      let s = match l with
-	| [] -> ""
-	| s::[] -> s
-	| a::b::[] -> 
-	  (* sprintf "\\diagbox[dir=NE]{%s}{%s}" a b *)
-	  sprintf "%s %s" a b
-	| l -> String.join " " l in
-      (* "\\tabbox[c]{" ^ s ^ "}"   *)
-      s
+    let tex_of_bar (b:D.Grille.e list) = 
+      match b with 
+	| D.Grille.A b -> (
+	    let  l = List.map tex_of_chord b in
+	    let s = match l with
+	      | [] -> ""
+	      | s::[] -> s
+	      | a::b::[] -> 
+		  (* sprintf "\\diagbox[dir=NE]{%s}{%s}" a b *)
+		  sprintf "%s %s" a b
+	      | l -> String.join " " l in
+	      (* "\\tabbox[c]{" ^ s ^ "}"   *)
+	      s
+	  )
+	| D.Grille.S -> (
+	    "S"
+	  )
     in
     let bars = List.map tex_of_bar line in
     pf "%s" (String.join " & " bars ) ;
@@ -87,6 +78,7 @@ let write_grille ~transpose fout (g:D.Grille.t) = (
 " length ;
 
 ) ;;
+*)
 
 let write_lyrics fout l = (
   let pf fs = ksprintf ( fun s -> fprintf fout "%s" s) fs in
@@ -107,11 +99,8 @@ let write_lyrics fout l = (
 	  let reg = Pcre.regexp "\\[(.*?);(.*?)\\]" in 
 	  let s = Pcre.exec ~rex:reg ~pos:0 line in
 	  let chord = 
-	    let l = Read_util.barlist_of_string (Pcre.get_substring s 1) in
-	    let () = assert(List.length l>0) in
-	    let l = List.hd l in 
-	    let () = assert(List.length l>0) in
-	    tex_of_chord (List.hd l)
+	    let l = Read_util.duration_and_silence_or_chord_of_string (Pcre.get_substring s 1) in
+	      tex_of_chord l
 	  in
 	  let word = Pcre.get_substring s 2 in
 	  let templ = sprintf "\\textsuperscript{\\textcolor{red}{%s}}\\underline{%s}" chord word in 
@@ -132,17 +121,38 @@ let write_lyrics fout l = (
   let () = pf "\n" in
   ()
 ) 
-
-let write_tab  song fout tab name count = (
+let write_grille  song fout g name count = (
   let pf fs = ksprintf ( fun s -> fprintf fout "%s" s) fs in
 
-  let title = tab.D.Tablature.titre in
+  let title = g.D.Grille.titre in
   let () = pf "
 \\begin{tabular}{c}
 \\\\
 {\\commentfont \\hl{%s}}
 \\\\
 " (tex_of_string title) in
+
+  let () = Write_mp_grille.write_mp song name g count in
+    pf "
+\\includegraphics{%s-grille-%d.mps}
+\\end{tabular}
+" (Filename.basename name) count ;
+    ()
+)
+
+let write_tab  song fout tab name count = (
+  let pf fs = ksprintf ( fun s -> fprintf fout "%s" s) fs in
+
+  let title = tab.D.Tablature.titre in
+    
+  let () = pf "
+\\begin{tabular}{c}
+\\\\
+" in 
+  let () = if title<>"" then pf"
+{\\commentfont \\hl{%s}}
+\\\\
+" (tex_of_string title) else () in
 
   let () = Write_mp_tab.write_mp song name tab count in
 (*
@@ -157,7 +167,7 @@ let write_tab  song fout tab name count = (
   in
 *)
     pf "
-\\includegraphics{%s-%d.mps}
+\\includegraphics{%s-tab-%d.mps}
 \\end{tabular}
 " (Filename.basename name) count ;
     ()
@@ -182,13 +192,15 @@ let write_song_body fout song = (
     | D.Tab tab -> () (* write_tab fout tab *)
     | D.Accords l -> write_accords fout l
     | D.Transpose i -> ()
+    | D.Nb_croches _ -> ()
     | D.PageBreak -> pf "\\newpage\n"
   ) song.D.Song.data in
 
 
   let (grilles:D.Grille.t list) = List.rev (List.fold_left ( fun acc c -> match c with | D.Grille g -> g::acc | _ -> acc ) [] song.D.Song.data) in
   let () = pf "\\begin{multicols}{2}\n" in
-  let () = List.iter ( fun g -> write_grille ~transpose:0 fout g ) grilles in
+  let name = Filename.chop_extension song.D.Song.filename in
+  let () = List.iteri ( fun index g -> write_grille song fout g name index ) grilles in
   let () = pf "\\end{multicols}\n" in
 
   let (tabs:D.Tablature.t list) = List.rev (List.fold_left ( fun acc c -> match c with | D.Tab g -> g::acc | _ -> acc ) [] song.D.Song.data) in

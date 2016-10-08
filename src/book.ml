@@ -5,6 +5,8 @@ open Read_util
 
 module D = Datamodel
 
+let (//) = Filename.concat
+
 let print_deps ~book ~top_src_dir ~top_build_dir = (
   let () = eprintf "top_build_dir : '%s'\n" top_build_dir in
   let () = eprintf "top_src_dir : '%s'\n" top_src_dir in
@@ -24,9 +26,11 @@ let print_deps ~book ~top_src_dir ~top_build_dir = (
 	    (* let () = Song.print_deps ~song ~top_build_dir in  *)
 	  let (_,acc) = List.fold_left ( fun (count,acc) tab ->
 	    let () = Write_mp_tab.write_mp song song_tex tab count in
-	    let acc = sprintf "%s\nbook-%s : %s-%d.mps\n" acc tex_name song_tex count in	
-	    let acc = sprintf "%s\nbook-%s : %s-%d.1\n" acc tex_name song_tex count in
-	    let acc = sprintf "%s\nbook-%s : %s-%d.mp\n" acc tex_name song_tex count in
+	      (*
+		let acc = sprintf "%s\nbook-%s : %s-%d.mps\n" acc tex_name song_tex count in	
+		let acc = sprintf "%s\nbook-%s : %s-%d.1\n" acc tex_name song_tex count in
+		let acc = sprintf "%s\nbook-%s : %s-%d.mp\n" acc tex_name song_tex count in
+	      *)
 	      (count+1,acc)
 	  ) (0,acc) (D.Song.tabs_of_song song) in
 	    acc
