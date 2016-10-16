@@ -63,12 +63,20 @@ module Tablature = struct
   }
 end
 
+module Lyrics = struct
+  type t = {
+    nb_cols : int ;
+    title : string ;
+    data : string list ;
+  }
+end
+
 type context =
 | Normal of string
 | Titre of string
 | Auteur of string
 | Grille of Grille.t
-| Lyrics of (int*string*string list)
+| Lyrics of Lyrics.t (* (int*string*string list) *)
 | Tab of Tablature.t
 | Mp3 of string
 | Accords of string list

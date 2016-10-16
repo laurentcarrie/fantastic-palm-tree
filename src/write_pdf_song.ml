@@ -25,7 +25,7 @@ let tex_of_string c = (
 
 let write_lyrics fout l = (
   let pf fs = ksprintf ( fun s -> fprintf fout "%s" s) fs in
-  let (nbcols,title,l) = l in
+  let (nbcols,title,l) = (l.D.Lyrics.nb_cols,l.D.Lyrics.title,l.D.Lyrics.data) in
   let () = pf "\\begin{lyricsfont}\n" in 
   let () = pf "\\begin{verse}\n" in
   let () = pf "{\\commentfont \\hl{%s}} \n" (tex_of_string title) in  
@@ -156,7 +156,7 @@ let write_song_body fout song = (
   in
 
   let lyrics = List.rev (List.fold_left ( fun acc c -> match c with | D.Lyrics l -> l::acc | _ -> acc ) [] song.D.Song.data) in
-  let nbcols = List.fold_left ( fun acc (n,_,_) -> if n>acc then n else acc) 1 lyrics in
+  let nbcols = List.fold_left ( fun acc l -> if l.D.Lyrics.nb_cols>acc then l.D.Lyrics.nb_cols else acc) 1 lyrics in
   let () = if nbcols>1 then pf "\\begin{multicols}{%d}\n" nbcols in
   let () = List.iter ( fun l -> write_lyrics fout l ) lyrics in
   let () = if nbcols>1 then pf "\\end{multicols}\n" in

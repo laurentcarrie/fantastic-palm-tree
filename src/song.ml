@@ -34,9 +34,15 @@ let read ~filename  = (
 		  let tab = Read_util.tablature_of_string_list arg l in
 		    r ((D.Tab tab)::acc)
 		)
-	      | "\\lyrics" -> r ((D.Lyrics (1,arg,(read_array_until_empty_line fin))::acc))
-	      | "\\lyrics2" -> r ((D.Lyrics (2,arg,(read_array_until_empty_line fin))::acc))
-	      | "\\lyrics3" -> r ((D.Lyrics (3,arg,(read_array_until_empty_line fin))::acc))
+	      | "\\lyrics" -> (
+		  let l =  { D.Lyrics.nb_cols=1;title=arg;data=(read_array_until_empty_line fin) } in r((D.Lyrics l)::acc)
+		)
+	      | "\\lyrics2" -> (
+		  let l =  { D.Lyrics.nb_cols=2;title=arg;data=(read_array_until_empty_line fin) } in r((D.Lyrics l)::acc)
+		)
+	      | "\\lyrics3" -> (
+		  let l =  { D.Lyrics.nb_cols=3;title=arg;data=(read_array_until_empty_line fin) } in r((D.Lyrics l)::acc)
+		)
 	      | "\\mp3" -> r ((D.Mp3 (read_string_until_empty_line fin))::acc)
 	      | "\\transpose" -> r ((D.Transpose (int_of_string (read_string_until_empty_line fin))::acc))
 	      | "\\nb-croches" 
