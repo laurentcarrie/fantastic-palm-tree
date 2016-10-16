@@ -32,7 +32,7 @@ let write_lyrics fout l = (
   (* let () = pf "\\paragraph{\\commentfont \\hl{%s}} \n" title in  *)
   let () = List.iter ( fun line ->
     if line="\\" then (
-      (* pf "%s" "\\newline\n"  *) ()
+      pf "%s" "\n\\end{verse}\n\\begin{verse}\n" 
     )  else (
       let reg = Str.regexp "{\\(.*\\)}" in
       let line = Str.global_replace reg "{\\sethlcolor{grey8}\\commentfont \\hl{\\1}}" line in
@@ -298,6 +298,7 @@ let write_song fout song = (
   let () = write_song_body fout song in
   
   let () = pf "
+
 \\end{document}
 "
   in

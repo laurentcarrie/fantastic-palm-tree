@@ -13,6 +13,9 @@ let tex_silence =
   (* "\\textdagger" *)
   "."
 
+let tex_idem = 
+  "\\small{\\textdiscount}" 
+
 let int_of_string s = 
   try
     int_of_string s
