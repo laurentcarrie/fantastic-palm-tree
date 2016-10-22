@@ -16,19 +16,22 @@ x1 := x0 + width ;
 draw(x0,base_line) -- (x0,base_line+height) ;
 " (* (List.length bar) *)   in
 
-  let e_of_chord c n nb = 
-    match c.D.Accord.chord with
-      | Some a -> 
-	  let (a,sa,usa) = mp_of_chord a in
-	  let rlap = match sa,usa with
-	    | "","" ->  ""
-	    | sa,"" ->  sprintf "\\rlap{}{\\textsubscript{\\small{%s}}}" sa 
-	    | "",usa ->  sprintf "\\rlap{\\textsuperscript{\\small{%s}}}{}" usa
-	    | sa,usa -> sprintf "\\rlap{\\textsubscript{\\small{%s}}}{\\textsuperscript{\\small{%s}}}" sa usa
-	  in
-	    sprintf "label(btex %s%s etex,(x0+(x1-x0)*%d/%d,base_line+height/2)) ; \n" a rlap n nb
-      | None   -> 
-	  sprintf "label(btex \\textdagger etex,((x0+(x1-x0)*%d/%d,base_line+height/2))) ; \n" n nb
+  let e_of_chord c previous n nb = 
+    let idem = match previous with
+      | None -> false
+      | Some d -> d=c
+    in
+      if idem then (
+	sprintf "label.bot(btex %s etex,((x0+(x1-x0)*%d/%d,base_line+height*0.8))) ; \n" D.tex_idem n nb
+      ) else (
+	  match c.D.Accord.chord with
+	    | Some a -> 
+		let (a,sa,usa) = mp_of_chord a in
+		let rlap = sprintf "\\rlap{\\textsubscript{\\subscriptfont{%s}}}{\\textsuperscript{\\subscriptfont{%s}}}" sa usa in
+		  sprintf "label.bot(btex %s%s etex,(x0+(x1-x0)*%d/%d,base_line+height*2.5/3)) ; \n" a rlap n nb
+	    | None   -> 
+		sprintf "label.bot(btex %s etex,((x0+(x1-x0)*%d/%d,base_line+height*0.6))) ; \n" D.tex_silence n nb
+	)
   in
 
   let () = match bar.D.Grille.chords with
@@ -36,17 +39,17 @@ draw(x0,base_line) -- (x0,base_line+height) ;
 	pf "%%empty bar\n" ; 
       )
     | c::[] -> (
-	pf "%s" (e_of_chord c 1  2)
+	pf "%s" (e_of_chord c None 1  2)
       )
     | c1::c2::[] -> (
-	pf "%s" (e_of_chord c1 1  3) ;
-	pf "%s" (e_of_chord c2 2  3)
+	pf "%s" (e_of_chord c1 None 1  3) ;
+	pf "%s" (e_of_chord c2 (Some c1) 2  3)
       )
     | c1::c2::c3::c4::[] -> (
-	pf "%s" (e_of_chord c1 1  5) ;
-	pf "%s" (e_of_chord c2 2  5) ;
-	pf "%s" (e_of_chord c3 3  5) ;
-	pf "%s" (e_of_chord c4 4  5)
+	pf "%s" (e_of_chord c1 None 1  5) ;
+	pf "%s" (e_of_chord c2 (Some c1) 2  5) ;
+	pf "%s" (e_of_chord c3 (Some c2) 3  5) ;
+	pf "%s" (e_of_chord c4 (Some c3) 4  5)
       )
     | l -> (
 	pf "label(\"not managed %d\",((x1+x0)*2/3,base_line+2.5*uy)) ;\n" (List.length l) ;
@@ -88,18 +91,23 @@ verbatimtex
 \\usepackage{fixltx2e}
 \\usepackage{amssymb}
 \\usepackage{wasysym}
+\\usepackage{latexsym}
+\\usepackage{nicefrac}
+\\usepackage{textcomp}
+\\newcommand*{\\subscriptfont}{\\fontfamily{ptm}\\fontsize{6}{6}\\fontshape{it}\\selectfont}
+\\newcommand*{\\flatsharpfont}{\\fontfamily{ptm}\\fontsize{6}{6}\\fontshape{it}\\selectfont}
 \\begin{document}
 etex
 
 beginfig(1) ;
   uy=0.2cm ;
-  ux=0.25cm ;
+%%  ux=0.15cm ;
   unote=0.1cm ;
 %%  b=10*uy ;
   base_line     = 0*uy ;
   gap_base_line = 0*uy ;
   height        = 4*uy ;
-  width         = 3cm ;
+  width         = 2cm ;
 %% scale pour le normal chord
   schord=1.3
 %% scale pour le susbcript chord
