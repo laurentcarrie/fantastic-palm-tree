@@ -60,7 +60,7 @@ let read ~filename ~top_src_dir  = (
   let songs = List.map ( fun  filename ->
     try
       let s = Song.read (top_src_dir // filename) in
-	eprintf "Ok path found : '%s'\n" (top_src_dir // filename) ;
+	(* eprintf "Ok path found : '%s'\n" (top_src_dir // filename) ; *)
 	D.Book.S s
     with
       | _ -> (
