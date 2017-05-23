@@ -101,3 +101,8 @@ $(prefix)/bin/generate : generate
 
 clean :
 	rm -rf install
+
+
+toto = $(CProgram toto,toto)
+
+build : $(toto)

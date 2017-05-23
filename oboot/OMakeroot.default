@@ -25,17 +25,17 @@ bootstrap_files[] =
 .PHONY: bootstrap
 bootstrap: $(bootstrap_files)
 
-open local/Configure
-open local/Distribute
-open local/C
-open local/LaTeX
-open local/OCaml
+#open local/Configure
+#open local/Distribute
+#open local/C
+#open local/LaTeX
+#open local/OCaml
 open local/Song.om
 
 # Ceci est fourni avec omake,... plus maintenant, a cause de camlp4
 open build/OCaml
 open build/LaTeX
-
+open build/C
 
 # On demande a omake d'importer toutes les variables
 # qui ont ete definies sur la ligne de commande

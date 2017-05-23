@@ -57,12 +57,12 @@ cat $(srcdir)/OMakefile.default > OMakefile
 cat $(srcdir)/success.ascii.root > success.ascii
 cat $(srcdir)/fail.ascii.root > fail.ascii
 mkdir -p local
-cat $(srcdir)/local/Configure.om > local/Configure.om
-cat $(srcdir)/local/Distribute.om > local/Distribute.om
-cat $(srcdir)/local/C.om > local/C.om
-cat $(srcdir)/local/Compatibility.om > local/Compatibility.om
-cat $(srcdir)/local/LaTeX.om > local/LaTeX.om
-cat $(srcdir)/local/OCaml.om > local/OCaml.om
+#cat $(srcdir)/local/Configure.om > local/Configure.om
+#cat $(srcdir)/local/Distribute.om > local/Distribute.om
+#cat $(srcdir)/local/C.om > local/C.om
+#cat $(srcdir)/local/Compatibility.om > local/Compatibility.om
+#cat $(srcdir)/local/LaTeX.om > local/LaTeX.om
+#cat $(srcdir)/local/OCaml.om > local/OCaml.om
 cat $(srcdir)/local/Song.om > local/Song.om
 
 
