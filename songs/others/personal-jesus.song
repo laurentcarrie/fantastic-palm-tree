@@ -26,7 +26,7 @@ G#:D::
 F#m:F#m
 
 \grille pont 4
-G#:D:F#m:F#m
+G#:G:F#m:F#m
 Bm:A
 
 \grille final
@@ -34,50 +34,52 @@ G#:D:F#m:F#m
 
 
 
-\lyrics2 a capella
+\lyrics2 
+{a capella}
 Reach out and touch faith
-
-\lyrics intro (4 mesures)
-
-\lyrics refrain
+\
+{intro (4 mesures)}
+\
+{refrain}
 Your own personal Jesus
 Someone to hear your prayers
 Someone who cares
--
+{ }
 Your own personal Jesus
 Someone to hear your prayers
 Someone who's there
-
-\lyrics pont 1 (4 mesures)
-
-\lyrics couplet 1
+\
+{pont 1 (4 mesures)}
+\
+{couplet 1}
 Feeling unknown
 And you're all alone
 Flesh and bone
 By the telephone
 Lift up the receiver
 I'll make you a believer
--
+{ }
 Take second best
 Put me to the test
 Things on your chest
 You need to confess
 I will deliver
 You know I'm a forgiver
-
-\lyrics pont 2 (8 mesures)
+\
+{pont 2 (8 mesures)}
 Reach out and touch faith
 Reach out and touch faith
+\
+{refrain}
+\
+{pont 3}
+\
+{couplet}
+\
+{pont 4}
+\
+{final}
 
-\lyrics refrain
-
-\lyrics pont 3
-
-\lyrics couplet
-
-\lyrics pont 4
-
-\lyrics final
 
 
 
