@@ -94,8 +94,8 @@ verbatimtex
 \\usepackage{latexsym}
 \\usepackage{nicefrac}
 \\usepackage{textcomp}
-\\newcommand*{\\subscriptfont}{\\fontfamily{ptm}\\fontsize{6}{6}\\fontshape{it}\\selectfont}
-\\newcommand*{\\flatsharpfont}{\\fontfamily{ptm}\\fontsize{6}{6}\\fontshape{it}\\selectfont}
+\\newcommand*{\\subscriptfont}{\\fontfamily{ptm}\\fontsize{8}{8}\\fontshape{it}\\selectfont}
+\\newcommand*{\\flatsharpfont}{\\fontfamily{ptm}\\fontsize{8}{8}\\fontshape{it}\\selectfont}
 \\begin{document}
 etex
 
