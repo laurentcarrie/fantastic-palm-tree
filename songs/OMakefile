@@ -1,4 +1,4 @@
-.PHONY: build all  xxx pdf no-book
+.PHONY: build all  xxx pdf no-book clean
 
 .DEFAULT: build
 
@@ -55,6 +55,8 @@ song_dirs[]=
 		$(target) : $s.pdf
 			cp $< $@
 		pdf no-book : $(target)
+		clean :
+			rm -f $s*
 		export
 
 .SUBDIRS: $(song_dirs)
@@ -73,6 +75,8 @@ song_dirs[]=
 		$(target) : book-$s.pdf
 			cp $< $@
 		pdf : $(target)
+		clean :
+			rm -f $s*
 		export
 
 songs=$(find $(srcdir)/songs -name *.song)
