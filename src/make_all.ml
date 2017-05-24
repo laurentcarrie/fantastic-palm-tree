@@ -38,6 +38,14 @@ let make ~filename ~top_src_dir = (
       fprintf fout "%s\n" s
   ) songs in
   let () = close_out fout in
+	       
+  let fout = open_out "all.model" (filename^".model") in 
+  let () = fprintf fout "\\print_index \n" in
+  let () = List.iter ( fun s ->
+    let s = Str.replace_first (Str.regexp (Str.quote (top_src_dir//""))) "" s in
+      fprintf fout "%s\n" s
+  ) songs in
+  let () = close_out fout in
     ()
 	       
 )

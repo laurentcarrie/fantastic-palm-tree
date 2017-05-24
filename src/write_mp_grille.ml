@@ -16,6 +16,8 @@ x1 := x0 + width ;
 draw(x0,base_line) -- (x0,base_line+height) ;
 " (* (List.length bar) *)   in
 
+
+(*
   let e_of_chord c previous n nb = 
     let idem = match previous with
       | None -> false
@@ -55,6 +57,71 @@ draw(x0,base_line) -- (x0,base_line+height) ;
 	pf "label(\"not managed %d\",((x1+x0)*2/3,base_line+2.5*uy)) ;\n" (List.length l) ;
       )
   in
+*)
+
+  let (has_position:bool) = 
+    match bar.D.Grille.chords with
+      | [] -> false
+      | hd::tl -> (
+	  List.fold_left ( fun has_position c ->
+	    match has_position,c.D.Accord.position with
+	      | false,None -> false
+	      | true,Some _ -> true
+	      | _,_ -> let msg = "mix of chords with position and without position" in
+			 eprintf "%s\n" msg ;
+		  failwith msg
+	  ) (Option.is_some hd.D.Accord.position) tl
+	)
+  in
+	    
+
+  let e_of_chord_with_position c nb = 
+    match c.D.Accord.chord with
+      | Some a -> 
+	  let (a,sa,usa) = mp_of_chord a in
+	  let rlap = sprintf "\\rlap{\\textsubscript{\\subscriptfont{%s}}}{\\textsuperscript{\\subscriptfont{%s}}}" sa usa in
+	    sprintf "label.bot(btex %s%s etex,(x0+(x1-x0)*%d/%d,base_line+height*2.5/3)) ; \n" a rlap (Option.get c.D.Accord.position) nb
+      | None   -> 
+	  sprintf "label.bot(btex %s etex,((x0+(x1-x0)*%d/%d,base_line+height*0.6))) ; \n" D.tex_silence (Option.get c.D.Accord.position) nb
+  in
+
+  let e_of_chord_without_position c nb i = 
+    match c.D.Accord.chord with
+      | Some a -> 
+	  let (a,sa,usa) = mp_of_chord a in
+	  let rlap = sprintf "\\rlap{\\textsubscript{\\subscriptfont{%s}}}{\\textsuperscript{\\subscriptfont{%s}}}" sa usa in
+	    sprintf "label.bot(btex %s%s etex,(x0+(x1-x0)*%d/%d,base_line+height*2.5/3)) ; \n" a rlap i nb 
+      | None   -> 
+	  sprintf "label.bot(btex %s etex,((x0+(x1-x0)*%d/%d,base_line+height*0.6))) ; \n" D.tex_silence i nb 
+  in
+
+    
+  let () = if has_position then (
+    List.iter ( fun c ->
+      pf "%s" (e_of_chord_with_position c 9)
+    ) bar.D.Grille.chords 
+  ) else (
+    let nb =  (List.length bar.D.Grille.chords) + 1  in
+    List.iteri ( fun i c ->
+      pf "%s" (e_of_chord_without_position c nb  (i+1))
+    ) bar.D.Grille.chords 
+  )
+  in
+    
+
+
+  let rec draw_petites_barres i b n =
+    if i=n then () else (
+      let (tb,ta) = if b then (4,0) else (1,0) in
+      pf "
+   xi:=x0+%d/%d*(x1-x0) ;
+   draw (xi,base_line-%d) -- (xi,base_line+%d) ;
+   draw (xi,base_line+height-%d) -- (xi,base_line+height+%d) ;
+" i n ta tb tb ta ;
+      draw_petites_barres (i+1) (not b) n 
+    )
+  in
+  let () = if has_position then draw_petites_barres 1 true 9 else () in
 
   let () = pf "%s" "
    draw (x0,base_line) -- (x1,base_line) ;

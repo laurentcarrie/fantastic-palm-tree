@@ -61,9 +61,9 @@ pickup pencircle scaled 0.15bp ;
       in
 
       let print_tail c = (
-	match p.D.Tablature.chord.D.Accord.duration with
-	| 1 ->
-	    (*  double croche *)
+	match (Option.get p.D.Tablature.chord.D.Accord.position) with
+	  | 1 ->
+	      (*  double croche *)
       pf "
   ynote := base_line+(6-%d)*uy ;
   draw(xi,ynote-0.5*uy) -- (xi,base_line-1*uy) ;

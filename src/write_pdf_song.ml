@@ -42,7 +42,7 @@ let write_lyrics fout l = (
 	  let reg = Pcre.regexp "\\[(.*?);(.*?)\\]" in 
 	  let s = Pcre.exec ~rex:reg ~pos:0 line in
 	  let chord = 
-	    let l = Read_util.duration_and_silence_or_chord_of_string (Pcre.get_substring s 1) in
+	    let l = Read_util.position_and_silence_or_chord_of_string (Pcre.get_substring s 1) in
 	      tex_of_chord l
 	  in
 	  let word = Pcre.get_substring s 2 in
@@ -102,7 +102,7 @@ let write_tab  song fout tab name count = (
   let () = List.iter ( fun line ->
     List.iter ( fun bar ->
       List.iter ( fun note ->
-	(* pf "%d %d %d" note.D.Tablature.duration note.D.Tablature.frette note.D.Tablature.corde *)
+	(* pf "%d %d %d" note.D.Tablature.position note.D.Tablature.frette note.D.Tablature.corde *)
 	pf " "
       ) bar
     ) line

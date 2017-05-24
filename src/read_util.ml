@@ -56,14 +56,15 @@ let chord_of_string s : Accord.c = (
     { Accord.note = note ; minor=minor ; alteration=alteration ; minor7=minor7 ; major7=major7 ; diminue=diminue ; sus4=sus4 }
 )
 
-let duration_and_silence_or_chord_of_string s : Accord.t = (
+let position_and_silence_or_chord_of_string s : Accord.t = (
   let a = String.nsplit s "," in
   let a = List.map String.strip a in
     match a with
       | [] -> failwith "erreur de format"
-      | "s"::[] -> { Accord.duration=noire ; chord = None }
-      | "s"::d::[] -> { Accord.duration=1 ; chord = None }
-      | hd::[] -> { Accord.duration=noire ; chord=Some (chord_of_string hd) }
+      | "s"::[] -> { Accord.position=None ; chord = None }
+      | n::"s"::[] -> { Accord.position=Some(int_of_string n) ; chord = None }
+      | n::hd::[] -> { Accord.position=Some (int_of_string n) ; chord=Some (chord_of_string hd) }
+      | hd::[] -> { Accord.position=None ; chord=Some (chord_of_string hd) }
       | _ -> let msg = sprintf "not managed : '%s'" s in failwith msg
 )
 
@@ -72,7 +73,7 @@ module Grille = struct
 
   let bars_of_string (s:string) = (
     let bar_of_string s =
-      { chords = List.map duration_and_silence_or_chord_of_string (String.nsplit s " ") }
+      { chords = List.map position_and_silence_or_chord_of_string (String.nsplit s " ") }
   in
       List.map bar_of_string (String.nsplit s ":") 
   ) ;;
@@ -110,9 +111,9 @@ let paquet_of_string s : Tablature.paquet = (
 	(s2,None)
   in
   let s2 = List.map String.strip s2 in
-  let duration = int_of_string(List.hd s2) in 
+  let position = int_of_string(List.hd s2) in 
   let notes = List.map note_of_string (List.tl s2) in
-    { Tablature.notes=notes ; chord={Accord.duration=duration;chord=chord }}
+    { Tablature.notes=notes ; chord={Accord.position=Some position;chord=chord }}
 ) ;;
 
 let bar_of_string s = (

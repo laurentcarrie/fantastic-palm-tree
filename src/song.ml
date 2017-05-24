@@ -73,6 +73,7 @@ let read ~filename  = (
     song
 ) ;;
 
+let msgstring_of_bool b msg = if b then msg else ""
 
 let print_deps ~song ~top_build_dir = (
   let name = (Filename.chop_extension song.D.Song.filename) in
@@ -89,6 +90,81 @@ let print_deps ~song ~top_build_dir = (
 	)
       | _ -> (count,acc)
   ) (0,"") song.D.Song.data in
+  let () = 
+    let fout = open_out "write model" (song.D.Song.filename ^ ".model") in
+    let () = fprintf fout "transpose : %d\n" song.D.Song.transpose in
+    let () = fprintf fout "filename : '%s'\n" song.D.Song.filename in
+    let () = fprintf fout "titre : '%s'\n" song.D.Song.titre in
+    let () = fprintf fout "auteur : '%s'\n" song.D.Song.auteur in
+    let () = fprintf fout "nb_croches : '%d'\n" song.D.Song.nb_croches in
+    let () = fprintf fout "data : \n" in
+    let () = List.iter ( fun d ->
+      match d with
+	| D.Normal s -> fprintf fout " normal : %s\n" s
+	| D.Titre s -> fprintf fout " titre : %s\n" s
+	| D.Auteur s -> fprintf fout " auteur : %s\n" s
+	| D.Mp3 s -> fprintf fout " mp3 : %s\n" s
+	| D.Transpose s -> fprintf fout " transpose : %d\n" s
+	| D.Nb_croches s -> fprintf fout " nb_croches : %d\n" s
+	| D.PageBreak -> fprintf fout " page break : \n" 
+	| D.Grille g  -> (
+	    fprintf fout " grille %s\n" g.D.Grille.titre ;
+	    List.iter ( fun l -> 
+	      fprintf fout "    ligne \n" ;
+	      List.iter ( fun b -> 
+		fprintf fout "      bar : " ;
+		List.iter ( fun c ->
+		  (match c.D.Accord.position with
+		    | None -> fprintf fout "        pas de position" ;
+		    | Some p -> fprintf fout "        %d " p
+		  ) ;
+		  match c.D.Accord.chord with
+		    | None -> ()
+		    | Some c -> (
+			fprintf fout "[%c %s %s %s %s %s %s] "       
+			  c.D.Accord.note
+			  (match c.D.Accord.alteration with | D.Accord.None -> "" | D.Accord.Flat -> "flat" | D.Accord.Sharp -> "sharp")
+			  (msgstring_of_bool c.D.Accord.minor "minor")
+			  (msgstring_of_bool c.D.Accord.minor7 "minor7")
+			  (msgstring_of_bool c.D.Accord.major7 "major7")
+			  (msgstring_of_bool c.D.Accord.diminue "diminue")
+			  (msgstring_of_bool c.D.Accord.sus4 "sus4")
+		      )
+		) b.D.Grille.chords ;
+		fprintf fout "\n" ;
+	      ) l.D.Grille.bars
+	    ) g.D.Grille.lignes
+	      
+	  )
+	| D.Lyrics l -> (
+	    fprintf fout "  lyrics %d cols, title '%s'\n" l.D.Lyrics.nb_cols l.D.Lyrics.title 
+	  )
+	| D.Tab t -> (
+	    fprintf fout "  tab \n" ;
+	    fprintf fout "    title : %s\n" t.D.Tablature.titre ;
+	    List.iter ( fun l ->
+	      fprintf fout "      ligne \n" ;
+	      List.iter ( fun b ->
+		fprintf fout "        bar \n" ;
+		List.iter ( fun p ->
+		  fprintf fout "          paquet " ;
+		  List.iter ( fun n ->
+		    fprintf fout "[ %d %d ]" n.D.Tablature.corde n.D.Tablature.frette
+		  ) p.D.Tablature.notes ;
+		  fprintf fout "\n" ;
+		) b.D.Tablature.paquets
+	      ) l.D.Tablature.bars
+	    ) t.D.Tablature.lines
+	  )
+	| D.Accords l -> (
+	    fprintf fout "  accords \n" ;
+	    List.iter ( fun s -> fprintf fout "%s\n" s ) l
+	  )
+
+    ) song.D.Song.data in
+    let () = close_out fout in
+      ()
+  in
     
     eprintf "%s\n" deps  ; flush stderr 
       (* printf "%s\n" deps  ; flush stdout  *)

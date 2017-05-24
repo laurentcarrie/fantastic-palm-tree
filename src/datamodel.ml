@@ -35,7 +35,7 @@ module Accord = struct
     sus4 : bool ;
   }
   type t = {
-    duration : int ;
+    position : int option ; (* position dans la mesure, en croche *)
     chord : c option ;
   }
 end
