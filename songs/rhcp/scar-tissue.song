@@ -5,7 +5,7 @@ scar tissue
 Red Hot Chili Peppers
 
 \grille couplet
-F:C Dm:F:Dm
+1,F 8,C:1,Dm:1,F 8,C:1,Dm
 
 \tab solo 1
 |4,2 13;4,2 10;8| 4,5 3,4 2,3 0,2 1 ; 2,2 3,3 3 ; 3|2,2 3;1,2 3|
@@ -13,6 +13,7 @@ F:C Dm:F:Dm
 \tab solo 2
 
 \lyrics2
+{couplet 1}
 Scar tissue that I wish you saw
 Sarcastic mister know it all
 Close your eyes and I'll kiss you 'cause
@@ -21,16 +22,16 @@ With the birds I'll share
 This lonely view
 With the birds I'll share
 This lonely view
-
-\lyrics2
+\
+{couplet 2}
 Push me up against the wall
 Young Kentucky girl in a push-up bra
 Fallin' all over myself
 To lick your heart and taste your health 'cause
 With the birds I'll share
 This lonely view...
-
-\lyrics2
+\
+{couplet 3}
 Blood loss in a bathroom stall
 Southern girl with a scarlet drawl
 Wave good-bye to ma and pa 'cause
@@ -39,16 +40,16 @@ With the birds I'll share
 This lonely view
 With the birds I'll share
 This lonely view
-
-\lyrics2
+\
+{couplet 4}
 Soft spoken with a broken jaw
 Step outside but not to brawl
 Autumn's sweet we call it fall
 I'll make it to the moon if I have to crawl and
 With the birds I'll share
 This lonely view...
-
-\lyrics2
+\
+{couplet 5}
 Scar tissue that I wish you saw
 Sarcastic mister know it all
 Close your eyes and I'll kiss you 'cause
