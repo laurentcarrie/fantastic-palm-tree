@@ -34,8 +34,15 @@ let write_lyrics fout l = (
     if line="\\" then (
       pf "%s" "\n\\end{verse}\n\\begin{verse}\n" 
     )  else (
+
       let reg = Str.regexp "{\\(.*\\)}" in
       let line = Str.global_replace reg "{\\sethlcolor{grey8}\\commentfont \\hl{\\1}}" line in
+
+
+      let reg = Str.regexp "\\(#a\\)\\(.*\\)\\(#\\)" in
+      let line = Str.global_replace reg "{\\sethlcolor{colora}\\commentafont \\hl{\\2}}" line in
+
+
 
       let rec r line = (
 	try
@@ -187,6 +194,7 @@ let write_preamble fout  = (
 \\usepackage{color,soul}
 \\definecolor{grey}{rgb}{0.7,0.7,0.7}
 \\definecolor{grey8}{rgb}{0.8,0.8,0.8}
+\\definecolor{colora}{rgb}{0.9,0.7,0.9}
 \\sethlcolor{grey8}
 \\usepackage[pdftex]{graphicx}
 %%\\usepackage{lmodern}
@@ -243,6 +251,7 @@ in
   let () = pf "\\newcommand*{\\authorfont}{\\fontfamily{ptm}\\fontsize{20}{25}\\fontshape{it}\\selectfont} \n" in
   let () = pf "\\newcommand*{\\titlefont}{\\fontfamily{ptm}\\fontsize{30}{35}\\fontshape{it}\\selectfont} \n" in
   let () = pf "\\newcommand*{\\commentfont}{\\fontfamily{ptm}\\fontsize{12}{15}\\fontshape{it}\\selectfont} \n" in
+  let () = pf "\\newcommand*{\\commentafont}{\\fontfamily{ptm}\\fontsize{12}{15}\\fontshape{it}\\selectfont} \n" in
   let () = pf "\\newcommand*{\\lyricstitlefont}{\\color{black}\\fontfamily{ptm}\\fontsize{15}{15}\\fontshape{it}\\selectfont} \n" in
   let () = pf "\\newenvironment{lyricsfont}{\\fontfamily{ptm}\\fontsize{12}{12}\\selectfont}{} \n" in
   let () = pf "\\newenvironment{grillefont}{\\color{blue}\\fontfamily{ptm}\\fontsize{15}{15}\\selectfont}{} \n" in 
