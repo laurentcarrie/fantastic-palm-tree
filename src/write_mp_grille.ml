@@ -30,6 +30,70 @@ draw(x0,base_line) -- (x0,base_line+height) ;
 	  ) (Option.is_some hd.D.Accord.position) tl
 	)
   in
+
+  let e_of_chord_without_position pid c nb i =
+    let ret = "" in
+    match c.D.Accord.chord with
+      | Some a -> (
+	  let ret = sprintf "%s
+%% %s:%d
+boxit.%s_n(btex \\notefont{%c} etex) ;
+%s_n.c = %s.c ;
+drawunboxed(%s_n) ;
+"
+	    ret
+	    __FILE__ __LINE__
+	    pid  a.D.Accord.note
+	    pid pid
+	    pid
+	  in
+	    (* minor major *)
+	  let ret = sprintf "%s
+boxit.%s_m(btex \\subscriptfont{%s} etex) ;
+%s_m.c = %s_n.se ;
+drawunboxed(%s_m) ;
+"
+	    ret 
+	    pid (if a.D.Accord.minor then "m" else "")
+	    pid pid
+	    pid
+	  in
+
+	    (* alteration *)
+	  let ret = sprintf "%s
+boxit.%s_fs(btex \\subscriptfont{%s} etex) ;
+%s_fs.c = %s_n.ne ;
+drawunboxed(%s_fs) ;
+"
+	    ret 
+	    pid (match a.D.Accord.alteration with | D.Accord.None -> "" | D.Accord.Flat ->  "\\flatsharpfont{$\\flat$}" | D.Accord.Sharp ->"\\flatsharpfont{$\\sharp$}" )
+	    pid pid
+	    pid
+	  in
+
+
+	    (* accord *)
+	  let aa = "" in
+	  let aa = aa^(if a.D.Accord.minor7 then "\\subscriptfont{7}" else "") in
+	  let aa = aa^(if a.D.Accord.major7 then "\\trianglefont{$\\bigtriangleup$}" else "") in
+	  let aa = aa^(if a.D.Accord.sus4 then "\\subscriptfont{4}" else "") in
+	  let ret = if aa="" then ret else (sprintf "%s
+boxit.%s_7(btex %s etex) ;
+%s_7.c =  %s_n.e ;
+drawunboxed(%s_7) ;
+"
+	    ret 
+	    pid aa
+	    pid pid
+	    pid
+	  )
+	  in
+
+	    ret
+	)
+      | None ->
+	  ""
+  in
 	    
   let e_of_chord_with_position pid i c nb = 
     let bid = sprintf "%s_%d" pid i in
@@ -37,31 +101,26 @@ draw(x0,base_line) -- (x0,base_line+height) ;
     match c.D.Accord.chord with
       | Some a -> (
 	  let ret = sprintf "%s
+%% %s:%d
 boxit.%s_a(btex \\notefont{%c} etex) ;
 boxit.%s_m(btex \\subscriptfont{%s} etex) ;
-" ret bid a.D.Accord.note bid (if a.D.Accord.minor then "m" else "") in 
-	  let (ret:string) = (if i mod 2 = 0 then 
+" ret 
+__FILE__ __LINE__
+bid a.D.Accord.note bid (if a.D.Accord.minor then "m" else "") in 
+	  let (ret:string) = (
 	    sprintf "%s
-%s_a.sw = %s.sw + 0.5 * (%s.nw-%s.sw) ;
+%s_a.sw = %s.sw ;
 %s_a.ne = %s.ne ;
 %%fill bpath.%s_a withcolor (%s) ;
 "
 	      ret
-	      bid pid pid pid
+	      bid pid 
 	      bid pid
 	      bid ".8,.2,.1"
-	    else
-	      sprintf "%s
-%s_a.sw = %s.sw ;
-%s_a.ne = %s.ne - 0.5 * (%s.ne-%s.se) ;
-"
-		ret
-		bid pid
-		bid pid pid pid
 	  )
 	  in
 	  let ret = sprintf "%s
-drawunboxed(%s_a) ;
+drawboxed(%s_a) ;
 " 
 	    ret
 	    bid
@@ -103,80 +162,86 @@ drawunboxed(%s_fs) ;
 	  sprintf "(%s etex,(((x1-x0)*%d/%d,height*0.6))) ; \n" D.tex_silence (Option.get c.D.Accord.position) nb
   in
 
-(*
-  let e_of_chord_without_position c nb i = 
-    match c.D.Accord.chord with
-      | Some a -> 
-	  let (a,sa,usa) = mp_of_chord a in
-	  let rlap = sprintf "\\rlap{\\textsubscript{\\subscriptfont{%s}}}{\\textsuperscript{\\subscriptfont{%s}}}" sa usa in
-	    sprintf "(%s%s etex,((x1-x0)*%d/%d,height*2.5/3)) ; \n" a rlap i nb 
-      | None   -> 
-	  sprintf "(btex %s etex,(((x1-x0)*%d/%d,height*0.6))) ; \n" D.tex_silence i nb 
-  in
-*)
-
-(*
-  let () = if has_position then (
-    List.iter ( fun c ->
-      pf "%s" (e_of_chord_with_position c 9)
-    ) bar.D.Grille.chords 
-  ) else (
-    let nb =  (List.length bar.D.Grille.chords) + 1  in
-    List.iteri ( fun i c ->
-      pf "%s" (e_of_chord_without_position c nb  (i+1))
-    ) bar.D.Grille.chords 
-  )
-  in
-*)
-
 
   let () = pf "
 %%   draw (x0,base_line) -- (x1,base_line) ;
-.
+
 %%   draw (x0,base_line+height) -- (x1,base_line+height) ;
-boxit.b%d(btex %s etex) ;
+%% %s:%d
+boxit.b%d() ;
 b%d.sw=(x0,base_line) ;
 b%d.ne=(x1,base_line+height) ;
 %%fill bpath.b%d withcolor (.8,.2,.8) ;
 drawboxed(b%d) ;
 "
+__FILE__ __LINE__
 index  
-""
 index index index index in
+    (*
+    pf "
+boxit.bb_%d(btex %d etex) ;
+bb_%d.sw = (x0,base_line) ;
+drawboxed(bb_%d) ;
+" index index index index ;
+    *)
   let () = if has_position then (
-    let nb = 10 in
+    let nb = 4.5 in
     List.iteri ( fun i c ->
       let pos = Option.get c.D.Accord.position in
       let (bid:string) = sprintf "b%d_%d" index i in
-      pf "
+	pf "
 %% has position
-boxit.%s(btex etex) ;
-%s.sw=(x0+(x1-x0)*(%d-1)/%d,base_line) ;
-%s.ne=(x0+(x1-x0)*(%d)/%d,base_line+height) ;
+%% %s:%d
+boxit.%s() ;
+" 
+	  __FILE__ __LINE__
+	  bid ;
+
+	if i mod 2 = 0 then (
+	  pf "
+%s.sw=(x0+(x1-x0)*(%d/2-0.5)/%f,base_line+height/2) ;
+%s.ne=(x0+(x1-x0)*(%d/2+0.5)/%f,base_line+height) ;
+" 
+	    bid pos nb
+	    bid pos nb
+)
+	else (
+	    pf"
+%s.sw=(x0+(x1-x0)*(%d/2-0.5)/%f,base_line) ;
+%s.ne=(x0+(x1-x0)*(%d/2+0.5)/%f,base_line+height/2) ;
+"
+	      bid pos nb
+	      bid pos nb
+	) ;
+	
+	pf "
 drawunboxed(%s) ;
 %s
 " 
-	bid
-	bid (pos+1) nb
-	bid (pos+1) nb
-	bid
-	(e_of_chord_with_position bid i c nb)
+	  bid
+	  (e_of_chord_with_position bid i c (int_of_float nb))
     ) bar.D.Grille.chords 
   ) else (
-    (* let nb=9 in *)
+    let nb = List.length bar.D.Grille.chords in
     List.iteri ( fun i c ->
+      let bid = sprintf "b%d_%d" index i in
       pf "
+%% %s:%d
 %% has no position
-boxit.b%d_%d(btex etex) ;
-b%d_%d.sw=(x0+(x1-x0)*%d/%d,base_line) ;
-b%d_%d.ne=(x0+(x1-x0)*(%d+1)/%d,base_line+height) ;
-drawboxed(b%d_%d) ;
+boxit.%s() ;
+x00 := x0 + 3 ;
+x11 := x1 - 3 ;
+%s.sw=(x00+(x11-x00)*%d/%d,base_line) ;
+%s.ne=(x00+(x11-x00)*(%d+1)/%d,base_line+height) ;
+drawunboxed(%s) ;
+%s
 " 
-	index i
-(*	(e_of_chord_without_position c nb i)*)
-	index i i (List.length bar.D.Grille.chords)
-	index i i (List.length bar.D.Grille.chords)
-	index i
+	__FILE__ __LINE__
+	bid
+	bid i nb
+	bid i nb
+	bid
+	(e_of_chord_without_position bid c nb i)
     ) bar.D.Grille.chords
   ) in
 
@@ -218,9 +283,10 @@ verbatimtex
 \\usepackage{latexsym}
 \\usepackage{nicefrac}
 \\usepackage{textcomp}
-\\newcommand*{\\notefont}{\\fontfamily{ptm}\\fontsize{10}{10}\\selectfont}
+\\newcommand*{\\notefont}{\\fontfamily{ptm}\\fontsize{12}{12}\\selectfont}
 \\newcommand*{\\subscriptfont}{\\fontfamily{ptm}\\fontsize{8}{8}\\fontshape{it}\\selectfont}
 \\newcommand*{\\flatsharpfont}{\\fontfamily{ptm}\\fontsize{8}{8}\\fontshape{it}\\selectfont}
+\\newcommand*{\\trianglefont}{\\fontfamily{ptm}\\fontsize{4}{4}\\selectfont}
 \\begin{document}
 etex
 
