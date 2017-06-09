@@ -23,7 +23,7 @@ prefix =
 
 
 srcdir = $(absname $(dirname $(nth 0, $(argv))))
-default_settings_file = $(absname $(srcdir)/host_settings.default)
+#default_settings_file = $(absname $(srcdir)/host_settings.default)
 host = $(lowercase $(rootname $(rootname $(HOST))))
 user_settings_file = $(absname $(HOME)/.omake/hosts/$(host).om)
 
@@ -64,26 +64,6 @@ mkdir -p local
 #cat $(srcdir)/local/LaTeX.om > local/LaTeX.om
 #cat $(srcdir)/local/OCaml.om > local/OCaml.om
 cat $(srcdir)/local/Song.om > local/Song.om
-
-
-# Recuperation de la configuration de la machine
-# Ce fichier fournit les flags de compilation
-# ainsi que l'emplacement des divers COTS
-if $(test -f $(user_settings_file))
-        println($"--- Copying $(homename $(user_settings_file)) locally.")
-        cat $(user_settings_file) > $(host).om
-else
-	println($"--- Copying $(default_settings_file) as $(host).om")
-        cat $(default_settings_file) > $(host).om
-        println($"""
-You'll probably need to edit $(host).om at least to adapt COTS
-locations. When done, you can save it as
-
-	$(homename $(user_settings_file))
-
-This way it will be automatically picked up whenever you'll bootstrap
-this project again on this host.
-""")
 
 
 # Recapitulatif
