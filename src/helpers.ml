@@ -1,3 +1,5 @@
+open ExtString
+
 let (//) = Filename.concat
 
 let uppercase_compare s1 s2 =
