@@ -8,7 +8,7 @@ module D = Datamodel
 let (//) = Filename.concat
 
 let make ~filename ~top_src_dir = (
-  
+
   let songs = 
     let rec r dirname acc =
       let paths = Array.to_list ( Sys.readdir dirname ) in
@@ -38,6 +38,8 @@ let make ~filename ~top_src_dir = (
       fprintf fout "%s\n" s
   ) songs in
   let () = close_out fout in
+	       
+  (* let () = Make_index.make ~songs in *)
 	       
   let fout = open_out "all.model" (filename^".model") in 
   let () = fprintf fout "\\print_index \n" in

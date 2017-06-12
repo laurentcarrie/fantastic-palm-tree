@@ -41,6 +41,7 @@ src[]=
 	write_util
 	make_all
 	main
+	write_html_index
 
 src_chord[]=
 	chord

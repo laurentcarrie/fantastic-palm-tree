@@ -7,9 +7,10 @@ USEPDFLATEX=true
 song_ist=$(file song.ist)
 MAKEINDEX=makeindex -s $(song_ist)
 
+
 .SCANNER: scan-song-%.song : %.song $(generator) 
 	section
-		$(generator) --song $< --show-deps --top-build-dir $(ROOT)/songs
+		$(generator) --song $< --show-deps --top-build-dir $(ROOT)/songs 
 
 .SCANNER: scan-book-%.book : %.book $(generator)
 	section
@@ -19,7 +20,7 @@ MAKEINDEX=makeindex -s $(song_ist)
 	$(generator) --song $< --prefix $(prefix) 
 
 book-%.tex : %.book $(generator) :scanner: scan-book-%.book
-	$(generator) --book $< --prefix $(prefix) --top-build-dir $(ROOT)/songs --top-src-dir $(srcdir)/songs
+	$(generator) --book $< --prefix $(prefix) --top-build-dir $(ROOT)/songs --top-src-dir $(srcdir)/songs 
 
 #%.1 : %.mp
 #	mpost $<
@@ -85,7 +86,14 @@ songs=$(find $(srcdir)/songs -name *.song)
 all.book : $(generator) :value: $(songs)
 	$(generator) --make-all $@ --top-src-dir $(srcdir)/songs
 
+index.html : $(generator) all.book :value: $(songs)
+	$(generator) --write-html-index $@ --top-src-dir $(srcdir)/songs --prefix $(absname $(prefix))
+
 LaTeXDocument(book-all,book-all)
 $(prefix)/pdf/book-all.pdf : book-all.pdf
 	cp $< $@
 pdf : $(prefix)/pdf/book-all.pdf
+
+pdf build : $(prefix)/index.html
+$(prefix)/index.html : index.html	
+	cp $< $@

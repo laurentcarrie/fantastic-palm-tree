@@ -11,7 +11,7 @@ let check_bar song = (
 )
 
 
-let read ~filename  = (
+let read ~filename = (
   let fin = open_in "read song" filename in
   let rec r acc  = 
     try

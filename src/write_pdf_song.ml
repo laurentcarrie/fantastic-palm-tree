@@ -314,8 +314,8 @@ let write_song fout song = (
   ()
 )
 
-
 let write_book ~book   = (
+
   let fout = open_out "book" ( ("book-"^(Filename.chop_suffix (Filename.basename book.D.Book.filename) ".book")^".tex")) in
   let pf fs = ksprintf ( fun s -> fprintf fout "%s" s) fs in
     
@@ -384,8 +384,10 @@ let write_book ~book   = (
 \\end{document}
 " in
   let () = close_out fout in
-  ()
+
+    ()
 
 
 
 )
+
