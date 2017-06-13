@@ -41,6 +41,7 @@ let write ~top_src_dir = (
 "
   in
 
+  let () = pf "%s" "<h2><a href=\"pdf/book-all.pdf\">all</a></h2>\n" in
   let () = pf "%s" "<h2>books</h2>\n<ul>" in
   let () = List.iter ( fun book ->
       let f = Filename.chop_suffix (Filename.basename book.D.Book.filename) ".book" in
