@@ -46,8 +46,8 @@ let write ~top_src_dir = (
   let () = List.iter ( fun book ->
       let f = Filename.chop_suffix (Filename.basename book.D.Book.filename) ".book" in
       let f = Str.replace_first (Str.regexp (Str.quote top_src_dir//"")) "" f in
-	pf "<li><a href=\"pdf/books/book-%s.pdf\">%s</a></li>"
-	  f book.D.Book.titre
+	pf "<li><a href=\"pdf/books/book-%s.pdf\">%s</a> <a href=\"html/books/book-%s.html\">(html)<a></li>"
+	  f book.D.Book.titre f
   ) all_books in
   let () = pf "%s" "</ul><h2>songs</h2>\n" in
 
@@ -56,8 +56,8 @@ let write ~top_src_dir = (
     let () = List.iter ( fun song ->
       let f = Filename.chop_suffix song.D.Song.filename ".song" in
       let f = Str.replace_first (Str.regexp (Str.quote top_src_dir//"")) "" f in
-      let () = pf "<li><a href=\"pdf/%s.pdf\">%s</a></li>\n"
-	f song.D.Song.titre
+      let () = pf "<li><a href=\"pdf/%s.pdf\">%s</a> <a href=\"html/%s.html\">(html)</a></li>\n"
+	f song.D.Song.titre f
       in 
 	()
     ) songs in

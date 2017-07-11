@@ -1,4 +1,4 @@
-.PHONY: build all  xxx pdf no-book clean
+.PHONY: build all  xxx pdf no-book clean html
 
 .DEFAULT: build
 
@@ -51,11 +51,16 @@ song_dirs[]=
 		LocalTeXGeneratedFiles($s)
 		LaTeXDocument($s,$s)
 		xxx : $(addsuffix .pdf,$s)
-		target = $(prefix)/pdf/$(rel_srcdir)/$s.pdf 
-		mkdir -p $(dirname $(target))
-		$(target) : $s.pdf
+		target_pdf = $(prefix)/pdf/$(rel_srcdir)/$s.pdf 
+		target_html = $(prefix)/html/$(rel_srcdir)/$s.html
+		mkdir -p $(dirname $(target_pdf))
+		mkdir -p $(dirname $(target_html))
+		$(target_pdf) : $s.pdf
 			cp $< $@
-		pdf no-book : $(target)
+		$(target_html) : $(target_pdf)
+			pdf2htmlEX $(target_pdf) $(target_html)
+		pdf no-book : $(target_pdf) 
+		html : $(target_html)
 		clean :
 			rm -f $s*
 		export
@@ -71,11 +76,16 @@ song_dirs[]=
 	foreach(s,$(books))
 		LaTeXDocument(book-$s,book-$s)
 		xxx : $(addsuffix .pdf,$s)
-		target = $(prefix)/pdf/$(rel_srcdir)/book-$s.pdf 
-		mkdir -p $(dirname $(target))
-		$(target) : book-$s.pdf
+		target_pdf = $(prefix)/pdf/$(rel_srcdir)/book-$s.pdf 
+		mkdir -p $(dirname $(target_pdf))
+		target_html = $(prefix)/html/$(rel_srcdir)/book-$s.html 
+		mkdir -p $(dirname $(target_html))
+		$(target_pdf) : book-$s.pdf
 			cp $< $@
-		pdf : $(target)
+		pdf : $(target_pdf)
+		$(target_html) : book-$s.pdf
+			pdf2htmlEX $(target_pdf) $(target_html)
+		html : $(target_html)
 		clean :
 			rm -f $s*
 		export
@@ -94,6 +104,18 @@ $(prefix)/pdf/book-all.pdf : book-all.pdf
 	cp $< $@
 pdf : $(prefix)/pdf/book-all.pdf
 
+html : $(prefix)/html/book-all.html
+$(prefix)/html/book-all.html : book-all.html
+	cp $< $@
+
+book-all.html : book-all.pdf
+	pdf2htmlEX book-all.pdf book-all.html
+
+
 pdf build : $(prefix)/index.html
 $(prefix)/index.html : index.html	
 	cp $< $@
+
+mkdir -p $(prefix)/html
+
+
