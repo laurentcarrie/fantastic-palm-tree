@@ -1,0 +1,118 @@
+#!/bin/sh
+
+set -e 
+set -x
+
+export HOME=/home/ubuntu
+export SHORT_HOSTNAME=ubuntu
+export HOSTNAME=ubuntu
+export LOGNAME=xxx
+
+srcdir=/home/ubuntu/fantastic-palm-tree
+builddir=/home/ubuntu/build
+omfile=$HOME/.omake/hosts/`hostname`.om
+
+function install_cots {
+packages="\
+omake \
+ocaml \
+g++ \
+liblablgtk-extras-ocaml-dev \
+camlmix  \
+liblwt-ocaml-dev libpcre-ocaml-dev libcalendar-ocaml-dev  libounit-ocaml-dev \
+libbitstring-ocaml-dev  \
+linux-libc-dev \
+texlive \
+pdf2htmlex \
+"
+
+apt-get -fy install
+
+for p in $packages ; do
+apt-get install -y $p
+done
+
+wget http://mirrors.ctan.org/macros/latex/contrib/slashbox.zip --output-document slashbox.zip
+rm -rf slashbox
+file slashbox.zip
+unzip slashbox.zip
+rm -rf /usr/share/texmf/tex/latex/slashbox
+mv slashbox /usr/share/texmf/tex/latex
+texhash
+
+}
+
+function install_f_p_t {
+rm -rf $srcdir
+mkdir -p $srcdir
+cd $srcdir
+tarball=fantastic-palm-tree.tar.gz
+aws s3 cp s3://lolo-web/$tarball $tarball
+tar xzf $tarball
+git reset --hard
+git status
+git ls-files
+ls -R
+}
+
+function clean {
+rm -rf $builddir
+}
+
+
+function install_json_wheel {
+mkdir -p $builddir
+cd $builddir
+wget https://github.com/mjambon/mjambon2016/raw/master/json-wheel-1.0.6.tar.bz2
+rm -rf json-wheel-1.0.6
+tar xvjf json-wheel-1.0.6.tar.bz2
+cd json-wheel-1.0.6
+cat README
+ocamlfind remove json-wheel 
+make 
+make install
+}
+
+function build {
+mkdir -p $builddir
+cd $builddir
+$srcdir/oboot/bootstrap prefix=install
+
+omake pdf
+omake html
+
+aws s3 sync install s3://lolo-web/partoches/install
+
+}
+
+
+
+function getfile {
+f=$1
+aws s3 cp s3://lolo-web/CIF/$f /home/ubuntu/fantastic-palm-tree/$f
+}
+
+function patch {
+
+aws s3 cp s3://lolo-web/files.txt files.txt
+
+source files.txt
+
+for f in $files ; do
+getfile $f
+done
+
+}
+
+export OCAMLPATH=${builddir}/install/lib/ocamlfind
+
+#install_cots
+#install_json_wheel
+#install_f_p_t
+patch
+#clean
+build
+#dpkg --help
+#dpkg --listfiles pdf2htmlex
+#pdf2htmlEX --help
+
