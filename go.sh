@@ -3,20 +3,27 @@
 set -e
 set -x 
 
-rm -rf bin
-mkdir -p bin
-ocamlfind ocamlopt -warn-error all  -o bin/song-to-html read.ml -linkpkg -package extlib,str
 
-songs=perfect-day
+cd /home/ubuntu
 
-mkdir -p install
-cp css/song.css install/.
-cp css/song-print.css install/.
+#rm -rf fantastic-palm-tree
+rm -rf fantastic-palm-tree/src
 
-./bin/song-to-html $PWD/songs $PWD/install
+aws s3 sync s3://lolo-web/fantastic-palm-tree fantastic-palm-tree
 
-zip -r partoches.zip install
-cp $PWD/partoches.zip  ~/Dropbox/partoches.zip
 
-auto-ftp --hostname pixies --port 1024 --user laurent  < ftp-commands.txt || echo failed
+cd fantastic-palm-tree
+rm -rf build
+mkdir -p build
+cd build
+cmake ../src
+ls
+make
 
+cat <<EOF > data.txt
+{
+"filename":"../songs/muse/starlight.song"
+}
+EOF
+
+./f4242 data.txt
