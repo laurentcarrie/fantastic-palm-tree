@@ -37,19 +37,6 @@ public:
     };
 } ;
 
-class Grille {
-public:
-    struct bar {
-        std::vector<Accord::t> chords ;
-    };
-    struct ligne {
-        std::vector<bar> bars ;
-    };
-    struct t {
-        std::string titre ;
-        std::vector<ligne> lignes ;
-    };
-} ;
 
 
 struct Tablature {
@@ -82,34 +69,31 @@ struct Lyrics {
     } ;
 } ;
 
-union context {
-    std::string normal ;
-    std::string titre ;
-    std::string auteur ;
-    Grille::t grille ;
-    Lyrics::t lyrics ;
-    Tablature::t tab ;
-    std::string mp3 ;
-    std::vector<std::string> accords ;
-    int transpose ;
-    int nb_croches ;
-    bool pagebreak ;
-    ~context() {}
-} ;
+/*
 
-typedef std::vector<context> document ;
+ union context {
+ context() : normal("???") {}
+ context(const Grille::t&t) : grille(t) {}
+ context(std::string s) : normal(s) {}
+   std::string normal ;
+   std::string titre ;
+   std::string auteur ;
+   Grille::t grille ;
+   Lyrics::t lyrics ;
+   Tablature::t tab ;
+   std::string mp3 ;
+   std::vector<std::string> accords ;
+   int transpose ;
+   int nb_croches ;
+   bool pagebreak ;
+   ~context() {}
+ } ;
+*/
 
-struct Song {
-    struct t {
-        int transpose ;
-        std::string filename ;
-        std::string titre ;
-        std::string auteur ;
-        std::vector<context> data ;
-        int nb_croches ; /* nombre de croches par mesure : 4/4 -> 8 ; 4/6 -> 12 */
-    } ;
-} ;
+// typedef std::vector<context> document ;
 
+
+/*
 struct Book {
     union s {
         std::string NF ;
@@ -124,5 +108,8 @@ struct Book {
     } ;
 } ;
 
-}
+*/
+
+} // namespace
+
 #endif

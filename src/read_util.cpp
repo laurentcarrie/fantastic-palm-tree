@@ -1,9 +1,11 @@
+#include <iostream>
 #include <string>
 #include <fstream>
 #include <sstream>
 #include <vector>
 #include <numeric>
 #include <functional>
+#include <algorithm>
 
 #include "read_util.h"
 
@@ -141,6 +143,22 @@ in
 
 */
 
+
+
+std::tuple<std::string,std::string> my_split(const std::string& s) {
+    auto pos = s.find(' ') ;
+    if (pos==std::string::npos) {
+	std::cout << "my_split " << s << " ; no s2" << std::endl; 
+        return std::make_tuple(s,std::string("")) ;
+    } else {
+        std::string s1(s.substr(0,pos)) ;
+        std::string s2(s.substr(pos,s.size()-pos)) ;
+	std::cout << "my_split " << s << " -> " << s1 << " ; " << s2 << std::endl; 
+        return std::make_tuple(s1,s2) ;
+    }
+}
+
+
 void strip_string(std::string& s) {
     if (s=="") return ;
     if (s[0]==' ') {
@@ -151,17 +169,30 @@ void strip_string(std::string& s) {
 }
 
 std::vector<std::string> read_array_until_empty_line(std::ifstream& fin) {
-    std::vector<std::string> ret ;
-    for (;;)
-    {
-        std::string line  ;
-        getline(fin,line) ;
-        strip_string(line) ;
-        if (line == "") {
-            break ;
-        }
-        ret.insert(ret.begin(),line);
+  std::function<
+  void (std::ifstream& fin,std::vector<std::string>& acc)
+    > r =
+    [&r](std::ifstream&fin,std::vector<std::string>& acc) {
+    if (fin.eof() || fin.bad() || fin.fail()) { 
+      std::reverse(acc.begin(),acc.end()) ;
+      return ;
     }
+    char line[1001] ;
+    fin.getline(line,1000) ;
+    std::string l(line) ;
+    strip_string(l) ;
+    if ( l == "" ) {
+      std::reverse(acc.begin(),acc.end()) ;
+      return ;
+    }
+    std::cout << __FILE__ << ":" << __LINE__ << " -> '" << l << "'" << std::endl ;
+    acc.push_back(l) ;
+    r(fin,acc) ;
+  } ;
+
+  std::vector<std::string> acc ;
+  r(fin,acc) ;
+  return acc ;
 }
 
 
@@ -170,9 +201,24 @@ std::vector<std::string> read_array_until_empty_line(std::ifstream& fin) {
 std::string read_string_until_empty_line(std::ifstream& fin) {
     std::vector<std::string> a = read_array_until_empty_line(fin) ;
     std::string ret = std::accumulate(a.begin(),a.end(),std::string(""),[](std::string acc,std::string inc) {
-        return acc + "\n" + inc ;
-    }) ;
+	if (acc=="") { return inc ; }
+	else {
+	  return acc + "\n" + inc ;
+	}
+      }) ;
     return ret ;
 }
 
 
+
+std::string replace_extension(const std::string& filename,const char* ext) {
+  auto pos = filename.rfind('.') ;
+  if (pos==std::string::npos) {
+    return filename + std::string(ext) ;
+  } else {
+    std::string s1(filename.substr(0,pos)) ;
+    std::string ret = s1 + std::string(ext) ;
+    std::cout << "replace my_split " << filename << " -> " << ret << std::endl; 
+    return ret ;
+  }
+}

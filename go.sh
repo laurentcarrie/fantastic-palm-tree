@@ -27,3 +27,8 @@ cat <<EOF > data.txt
 EOF
 
 ./f4242 data.txt
+
+#ls -R
+
+aws s3 cp ../songs/muse/starlight.tex s3://lolo-web/starlight.tex
+

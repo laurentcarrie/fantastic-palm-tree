@@ -51,7 +51,9 @@ int main(int argc,char** argv) {
         std::cout << "filename : " << data.song_filename_ << std::endl ;
         song.read(data.song_filename_) ;
 
-	std::cout << "song.titre : " << song.data.titre << std::endl ;
+	std::cout << "song.titre : " << song.titre_ << std::endl ;
+
+	song.write();
 
 	std::cout << "DONE !" << std::endl ;
         return 0 ;
