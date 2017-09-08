@@ -34,6 +34,7 @@ void Song::read(const std::string& filename) {
             fin.getline(line,1000) ;
             auto t=my_split(line) ;
             std::string word = std::get<0>(t) ;
+	    std:: cout << "word : '" << word << "'" << std::endl ;
             std::string arg = std::get<1>(t) ;
             if ( word == "\\titre" ) {
 	      titre_ = read_string_until_empty_line(fin) ;
@@ -43,6 +44,22 @@ void Song::read(const std::string& filename) {
             }
             else if ( word == "\\grille" ) {
 	      grille_.push_back(Grille(fin,arg)) ;
+            }
+            else if ( word == "\\lyrics" ) {
+	      std::cout << "LLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLL" << std::endl ;
+	      Lyrics l ;
+	      l.nb_cols_ = 1 ;
+	      l.title_ = arg ;
+	      l.data_ = read_array_until_empty_line(fin) ;
+	      lyrics_.push_back(l) ;
+            }
+            else if ( word == "\\lyrics2" ) {
+	      std::cout << "LLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLL" << std::endl ;
+	      Lyrics l ;
+	      l.nb_cols_ = 2 ;
+	      l.title_ = arg ;
+	      l.data_ = read_array_until_empty_line(fin) ;
+	      lyrics_.push_back(l) ;
             }
             r (fin) ;
         }
@@ -172,8 +189,33 @@ const void Song::write() {
   } ;
 
 
+
+  std::function<void(std::ofstream&)>write_lyrics =
+    [this](std::ofstream&fout) {
+    fout << "LLLLLLLLLLLLLL" << this->lyrics_.size() << std::endl; 
+    fout << "\\begin{multicols}{2}\n" ;
+    for (auto l:this->lyrics_) {
+      fout << "\\begin{lyricsfont}\n" ;
+      fout << "\\begin{verse}\n" ;
+      fout << "{\\commentfont \\hl{" << tex_of_string(l.title_) << "}}\n" ;
+      for (auto line:l.data_) {
+	if (line=="\\") {
+	  fout << "\n\\end{verse}\n\\begin{verse}\n" ;
+	} else {
+	  fout << line << std::endl; 
+	}
+      }
+      fout << "\\end{verse}\n" ;
+      fout << "\\end{lyricsfont}\n" ;
+    }
+    fout << "\\end{multicols}\n" ;
+  } ;
+
+
+
   std::ofstream fout(path) ;
   write_preamble(fout) ;
   write_1(fout) ;
+  write_lyrics(fout) ;
   fout << "\\end{document}\n" ;
 }

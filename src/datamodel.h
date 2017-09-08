@@ -60,14 +60,15 @@ struct Tablature {
     };
 } ;
 
-
+/*
 struct Lyrics {
     struct t {
-        int nb_cols ;
-        std::string title ;
-        std::vector<std::string> data ;
+        int nb_cols_ ;
+        std::string title_ ;
+        std::vector<std::string> data_ ;
     } ;
 } ;
+*/
 
 /*
 

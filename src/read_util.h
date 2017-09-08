@@ -11,4 +11,6 @@ std::vector<std::string> read_array_until_empty_line(std::ifstream& in_channel) 
 
 std::string replace_extension(const std::string&,const char*) ;
 
+std::string tex_of_string(const std::string&) ;
+
 #endif

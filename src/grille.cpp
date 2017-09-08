@@ -21,6 +21,7 @@ Grille::Grille(std::ifstream& fin,const std::string& titre) {
             if (fin.bad()) return ;
             if (fin.fail()) return ;
             fin.getline(line,1000) ;
+	    if (std::string(line)=="") return ;
             auto t=my_split(line) ;
             std::string word = std::get<0>(t) ;
             std::string arg = std::get<1>(t) ;

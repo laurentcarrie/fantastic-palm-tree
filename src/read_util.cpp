@@ -222,3 +222,8 @@ std::string replace_extension(const std::string& filename,const char* ext) {
     return ret ;
   }
 }
+
+
+std::string tex_of_string (const std::string& s) {
+  return s ;
+}
