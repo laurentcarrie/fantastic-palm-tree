@@ -148,12 +148,12 @@ in
 std::tuple<std::string,std::string> my_split(const std::string& s) {
     auto pos = s.find(' ') ;
     if (pos==std::string::npos) {
-	std::cout << "my_split " << s << " ; no s2" << std::endl; 
+      // std::cout << "my_split " << s << " ; no s2" << std::endl; 
         return std::make_tuple(s,std::string("")) ;
     } else {
         std::string s1(s.substr(0,pos)) ;
         std::string s2(s.substr(pos,s.size()-pos)) ;
-	std::cout << "my_split " << s << " -> " << s1 << " ; " << s2 << std::endl; 
+	// std::cout << "my_split " << s << " -> " << s1 << " ; " << s2 << std::endl; 
         return std::make_tuple(s1,s2) ;
     }
 }
@@ -185,7 +185,7 @@ std::vector<std::string> read_array_until_empty_line(std::ifstream& fin) {
       std::reverse(acc.begin(),acc.end()) ;
       return ;
     }
-    std::cout << __FILE__ << ":" << __LINE__ << " -> '" << l << "'" << std::endl ;
+    // std::cout << __FILE__ << ":" << __LINE__ << " -> '" << l << "'" << std::endl ;
     acc.push_back(l) ;
     r(fin,acc) ;
   } ;
