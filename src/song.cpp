@@ -20,7 +20,7 @@ std::string concat_filenames(const std::string& n1,const std::string& n2) {
 }
 
 
-void Song::read(const std::string& filename) {
+void Song::read(const Datamodel::Conf& la_conf,const std::string& filename) {
   std::function<void(std::ifstream&)> r =
     [&r,this](std::ifstream& fin) {
         char line[1001] ;
@@ -43,7 +43,7 @@ void Song::read(const std::string& filename) {
 	      auteur_ = read_string_until_empty_line(fin) ;
             }
             else if ( word == "\\grille" ) {
-	      grille_.push_back(Grille(fin,arg)) ;
+	      grilles_.push_back(Grille(fin,arg)) ;
             }
             else if ( (word == "\\lyrics") || (word=="\\lyrics2")) {
 	      Lyrics l ;
@@ -66,10 +66,9 @@ void Song::read(const std::string& filename) {
         }
     } ;
 
-
   filename_ = filename ;
 
-  std::ifstream fin(filename,std::ios::binary) ;
+  std::ifstream fin(la_conf.srcdir_ + "/" + filename,std::ios::binary) ;
   r(fin) ;
   return ;
 }

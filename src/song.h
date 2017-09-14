@@ -4,6 +4,8 @@
 #include "datamodel.h"
 #include "grille.h"
 
+
+
 struct Lyrics {
   int nb_cols_ ;
   std::string title_ ;
@@ -16,10 +18,10 @@ public:
   std::string titre_ ;
   std::string auteur_ ;
   std::string filename_ ;
-  std::vector<Grille> grille_ ;
+  std::vector<Grille> grilles_ ;
   std::vector<Lyrics> lyrics_ ;
-  void read (const std::string&) ;
-  const void write () ;
+  void read (const Datamodel::Conf&,const std::string&) ;
+  const void write (const Datamodel::Conf&) ;
 } ;
 
 

@@ -11,11 +11,27 @@ static int noire = 4 ;
 static int blanche = 2 ;
 static int ronde = 1 ;
 
-static std::string tex_idem =  "\\small{\\textdiscount}"  ;
+
+ static std::string builddir ;
+ static std::string srcdir ;
+
+ static std::string  tex_silence = 
+   // "\\textdagger" 
+   "." ;
+   
+ static std::string tex_idem =  "\\small{\\textdiscount}"  ;
 
 static int int_of_string(const std::string& s) {
     atoi(s.c_str()) ;
 }
+
+
+ class Conf {
+ public :
+   std::string builddir_ ;
+   std::string srcdir_ ;
+   std::string song_ ;
+ } ;
 
 class Accord {
 public:
@@ -35,6 +51,7 @@ public:
         bool has_chord_ ;
         c chord_ ;
     };
+    t t_ ;
 } ;
 
 

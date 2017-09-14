@@ -7,19 +7,43 @@
 #include "json11.hpp"
 
 #include "song.h"
+#include "datamodel.h"
+#include "read_util.h"
+
+static Datamodel::Conf la_conf ;
 
 class Data {
 public:
-    std::string song_filename_ ;
 
     Data(const std::string& in) {
+      try {
         std::string errmsg ;
         json11::Json j ( json11::Json::parse (in,errmsg) ) ;
         assert(j.is_object()) ;
         json11::Json::object o = j.object_items() ;
         {
-            song_filename_ = o["filename"].string_value() ;
+	  la_conf.song_ = o["filename"].string_value() ;
+	  la_conf.srcdir_ = o["srcdir"].string_value() ;
+	  la_conf.builddir_ = o["builddir"].string_value() ;
         }
+	std::cout << "BBBBB " << la_conf.builddir_ << std::endl; 
+	if (! path_is_absolute(la_conf.srcdir_)) {
+	  std::ostringstream oss ;
+	  oss << "srcdir is not absolute : '" << la_conf.srcdir_ << "'" << std::endl ;
+	  throw std::runtime_error(oss.str()) ;
+	}
+	if (! path_is_absolute(la_conf.builddir_)) {
+	  std::ostringstream oss ;
+	  oss << "builddir is not absolute : '" << la_conf.builddir_ << "'" << std::endl ;
+	  throw std::runtime_error(oss.str()) ;
+	}
+      }
+      catch (std::runtime_error& e) {
+	std::cout << e.what () << std::endl ; exit(1) ;
+      }
+      catch (...) {
+	std::cout << "caughut unknown" << std::endl ; exit(1) ;
+      }
     }
 
 } ;
@@ -48,12 +72,12 @@ int main(int argc,char** argv) {
         std::ostringstream oss ;
 
         Song song ;
-        std::cout << "filename : " << data.song_filename_ << std::endl ;
-        song.read(data.song_filename_) ;
+        std::cout << "filename : " << la_conf.song_ << std::endl ;
+        song.read(la_conf,la_conf.song_) ;
 
 	std::cout << "song.titre : " << song.titre_ << std::endl ;
 
-	song.write();
+	song.write(la_conf);
 
 	std::cout << "DONE !" << std::endl ;
         return 0 ;

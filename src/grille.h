@@ -7,10 +7,10 @@
 class Grille {
 public:
     struct bar {
-      std::vector<Datamodel::Accord::t> chords ;
+      std::vector<Datamodel::Accord> chords_ ;
     };
     struct ligne {
-        std::vector<bar> bars ;
+        std::vector<bar> bars_ ;
     };
     struct t {
         std::string titre_ ;
