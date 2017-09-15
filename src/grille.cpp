@@ -8,8 +8,86 @@
 
 #include "grille.h"
 #include "read_util.h"
+
+Datamodel::Accord chord_of_string(const std::string& s) {
+  if (s=="") {
+    throw std::runtime_error("empty bar") ;
+  }
+  std::string remain(s) ;
+  Datamodel::Accord ret ;
+  ret.t_.chord_.note_ = s[0] ;
+
+  remain = remain.substr(1,remain.size()-1) ;
+
+  
+  // alteration
+  if (remain=="") {
+    ret.t_.chord_.alteration_ = Datamodel::Accord::None ;
+    ret.t_.chord_.sus4_ = false ;
+    ret.t_.chord_.minor_ = false ;
+    ret.t_.chord_.minor7_ = false ;
+    ret.t_.chord_.major7_ = false ;
+    ret.t_.chord_.diminue_ = false ;
+    return ret ;
+  }
+  else if (remain[0]=='#') {
+    ret.t_.chord_.alteration_ = Datamodel::Accord::Sharp ;
+    remain = remain.substr(1,remain.size()-1) ;
+  }
+  else if (remain[0]=='b') {
+    ret.t_.chord_.alteration_ = Datamodel::Accord::Flat ;
+    remain = remain.substr(1,remain.size()-1) ;
+  }
+  else {
+    ret.t_.chord_.alteration_ = Datamodel::Accord::None ;
+  }
+
+  // 4
+  if (remain.substr(0,4) == "sus4") {
+    ret.t_.chord_.sus4_ = true ;
+    remain = remain.substr(4,remain.size()-4) ;
+  } else {
+    ret.t_.chord_.sus4_ = false ;
+  }
+
+  // dim
+  if (remain.substr(0,3) == "dim") {
+    ret.t_.chord_.diminue_ = true ;
+    remain = remain.substr(3,remain.size()-3) ;
+  } else {
+    ret.t_.chord_.diminue_ = false ;
+  }
+
+  // minor
+  if (remain.substr(0,1) == "m") {
+    ret.t_.chord_.minor_ = true ;
+    remain = remain.substr(1,remain.size()-1) ;
+  } else {
+    ret.t_.chord_.minor_ = false ;
+  }
+
+  // 7
+  if (remain.substr(0,2) == "M7") {
+    ret.t_.chord_.minor7_ = false ;
+    ret.t_.chord_.major7_ = true ;
+    remain = remain.substr(2,remain.size()-2) ;
+  } 
+  else if (remain.substr(0,1) == "7") {
+    ret.t_.chord_.minor7_ = true ;
+    ret.t_.chord_.major7_ = false ;
+    remain = remain.substr(1,remain.size()-1) ;
+  } 
+  else {
+    ret.t_.chord_.minor7_ = false ;
+    ret.t_.chord_.major7_ = false ;
+  }
+
+
+  return ret ;
+}
+
 /*
-let chord_of_string s : Accord.c = (
+
   let a = String.explode s in 
   let (note,a) = match a with
     | [] -> failwith "empty bar"
@@ -46,22 +124,11 @@ let chord_of_string s : Accord.c = (
 )
 */
 
-Datamodel::Accord accord_of_string(const std::string& s) {
-  Datamodel::Accord a ;
-  a.t_.has_position_ = false ;
-  a.t_.has_chord_ = true ;
-  a.t_.chord_.note_ = 'C' ;
-  a.t_.chord_.alteration_ = Datamodel::Accord::None ;
-  return a ;
-}
-  
-  
-
 
 Grille::bar bar_of_string(const std::string&s ) {
   Grille::bar b ;
   std::vector<std::string> v (stringvector_of_string(s," ")) ;
-  std::transform (v.begin(),v.end(),std::back_inserter(b.chords_),[](const std::string& s) -> Datamodel::Accord { return (accord_of_string(s));}) ;
+  std::transform (v.begin(),v.end(),std::back_inserter(b.chords_),[](const std::string& s) -> Datamodel::Accord { return (chord_of_string(s));}) ;
   return b ;
 }
 

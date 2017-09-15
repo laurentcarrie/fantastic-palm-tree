@@ -12,7 +12,9 @@
 #include "datamodel.h"
 #include "read_util.h"
 
-extern void write_mp(const Datamodel::Conf&,const Song& song,const std::string&name,const Grille& grille, int count) ;
+extern void grille_write_mp(const Datamodel::Conf&,const Song& song,const std::string&name,const Grille& grille, int count) ;
+
+extern void tab_write_mp(const Datamodel::Conf&,const Song& song,const std::string&name,const Tablature& tab, int count) ;
 
 
 void write_preamble(std::ofstream& fout) {
@@ -107,11 +109,17 @@ void write_preamble(std::ofstream& fout) {
 const void Song::write(const Datamodel::Conf& la_conf) {
 
 
-  std::cout << "NB grilles : " << grilles_.size() << std::endl ;
   std::accumulate(
 		  grilles_.begin(),grilles_.end(),0,
 		  [this,&la_conf](int index,const Grille& g) {
-		    write_mp(la_conf,*this,this->filename_,g,index) ;
+		    grille_write_mp(la_conf,*this,this->filename_,g,index) ;
+		    return index+1 ;
+		  }) ;
+
+  std::accumulate(
+		  tablatures_.begin(),tablatures_.end(),0,
+		  [this,&la_conf](int index,const Tablature& t) {
+		    tab_write_mp(la_conf,*this,this->filename_,t,index) ;
 		    return index+1 ;
 		  }) ;
 
@@ -159,6 +167,28 @@ const void Song::write(const Datamodel::Conf& la_conf) {
   } ;
 
 
+  std::function<void(std::ofstream&,const std::string&)>write_tablatures =
+    [this](std::ofstream&fout,const std::string &file_basename) {
+    int count=0 ;
+    fout << "\\begin{multicols}{2}\n" ;
+    for (auto b:this->tablatures_) {
+      fout << "\
+\\begin{tabular}{c}\n\
+\\\\\n\n\
+{\\commentfont \\hl{" << tex_of_string(b.t_.titre_) << "}}\n\
+\\\\\n\
+\n\
+\\includegraphics{" << file_basename << "-tab-" << count << ".mps}\n\
+\\end{tabular}\n\
+" ;
+      count++ ;
+    }
+    fout << "\
+\\end{multicols}\n\
+" ;
+  } ;
+
+
   std::function<void(std::ofstream&)>write_lyrics =
     [this](std::ofstream&fout) {
     // fout << "LLLLLLLLLLLLLL" << this->lyrics_.size() << std::endl; 
@@ -193,6 +223,7 @@ const void Song::write(const Datamodel::Conf& la_conf) {
   write_1(fout) ;
   std::cout << "before write_grilles : " << filename_ << std::endl ;
   write_grilles(fout,replace_extension(basename(this->filename_),"")) ;
+  write_tablatures(fout,replace_extension(basename(this->filename_),"")) ;
   write_lyrics(fout) ;
   fout << "\n\\end{document}\n" ;
 }

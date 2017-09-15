@@ -72,7 +72,11 @@ boxit." << pid << "_fs(btex \\subscriptfont{" ;
       case Datamodel::Accord::None : break ;
       case Datamodel::Accord::Flat : fout << "\\flatsharpfont{$\\flat$}" ; break ;
       case Datamodel::Accord::Sharp : fout << "\\flatsharpfont{$\\sharp$}" ; break ;
-      default : throw std::runtime_error("missing case") ;
+      default : {
+	std::ostringstream oss ;
+	oss << __FILE__ << ":" << __LINE__ << ", missing case for alteration_" ;
+	throw std::runtime_error(oss.str()) ;
+      }
       }
       fout << "} etex) ;\n\
 " << pid << "_fs.c = " << pid << "_n.ne ;\n\
@@ -153,7 +157,7 @@ boxit.b" << index << "() ;\n\
 b" << index << ".sw=(x0,base_line) ;\n\
 b" << index << ".ne=(x1,base_line+height) ;\n\
 %fill bpath.b" << index << " withcolor (.8,.2,.8) ;\n\
-drawboxed(b" << index << ");\n\
+drawboxed(b" << index << ") ;\n\
 " ;
 
   // if (a.t_.has_position_) {
@@ -203,14 +207,14 @@ drawunboxed(" << bid << ") ;\n\
 boxit." << bid << "() ;\n\
 x00 := x0 + 3 ;\n\
 x11 := x1 - 3 ;\n\
-" << bid << ".sw=(x00+(x11-x00)*" << i << "/" << nb << ",base_line) ; \n\
+" << bid << ".sw=(x00+(x11-x00)*" << i << "/" << nb << ",base_line) ;\n\
 " << bid << ".ne=(x00+(x11-x00)*(" << i << "+1)/" << nb << ",base_line+height) ;\n\
-drawunboxed(" << bid << ") ; \n\
+drawunboxed(" << bid << ") ;\n\
 " ;
 	e_of_chord_without_position(bid,c,nb,i) ;
       }
   }
-  fout << "\n\
+  fout << "\n\n\
 x0:=x1 ;\n\
 " ;
 
@@ -231,13 +235,13 @@ void write_line(std::ofstream& fout,int index,const Grille::ligne& ligne) {
 		  }) ;
 
   fout << "\n\
-draw(x1,base_line) -- (x1,base_line+height) ; \n\
-base_line := base_line - gap_base_line - height ; \n\
+draw(x1,base_line) -- (x1,base_line+height) ;\n\
+base_line := base_line - gap_base_line - height ;\n\
 " ;
 }
 
 
-void write_mp(const Datamodel::Conf& la_conf,const Song& song,const std::string&name,const Grille& grille, int count) {
+void grille_write_mp(const Datamodel::Conf& la_conf,const Song& song,const std::string&name,const Grille& grille, int count) {
   std::string filename ;
   { std::ostringstream oss ; oss << la_conf.builddir_ << "/" << replace_extension(name,"") <<  "-grille-" << count << ".mp" ; filename = oss.str() ;}
   std::cout << "Write mp file '" << filename << "'" << std::endl ;
@@ -284,9 +288,9 @@ beginfig(1) ;\n\
 		  }) ;
  
   fout << "\n\
-endfig ; \n\
-\\end{document} \n\
-bye \n\
+endfig ;\n\
+\\end{document}\n\
+bye\n\
 " ; 
   /*
   let command = sprintf "mpost %s-grille-%d.mp > /dev/null " (Filename.basename name) count in

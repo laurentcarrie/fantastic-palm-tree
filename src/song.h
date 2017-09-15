@@ -3,6 +3,7 @@
 
 #include "datamodel.h"
 #include "grille.h"
+#include "tablature.h"
 
 
 
@@ -19,7 +20,9 @@ public:
   std::string auteur_ ;
   std::string filename_ ;
   std::vector<Grille> grilles_ ;
+  std::vector<Tablature> tablatures_ ;
   std::vector<Lyrics> lyrics_ ;
+  int nb_croches_ ;
   void read (const Datamodel::Conf&,const std::string&) ;
   const void write (const Datamodel::Conf&) ;
 } ;

@@ -45,6 +45,9 @@ void Song::read(const Datamodel::Conf& la_conf,const std::string& filename) {
             else if ( word == "\\grille" ) {
 	      grilles_.push_back(Grille(fin,arg)) ;
             }
+            else if ( word == "\\tab" ) {
+	      tablatures_.push_back(Tablature(fin,arg)) ;
+            }
             else if ( (word == "\\lyrics") || (word=="\\lyrics2")) {
 	      Lyrics l ;
 	      if (word=="\\lyrics2") {
@@ -67,7 +70,7 @@ void Song::read(const Datamodel::Conf& la_conf,const std::string& filename) {
     } ;
 
   filename_ = filename ;
-
+  nb_croches_ = 8 ;
   std::ifstream fin(la_conf.srcdir_ + "/" + filename,std::ios::binary) ;
   r(fin) ;
   return ;

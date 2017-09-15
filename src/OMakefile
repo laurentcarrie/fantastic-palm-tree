@@ -3,6 +3,8 @@
 .DEFAULT: build
 
 
+INCLUDES+=$(CWD)
+
 
 USE_OCAMLFIND = true
 
@@ -104,6 +106,6 @@ clean :
 	rm -rf install
 
 
-toto = $(CProgram toto,toto)
+#toto = $(CProgram toto,toto)
 
-build : $(toto)
+#build : $(toto)

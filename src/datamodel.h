@@ -56,27 +56,6 @@ public:
 
 
 
-struct Tablature {
-    struct note {
-        int frette ;
-        int corde ;
-    } ;
-    struct paquet  {
-        std::vector<note> notes ;
-        Accord::t chord ;
-    } ;
-    struct bar {
-        std::vector<paquet> paquets ;
-    } ;
-    struct line {
-        std::vector<bar> bars ;
-    } ;
-    struct t {
-        std::string titre ;
-        std::vector<line> lines ;
-    };
-} ;
-
 /*
 struct Lyrics {
     struct t {
