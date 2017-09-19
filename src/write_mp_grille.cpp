@@ -7,6 +7,7 @@
 #include <ctime>
 #include <iomanip>
 #include <numeric>
+#include <string>
 
 #include "song.h"
 #include "datamodel.h"
@@ -241,11 +242,13 @@ base_line := base_line - gap_base_line - height ;\n\
 }
 
 
-void grille_write_mp(const Datamodel::Conf& la_conf,const Song& song,const std::string&name,const Grille& grille, int count) {
-  std::string filename ;
-  { std::ostringstream oss ; oss << la_conf.builddir_ << "/" << replace_extension(name,"") <<  "-grille-" << count << ".mp" ; filename = oss.str() ;}
-  std::cout << "Write mp file '" << filename << "'" << std::endl ;
+void grille_write_mp(const std::string& filename,const Grille& grille) {
+  std::cout << "Write mp grille '" << filename << "'" << std::endl ;
   std::ofstream fout(filename) ;
+  if (!fout.good()) {
+    std::cout << "could not open for writing : '" << filename << "'" << std::endl ;
+    assert(false) ;
+  }
   fout << "\n\
 verbatimtex \n\
 %&latex\n\

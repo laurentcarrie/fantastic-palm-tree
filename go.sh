@@ -20,6 +20,10 @@ cmake ../src
 ls
 make
 
+cmake --graphviz=m.dot ../src
+ls -lhtr
+aws s3 cp m.dot s3://lolo-web/m.dot
+
 cat <<EOF > data.txt
 {
 "builddir":"/home/ubuntu/fantastic-palm-tree/build",

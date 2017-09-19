@@ -7,6 +7,7 @@
 #include <ctime>
 #include <iomanip>
 #include <numeric>
+#include <string>
 
 #include "song.h"
 #include "datamodel.h"
@@ -15,7 +16,6 @@
 
 std::tuple<std::string,std::string,std::string>
 mp_of_chord(const Datamodel::Accord::c& c) {
-  assert(false) ;
   std::string s(&c.note_,1) ;
   if (c.alteration_ == Datamodel::Accord::Flat) {
     s += "\\flatsharpfont{$\\flat$}" ;
@@ -101,8 +101,6 @@ pickup pencircle scaled 0.15bp ;\n\
 			 else { return n.corde_ ; }
 		       }) ;
 		     }
-		     std::cout << "LLLLLLLLLLLLLLLLLLLLLLLLLLLLowest note : " << lowest_note << std::endl ;
-
 		     std::function<void(int c)> print_tail = 
 		       [&p,&fout](int c) {
 		       if (p.chord_.position_ == 1) {
@@ -176,12 +174,15 @@ base_line := base_line + 6*ux ;\n\
 " ;
 }
 
-void tab_write_mp(const  Datamodel::Conf& la_conf,const Song& song,const std::string& name, const Tablature& tab,int count) {
-  std::string filename ;
-  { std::ostringstream oss ; oss << la_conf.builddir_ << "/" << replace_extension(name,"") <<  "-tab-" << count << ".mp" ; filename = oss.str() ;}
+void tab_write_mp(const Song& song,const std::string& filename, const Tablature& tab) {
 
-  std::cout << "WWWWWWWWWWWWWWWWrite " << filename << std::endl ;
+  std::cout << "tab_write_mp '" << filename << "'" << std::endl ;
+
   std::ofstream fout(filename) ;
+  if (!fout.good()) {
+    std::cout << "could not open for writing : '" << filename << "'" << std::endl ;
+    assert(false) ;
+  }
   fout << "\n\
 verbatimtex \n\
 %&latex\n\
@@ -213,9 +214,16 @@ endfig ;\n\
 bye\n\
 " ;
 
+
   /*
-  let command = sprintf "mpost %s-tab-%d.mp > /dev/null " (Filename.basename name) count in
-  let ret = Unix.system command in
+
+  {
+    std::ostringstream oss ;
+    oss << "mpost " << filename ; 
+    std::string command(oss.str()) ;
+    int ret = system(command) ;
+
+    let ret = Unix.system command in
   let () = match ret with
     | Unix.WEXITED 0 -> ()
     | _ -> failwith "mpost failed"

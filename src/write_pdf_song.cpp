@@ -12,9 +12,26 @@
 #include "datamodel.h"
 #include "read_util.h"
 
-extern void grille_write_mp(const Datamodel::Conf&,const Song& song,const std::string&name,const Grille& grille, int count) ;
 
-extern void tab_write_mp(const Datamodel::Conf&,const Song& song,const std::string&name,const Tablature& tab, int count) ;
+std::string mp_grille_filename (const Datamodel::Conf& conf,const Song& song,int count) {
+  std::string ret(replace_extension(song.filename_,"")) ;
+  ret = replace_path(ret,conf.srcdir_.c_str(),conf.builddir_.c_str()) ;
+  replace_extension(ret,"") ;
+  ret += "-grille-" + std::to_string(count) + ".mp" ;
+  return ret ;
+}
+
+std::string mp_tab_filename (const Datamodel::Conf& conf,const Song& song,int count) {
+  std::string ret(replace_extension(song.filename_,"")) ;
+  ret = replace_path(ret,conf.srcdir_.c_str(),conf.builddir_.c_str()) ;
+  replace_extension(ret,"") ;
+  ret += "-tab-" + std::to_string(count) + ".mp" ;
+  return ret ;
+}
+
+extern void grille_write_mp(const std::string&filename,const Grille& grille) ;
+
+extern void tab_write_mp(const Song& song,const std::string&filename,const Tablature& tab) ;
 
 
 void write_preamble(std::ofstream& fout) {
@@ -108,18 +125,20 @@ void write_preamble(std::ofstream& fout) {
 
 const void Song::write(const Datamodel::Conf& la_conf) {
 
+  std::cout << "Song::write " << filename_ << std::endl ;
+
 
   std::accumulate(
 		  grilles_.begin(),grilles_.end(),0,
 		  [this,&la_conf](int index,const Grille& g) {
-		    grille_write_mp(la_conf,*this,this->filename_,g,index) ;
+		    grille_write_mp(mp_grille_filename(la_conf,*this,index),g) ;
 		    return index+1 ;
 		  }) ;
 
   std::accumulate(
 		  tablatures_.begin(),tablatures_.end(),0,
 		  [this,&la_conf](int index,const Tablature& t) {
-		    tab_write_mp(la_conf,*this,this->filename_,t,index) ;
+		    tab_write_mp(*this,mp_tab_filename(la_conf,*this,index),t) ;
 		    return index+1 ;
 		  }) ;
 
@@ -155,7 +174,7 @@ const void Song::write(const Datamodel::Conf& la_conf) {
 {\\commentfont \\hl{" << tex_of_string(g.t_.titre_) << "}}\n\
 \\\\\n\
 \n\
-\\includegraphics{" << file_basename << "-grille-" << count << ".mps}\n\
+\\includegraphics{" << file_basename << "-grille-" << count << ".mps}\n \
 \\end{tabular}\n\
 \n\
 " ;
@@ -214,16 +233,14 @@ const void Song::write(const Datamodel::Conf& la_conf) {
     fout << "\\end{multicols}\n\n" ;
   } ;
 
-
-  std::string path(la_conf.builddir_ + "/" + replace_extension(filename_,".tex")) ;
-  std::cout << "builddir : " << la_conf.builddir_ << std::endl ;
+  std::string path (replace_extension(filename_,".tex")) ;
+  path = replace_path(path,la_conf.srcdir_.c_str(),la_conf.builddir_.c_str()) ;
   std::cout << "Write tex file '" << path << "'" << std::endl ;
   std::ofstream fout(path) ;
   write_preamble(fout) ;
   write_1(fout) ;
-  std::cout << "before write_grilles : " << filename_ << std::endl ;
-  write_grilles(fout,replace_extension(basename(this->filename_),"")) ;
-  write_tablatures(fout,replace_extension(basename(this->filename_),"")) ;
+  write_grilles(fout,replace_extension(path,"")) ;
+  write_tablatures(fout,replace_extension(path,"")) ;
   write_lyrics(fout) ;
   fout << "\n\\end{document}\n" ;
 }

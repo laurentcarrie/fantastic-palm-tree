@@ -5,6 +5,7 @@
 #include <fstream>
 #include <functional>
 #include <algorithm>
+#include <string>
 
 #include "tablature.h"
 #include "read_util.h"
@@ -12,7 +13,7 @@
 extern Datamodel::Accord chord_of_string(const std::string& s) ;
 
 Tablature::paquet paquet_of_string(const std::string& s) {
-  std::cout << "paquet_of_string '" << s << "'" << std::endl ; 
+  // std::cout << "paquet_of_string '" << s << "'" << std::endl ; 
   std::vector<std::string> v = stringvector_of_string(s,",") ;
   Tablature::paquet ret ;
   // default
@@ -60,10 +61,8 @@ Tablature::paquet paquet_of_string(const std::string& s) {
 		   }
 		   Tablature::note note ;
 		   try {
-		     std::cout << "NNNNNNNNNNNNNNNN : '" << vv[0] << "' ; '" << vv[1] << "'" << std::endl ;
 		     note.corde_  = stoi(vv[0]) ;
 		     note.frette_ = stoi(vv[1]) ;
-		     std::cout << "NNNNNNNNNNNNNNNN : '" << note.corde_ << "' ; '" << note.frette_ << "'" << std::endl ;
 		   } 
 		   catch (...) {
 		     std::cout << "failed to convert '" <<  vv[0] << "' or << '" << vv[1] << "' to integer" << std::endl ;
@@ -109,7 +108,6 @@ Tablature::Tablature(std::ifstream& fin,const std::string& titre) {
             if (fin.bad()) return ;
             if (fin.fail()) return ;
             fin.getline(line,1000) ;
-	    std::cout << "RRRRRRRRRRRRRead  --> '" << line << "'" << std::endl ;
 	    if (std::string(line)=="") return ;
 	    Tablature::line l ;
 	    l.bars_ = tablature_bars_of_line(line) ;

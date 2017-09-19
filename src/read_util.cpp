@@ -7,6 +7,7 @@
 #include <functional>
 #include <algorithm>
 #include <string.h>
+#include <dirent.h>
 
 #include "read_util.h"
 
@@ -95,6 +96,15 @@ std::string read_string_until_empty_line(std::ifstream& fin) {
 }
 
 
+std::string extension(const std::string& filename) {
+  auto pos = filename.rfind('.') ;
+  if (pos==std::string::npos) {
+    return "" ;
+  } else {
+    std::string ret(filename.substr(pos+1,filename.length()-pos-1)) ;
+    return ret ;
+  }
+}
 
 std::string replace_extension(const std::string& filename,const char* ext) {
   auto pos = filename.rfind('.') ;
@@ -103,7 +113,6 @@ std::string replace_extension(const std::string& filename,const char* ext) {
   } else {
     std::string s1(filename.substr(0,pos)) ;
     std::string ret = s1 + std::string(ext) ;
-    std::cout << "replace my_split " << filename << " -> " << ret << std::endl; 
     return ret ;
   }
 }
@@ -116,10 +125,7 @@ std::string replace_path(const std::string& filename,const char* path1,const cha
   }
   
   std::string ret(path2) ;
-  ret += filename.substr(0,strlen(path1)) ;
-
-  
-  std::cout << "replace_path '" << filename << "' ; path1='" << path1 << "' ; path2='" << path2 << "'" << std::endl ;
+  ret += filename.substr(strlen(path1),filename.size()-strlen(path1)) ;
 
   return ret ;
 }
@@ -130,9 +136,21 @@ std::string basename(const std::string& filename) {
     return filename ;
   } else {
     std::string s1(filename.substr(pos+1,filename.size()-pos-1)) ;
-    std::cout << "basename of '" << filename << "' -> '" << s1 << "'" << std::endl; 
     return s1 ;
   }
+}
+
+std::string dirname(const std::string& filename) {
+  auto pos = filename.rfind('/') ;
+  if (pos==std::string::npos) {
+    return filename ;
+  } else {
+    std::string s1(0,pos) ;
+    return s1 ;
+  }
+}
+
+void mkdir_p(const std::string& dirname) {
 }
 
 bool path_is_absolute(const std::string& path) {
@@ -162,7 +180,6 @@ std::vector<std::string> stringvector_of_string(const std::string&s, const std::
     } else {
       std::string s1(s.substr(0,pos)) ;
       std::string s2(s.substr(pos+2-sep.size(),s.size()-pos-2+sep.size())) ;
-      std::cout << "PPPPPPPPPPPPPPPPPPPPPPPPP '" << s1 << "'" << std::endl ;
       if (s1 != "") { acc.push_back(s1) ; }
       if (! (s1.size() < s.size())) { throw std::runtime_error("algorithm stringvector_of_string") ; }
       r(s2,acc) ;
@@ -173,10 +190,23 @@ std::vector<std::string> stringvector_of_string(const std::string&s, const std::
   std::vector<std::string> acc ;
   r(s,acc) ;
 
-  // std::cout << "SSSSSSSSSSSSSSSS string split '" << s << "'" << std::endl ;
-  // std::cout << (std::accumulate(acc.begin(),acc.end(),std::string(""),[](std::string acc,std::string i) { return (acc + "; '" + i + ";") ; })) ;
-
   return acc ;
 }
+
+
+std::vector<std::string> sub_tree(const std::string& root_dir) {
+
+  typedef std::vector<std::string> T ;
+  T ret ;
+  std::function<void (T&acc,const std::string& root_dir,bool)> r = 
+    [](T& acc,const std::string& filename,bool is_dir) {
+    if (! is_dir) { acc.push_back(filename) ; }
+  } ;
+  walk_tree(root_dir,ret,r) ;
+  return ret ;
+}
+
+
+
 
 		     
