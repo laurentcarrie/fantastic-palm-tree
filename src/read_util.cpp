@@ -45,13 +45,14 @@ std::tuple<std::string,std::string> my_split(const std::string& s) {
 }
 
 
-void strip_string(std::string& s) {
-    if (s=="") return ;
-    if (s[0]==' ') {
-        s.erase(s.begin()) ;
-        strip_string(s) ;
+std::string strip_string(const std::string& s) {
+    if (s=="") return s ;
+    std::string ret(s) ;
+    if (ret[0]==' ') {
+      ret.erase(ret.begin()) ;
+      ret = strip_string(ret) ;
     }
-    return ;
+    return ret ;
 }
 
 std::vector<std::string> read_array_until_empty_line(std::ifstream& fin) {
@@ -65,8 +66,7 @@ std::vector<std::string> read_array_until_empty_line(std::ifstream& fin) {
     }
     char line[1001] ;
     fin.getline(line,1000) ;
-    std::string l(line) ;
-    strip_string(l) ;
+    std::string l (strip_string(line)) ;
     if ( l == "" ) {
       // std::reverse(acc.begin(),acc.end()) ;
       return ;
@@ -143,9 +143,9 @@ std::string basename(const std::string& filename) {
 std::string dirname(const std::string& filename) {
   auto pos = filename.rfind('/') ;
   if (pos==std::string::npos) {
-    return filename ;
+    return "" ;
   } else {
-    std::string s1(0,pos) ;
+    std::string s1(filename.substr(0,pos)) ;
     return s1 ;
   }
 }
@@ -166,7 +166,15 @@ bool path_is_absolute(const std::string& path) {
 
 
 std::string tex_of_string (const std::string& s) {
-  return s ;
+  auto pos = s.find('#') ;
+  if ( pos == std::string::npos) {
+    return s ;
+  } 
+  std::string s1(s.substr(0,pos)) ;
+  std::string s2(s.substr(pos+1,s.size()-pos-1)) ;
+  std::string ret(s1 + "$\\sharp$" + s2) ;
+  std::cout << "tex_of_string \n'" << s << "'\n'" << ret << "'" << std::endl ;
+  return (tex_of_string(ret)) ;
 }
 
 std::vector<std::string> stringvector_of_string(const std::string&s, const std::string& sep) {
@@ -207,6 +215,11 @@ std::vector<std::string> sub_tree(const std::string& root_dir) {
 }
 
 
-
+std::string normalize_path(const std::string& path) {
+  if (path.size()==0) return path ;
+  if (path[path.length()] == '/') {
+    return path.substr(0,path.length()-1) ;
+  }
+}
 
 		     

@@ -12,11 +12,14 @@ std::string read_string_until_empty_line(std::ifstream& in_channel) ;
 std::vector<std::string> read_array_until_empty_line(std::ifstream& in_channel) ;
 
 
+std::string strip_string(const std::string&) ;
 std::string extension(const std::string&) ;
 std::string replace_extension(const std::string&,const char*) ;
 std::string replace_path(const std::string&,const char*,const char*) ;
 std::string basename(const std::string&) ;
+std::string dirname(const std::string&) ;
 bool path_is_absolute(const std::string&) ;
+std::string normalize_path(const std::string& path) ;
 
 std::string tex_of_string(const std::string&) ;
 

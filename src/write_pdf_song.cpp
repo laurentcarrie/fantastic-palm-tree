@@ -12,6 +12,66 @@
 #include "datamodel.h"
 #include "read_util.h"
 
+extern Datamodel::Accord chord_of_string(const std::string&) ;
+
+std::string replace_chord(const std::string& line) {
+  std::function<void (std::string& line)> r = 
+    [&r](std::string& line) {
+    auto pos1 = line.find('[') ;
+    if (pos1==std::string::npos) return ;
+    auto pos2 = line.find(']') ;
+    if (pos2==std::string::npos) return ;
+    
+    std::string before = line.substr(0,pos1) ;
+    std::string after = line.substr(pos2+1,line.size()-pos2-1) ;
+    std::string chord_and_word = line.substr(pos1+1,pos2-pos1-1) ;
+
+    auto pos3 = chord_and_word.find(';') ;
+    std::string chord = chord_and_word.substr(0,pos3) ;
+    std::string word = chord_and_word.substr(pos3+1,chord_and_word.size()-pos3-1) ;
+
+    std::cout << "before '" << before << "'" << std::endl; 
+    std::cout << "chord_and_word '" << chord_and_word << "'" << std::endl; 
+    std::cout << "chord '" << chord << "'" << std::endl; 
+
+    Datamodel::Accord a(chord_of_string(chord)) ;
+    {
+      std::ostringstream oss ;
+      std::cout << "note : '" << a.t_.chord_.note_ << "'" << std::endl ;
+      oss << "\\textsuperscript{\\textcolor{red}{" << a.t_.chord_.note_ ;
+      switch (a.t_.chord_.alteration_) {
+      case Datamodel::Accord::None : break ;
+      case Datamodel::Accord::Flat : oss << "$\\flat$" ; break ;
+      case Datamodel::Accord::Sharp : oss << "$\\sharp$" ; break ;
+      default : assert(false) ;
+      }
+      std::string subscript ;
+      if (a.t_.chord_.minor_) { subscript="m" ; }
+      if (a.t_.chord_.minor7_) { subscript += "7" ; }
+      if (a.t_.chord_.sus4_) { subscript += "4" ; } 
+      if (a.t_.chord_.major7_) { subscript += "7M" ; }
+      if (subscript != "" ) { oss << "\\textsubscript{\\small{" << subscript << "}}" ; }
+      oss << "}}" ;
+      chord = oss.str() ;
+    }
+
+    std::cout << "word '" << word << "'" << std::endl; 
+    std::cout << "after '" << after << "'" << std::endl; 
+    std::string line2(before + chord + "\\underline{" + word + "}" + after) ;
+    std::cout << "line2 '" << line2 << "'" << std::endl; 
+    line=line2 ;
+    // std::string line2(after) ;
+    // assert(line.size() > line2.size()+2) ;
+    r(line) ;
+  } ;
+  std::string ret(line) ;
+  std::cout << "BBBBBBBBBBefore : " << line << std::endl ;
+  r(ret) ;
+  std::cout << "AAAAAAAAAAAAAafter : " << ret << std::endl ;
+  return ret ;
+}
+  
+
 
 std::string mp_grille_filename (const Datamodel::Conf& conf,const Song& song,int count) {
   std::string ret(replace_extension(song.filename_,"")) ;
@@ -174,9 +234,8 @@ const void Song::write(const Datamodel::Conf& la_conf) {
 {\\commentfont \\hl{" << tex_of_string(g.t_.titre_) << "}}\n\
 \\\\\n\
 \n\
-\\includegraphics{" << file_basename << "-grille-" << count << ".mps}\n \
+\\includegraphics{" << basename(file_basename) << "-grille-" << count << ".mps}\n\
 \\end{tabular}\n\
-\n\
 " ;
       count++ ;
     }
@@ -197,7 +256,7 @@ const void Song::write(const Datamodel::Conf& la_conf) {
 {\\commentfont \\hl{" << tex_of_string(b.t_.titre_) << "}}\n\
 \\\\\n\
 \n\
-\\includegraphics{" << file_basename << "-tab-" << count << ".mps}\n\
+\\includegraphics{" << basename(file_basename) << "-tab-" << count << ".mps}\n \
 \\end{tabular}\n\
 " ;
       count++ ;
@@ -224,7 +283,7 @@ const void Song::write(const Datamodel::Conf& la_conf) {
 	  fout << "{\\sethlcolor{grey8}\\commentfont \\hl" << line << "}\\\\\n" ;
 	}
 	else {
-	  fout << line << "\\\\" << std::endl; 
+	  fout << tex_of_string(replace_chord(line)) << "\\\\" << std::endl; 
 	}
       }
       fout << "\\end{verse}\n" ;

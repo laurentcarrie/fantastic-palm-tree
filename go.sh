@@ -20,26 +20,30 @@ cmake ../src
 ls
 make
 
-cmake --graphviz=m.dot ../src
-ls -lhtr
-aws s3 cp m.dot s3://lolo-web/m.dot
 
 cat <<EOF > data.txt
 {
-"builddir":"/home/ubuntu/fantastic-palm-tree/build",
+"builddir":"/home/ubuntu/fantastic-palm-tree/tex-songs",
 "srcdir":"/home/ubuntu/fantastic-palm-tree/songs",
 "filename":"muse/starlight.song"
 }
 EOF
 
+mkdir -p /home/ubuntu/fantastic-palm-tree/tex-songs
+
 mkdir -p /home/ubuntu/fantastic-palm-tree/build/muse
 
 ./f4242 data.txt
 
-ls -R /home/ubuntu/fantastic-palm-tree/build
+rm -rf core*
 
-cd /home/ubuntu/fantastic-palm-tree/build/muse
+ls -R /home/ubuntu/fantastic-palm-tree/tex-songs
 
+aws s3 sync /home/ubuntu/fantastic-palm-tree/tex-songs s3://lolo-web/tex-songs
+
+cd /home/ubuntu/fantastic-palm-tree/tex-songs/muse
+
+if 0; then
 ls starlight*.mp | while read f ; do
     aws s3 cp $f s3://lolo-web/xxx/$f
     b=`basename $f .mp`
@@ -54,9 +58,33 @@ pdflatex starlight.tex
 pdflatex starlight.tex
 ls -lhtr
 aws s3 cp starlight.pdf s3://lolo-web/xxx/starlight.pdf
+fi
 
 
-cd /home/ubuntu/fantastic-palm-tree
+aws s3 cp /home/ubuntu/fantastic-palm-tree/tex-songs/CMakeLists.txt s3://lolo-web/CMakeLists.txt
+
+echo "XXXXXXXXXXXXXXXXXX1"
+
+#aws s3 sync /home/ubuntu/fantastic-palm-tree/build s3://lolo-web/xxxbuild
+
+echo "XXXXXXXXXXXXXXXXXX2"
+
+cd /home/ubuntu/fantastic-palm-tree/tex-songs
+cp /home/ubuntu/fantastic-palm-tree/UseLATEX.cmake .
+ls -R
+echo "XXXXXXXXXXXXXXXXXX3"
+cmake $PWD
+echo "XXXXXXXXXXXXXXXXXX4"
+ls -R
+echo "XXXXXXXXXXXXXXXXXX5"
+make -k || echo "build failed"
+echo "XXXXXXXXXXXXXXXXXX6"
+
+aws s3 sync /home/ubuntu/fantastic-palm-tree/xxx-pdf s3://lolo-web/xxx-pdf
+
+ls -R install
+aws s3 sync /home/ubuntu/fantastic-palm-tree/install s3://lolo-web/install
+
 
 
 

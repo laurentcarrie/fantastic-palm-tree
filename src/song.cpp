@@ -45,6 +45,7 @@ void Song::read(const Datamodel::Conf& la_conf,const std::string& filename) {
             }
             else if ( word == "\\grille" ) {
 	      grilles_.push_back(Grille(fin,arg)) ;
+	      std::cout << "GGGGGGGGGGGGGGGGGGrilles : " << grilles_.size() << std::endl ;
             }
             else if ( word == "\\tab" ) {
 	      tablatures_.push_back(Tablature(fin,arg)) ;

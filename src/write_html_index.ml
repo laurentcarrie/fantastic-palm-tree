@@ -20,7 +20,7 @@ let write ~top_src_dir = (
   let all_songs = List.map ( fun f -> Song.read ~filename:f ) all_songs in
 
   let by_auteur = List.fold_left ( fun acc song ->
-    let auteur = String.uppercase_ascii song.D.Song.auteur in
+    let auteur = (* String.uppercase_ascii *) song.D.Song.auteur in
     let a = try List.assoc auteur acc with | Not_found -> [] in
     let a = (auteur,(song::a)) in
     let acc = List.remove_assoc auteur acc in

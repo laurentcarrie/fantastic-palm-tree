@@ -67,7 +67,7 @@ Datamodel::Accord chord_of_string(const std::string& s) {
   }
 
   // 7
-  if (remain.substr(0,2) == "M7") {
+  if (remain.substr(0,2) == "7M") {
     ret.t_.chord_.minor7_ = false ;
     ret.t_.chord_.major7_ = true ;
     remain = remain.substr(2,remain.size()-2) ;
@@ -143,7 +143,7 @@ std::vector<Grille::bar> bars_of_line(const std::string& s) {
 Grille::Grille(std::ifstream& fin,const std::string& titre) {
   std::function<void(std::ifstream&)> r =
     [&r,this](std::ifstream& fin) {
-        char line[1001] ;
+        char buffer[1001] ;
         try {
             if (fin.eof()) {
                 std::cout << "EOF" << std::endl ;
@@ -151,7 +151,8 @@ Grille::Grille(std::ifstream& fin,const std::string& titre) {
             }
             if (fin.bad()) return ;
             if (fin.fail()) return ;
-            fin.getline(line,1000) ;
+            fin.getline(buffer,1000) ;
+	    std::string line(strip_string(buffer)) ;
 	    if (std::string(line)=="") return ;
 	    ligne l ;
 	    l.bars_ = bars_of_line(line) ;

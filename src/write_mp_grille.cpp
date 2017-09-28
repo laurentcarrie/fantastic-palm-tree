@@ -213,6 +213,7 @@ x11 := x1 - 3 ;\n\
 drawunboxed(" << bid << ") ;\n\
 " ;
 	e_of_chord_without_position(bid,c,nb,i) ;
+	i++ ;
       }
   }
   fout << "\n\n\

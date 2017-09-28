@@ -3,3 +3,6 @@
 build/
 *.orig
 *#*#
+CMakeFiles/
+CMakeCache.txt
+tex-songs/
