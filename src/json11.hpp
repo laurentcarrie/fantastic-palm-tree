@@ -57,15 +57,15 @@
 #include <initializer_list>
 
 #ifdef _MSC_VER
-#if _MSC_VER <= 1800 // VS 2013
-#ifndef noexcept
-#define noexcept throw()
-#endif
+    #if _MSC_VER <= 1800 // VS 2013
+        #ifndef noexcept
+            #define noexcept throw()
+        #endif
 
-#ifndef snprintf
-#define snprintf _snprintf_s
-#endif
-#endif
+        #ifndef snprintf
+            #define snprintf _snprintf_s
+        #endif
+    #endif
 #endif
 
 namespace json11 {
@@ -106,17 +106,21 @@ public:
     Json(const T & t) : Json(t.to_json()) {}
 
     // Implicit constructor: map-like objects (std::map, std::unordered_map, etc)
-    template <class M, typename std::enable_if<
-                  std::is_constructible<std::string, decltype(std::declval<M>().begin()->first)>::value
-                  && std::is_constructible<Json, decltype(std::declval<M>().begin()->second)>::value,
-                  int>::type = 0>
+	/*
+	template <class M, typename std::enable_if<
+        std::is_constructible<std::string, decltype(std::declval<M>().begin()->first)>::value
+        && std::is_constructible<Json, decltype(std::declval<M>().begin()->second)>::value,
+            int>::type = 0>
     Json(const M & m) : Json(object(m.begin(), m.end())) {}
+	*/
 
     // Implicit constructor: vector-like objects (std::list, std::vector, std::set, etc)
+	/*
     template <class V, typename std::enable_if<
-                  std::is_constructible<Json, decltype(*std::declval<V>().begin())>::value,
-                  int>::type = 0>
+        std::is_constructible<Json, decltype(*std::declval<V>().begin())>::value,
+            int>::type = 0>
     Json(const V & v) : Json(array(v.begin(), v.end())) {}
+	*/
 
     // This prevents Json(some_pointer) from accidentally producing a bool. Use
     // Json(bool(some_pointer)) if that behavior is desired.
@@ -125,24 +129,12 @@ public:
     // Accessors
     Type type() const;
 
-    bool is_null()   const {
-        return type() == NUL;
-    }
-    bool is_number() const {
-        return type() == NUMBER;
-    }
-    bool is_bool()   const {
-        return type() == BOOL;
-    }
-    bool is_string() const {
-        return type() == STRING;
-    }
-    bool is_array()  const {
-        return type() == ARRAY;
-    }
-    bool is_object() const {
-        return type() == OBJECT;
-    }
+    bool is_null()   const { return type() == NUL; }
+    bool is_number() const { return type() == NUMBER; }
+    bool is_bool()   const { return type() == BOOL; }
+    bool is_string() const { return type() == STRING; }
+    bool is_array()  const { return type() == ARRAY; }
+    bool is_object() const { return type() == OBJECT; }
 
     // Return the enclosed value if this is a number, 0 otherwise. Note that json11 does not
     // distinguish between integer and non-integer numbers - number_value() and int_value()
@@ -203,18 +195,10 @@ public:
 
     bool operator== (const Json &rhs) const;
     bool operator<  (const Json &rhs) const;
-    bool operator!= (const Json &rhs) const {
-        return !(*this == rhs);
-    }
-    bool operator<= (const Json &rhs) const {
-        return !(rhs < *this);
-    }
-    bool operator>  (const Json &rhs) const {
-        return  (rhs < *this);
-    }
-    bool operator>= (const Json &rhs) const {
-        return !(*this < rhs);
-    }
+    bool operator!= (const Json &rhs) const { return !(*this == rhs); }
+    bool operator<= (const Json &rhs) const { return !(rhs < *this); }
+    bool operator>  (const Json &rhs) const { return  (rhs < *this); }
+    bool operator>= (const Json &rhs) const { return !(*this < rhs); }
 
     /* has_shape(types, err)
      *

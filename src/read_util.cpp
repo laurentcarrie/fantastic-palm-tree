@@ -7,7 +7,9 @@
 #include <functional>
 #include <algorithm>
 #include <string.h>
+#ifndef WIN32
 #include <dirent.h>
+#endif
 
 #include "read_util.h"
 

@@ -3,7 +3,11 @@
 #include <assert.h>
 #include <sstream>
 #include <fstream>
+#ifndef WIN32
 #include <dirent.h>
+#else
+#include <direct.h>
+#endif
 #include <sys/stat.h>
 
 #include "json11.hpp"
@@ -27,16 +31,42 @@ Datamodel::Conf read_conf(const std::string& in) {
       la_conf.srcdir_ = o["srcdir"].string_value() ;
       la_conf.builddir_ = o["builddir"].string_value() ;
     }
+#ifdef WIN32
+	{
+		char buffer[1000];
+		if (_fullpath(buffer, la_conf.srcdir_.c_str(), 9999) != NULL) {
+			la_conf.srcdir_ = buffer;
+		}
+		else {
+			throw std::runtime_error("pb avec fullpath");
+		}
+	}
+#else
     if (! path_is_absolute(la_conf.srcdir_)) {
       std::ostringstream oss ;
       oss << "srcdir is not absolute : '" << la_conf.srcdir_ << "'" << std::endl ;
       throw std::runtime_error(oss.str()) ;
     }
-    if (! path_is_absolute(la_conf.builddir_)) {
+#endif
+
+
+#ifdef WIN32
+	{
+		char buffer[1000];
+		if (_fullpath(buffer, la_conf.builddir_.c_str(), 9999) != NULL) {
+			la_conf.builddir_ = buffer;
+		}
+		else {
+			throw std::runtime_error("pb avec fullpath");
+		}
+	}
+#else
+	if (!path_is_absolute(la_conf.builddir_)) {
       std::ostringstream oss ;
       oss << "builddir is not absolute : '" << la_conf.builddir_ << "'" << std::endl ;
       throw std::runtime_error(oss.str()) ;
     }
+#endif
     return la_conf ;
   }
   catch (std::runtime_error& e) {
@@ -68,7 +98,18 @@ int main(int argc,char** argv) {
     Datamodel::Conf la_conf = read_conf(buffer) ;
 
 
-    std::ofstream fout_cmake(la_conf.builddir_ + "/CMakeLists.txt") ;
+	std::cout << __FILE__ << ":" << __LINE__ << std::endl;
+	std::string cmake_filename(la_conf.builddir_ + "\\CMakeLists.txt");
+	std::cout << __FILE__ << ":" << __LINE__ << std::endl;
+	std::cout << "generate '" << cmake_filename << "'" << std::endl;
+
+	std::cout << __FILE__ << ":" << __LINE__ << std::endl;
+	std::ofstream fout_cmake(cmake_filename);
+	std::cout << __FILE__ << ":" << __LINE__ << std::endl;
+	if (fout_cmake.bad()) {
+		throw std::runtime_error("bad file " + cmake_filename);
+	}
+	std::cout << __FILE__ << ":" << __LINE__ << std::endl;
     fout_cmake << "\
 project(\"songs\")\n\
 cmake_minimum_required(VERSION 3.5)\n\
@@ -76,32 +117,24 @@ set(CMAKE_VERION 3.5)\n\
 include(UseLATEX.cmake)\n\
 " ;
 
-    /*
-      for ( auto i : v) {
-      fout << "\n\
-      add_custom_command(\n\
-      OUTPUT muse/starlight-grille-" << i << ".mps\n\
-      DEPENDS muse/starlight-grille-" << i << ".mp\n\
-      WORKING_DIRECTORY " << la_conf.builddir_ << "/muse\n\
-      COMMAND mpost starlight-grille-" << i << "\n\
-      COMMAND mv starlight-grille-" << i << ".1  starlight-grille-" << i << ".mps \n\
-      )\n\
-      " ;
-      }
-      }
-    */
-
-
-
-	
-    std::function<void(bool& acc,const std::string& filename,bool)> walk = 
+ 	
+	std::cout << __FILE__ << ":" << __LINE__ << std::endl;
+	std::function<void(bool& acc, const std::string& filename, bool)> walk =
       [&la_conf,&fout_cmake] (bool& acc,const std::string& filename,bool is_dir) {
-      if (is_dir) {
+		std::cout << __FILE__ << ":" << __LINE__ << std::endl;
+		if (is_dir) {
 	std::string builddir(replace_path(filename,la_conf.srcdir_.c_str(),la_conf.builddir_.c_str())) ;
 	std::cout << "mkdir '" << builddir << "'" << std::endl; 
-	mkdir(builddir.c_str(),077) ;
+#ifdef WIN32
+	_mkdir(builddir.c_str()) ;
+#else
+	xxxx
+	mkdir(builddir.c_str(), 077);
+#endif
+
       } else if ( extension(filename) == "song") {
-	Song song ;
+	std::cout << __FILE__ << ":" << __LINE__ << std::endl;
+	Song song;
 	song.read(la_conf,filename) ;
 	song.write(la_conf) ;
 	std::string name(replace_path(filename,(la_conf.srcdir_+"/").c_str(),"")) ;
@@ -124,15 +157,19 @@ FORCE_PDF \n\
 DEPENDS \n\
 " ;
 
-	for ( int count=0;count<song.grilles_.size();++count ) {
+	std::cout << __FILE__ << ":" << __LINE__ << std::endl;
+
+	for (unsigned int count=0;count<song.grilles_.size();++count ) {
 	  fout_cmake << "${output_dir}/" << basename(name) << "-grille-" << count << ".mps\n" ;
 	}
-	for ( int count=0;count<song.tablatures_.size();++count ) {
+	std::cout << __FILE__ << ":" << __LINE__ << std::endl;
+	for (unsigned int count = 0; count<song.tablatures_.size(); ++count) {
 	  fout_cmake << "${output_dir}/" << basename(name) << "-tab-" << count << ".mps\n" ;
 	}
 	fout_cmake << ")\n" ;
+	std::cout << __FILE__ << ":" << __LINE__ << std::endl;
 
-	for (int count=0;count<song.grilles_.size();++count) {
+	for (unsigned int count=0;count<song.grilles_.size();++count) {
 	  fout_cmake << "\n\
 add_custom_command(\n\
 OUTPUT ${output_dir}/" << basename(name) << "-grille-" << count << ".mps\n\
@@ -142,7 +179,7 @@ COMMAND mpost " << basename(name) << "-grille-" << count << "\n\
 COMMAND cp " << basename(name) << "-grille-" << count << ".1  ${output_dir}/" << basename(name) << "-grille-" << count << ".mps \n \
 )\n " ;
 	}
-	for (int count=0;count<song.tablatures_.size();++count) {
+	for (unsigned int count=0;count<song.tablatures_.size();++count) {
 	  fout_cmake << "\n\
 add_custom_command(\n\
 OUTPUT ${output_dir}/" << basename(name) << "-tab-" << count << ".mps\n\
@@ -161,13 +198,15 @@ COMMAND cp " << basename(name) << "-tab-" << count << ".1  ${output_dir}/" << ba
     } ;
 
     bool ret ;
+	std::cout << __FILE__ << ":" << __LINE__ << std::endl;
     walk_tree(la_conf.srcdir_,ret,walk) ;
 
     std::cout << "DONE !" << std::endl ;
     return 0 ;
   }
   catch (std::exception& e) {
-    std::cout << "caught : " << e.what() << std::endl;
+	  std::cout << __FILE__ << ":" << __LINE__ << std::endl;	   
+    std::cout << "caught : " << e.what() << std::endl ;
     return 1 ;
   }
   catch (...) {

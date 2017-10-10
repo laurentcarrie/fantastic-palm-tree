@@ -42,12 +42,8 @@ using std::move;
  * it may not be orderable.
  */
 struct NullStruct {
-    bool operator==(NullStruct) const {
-        return true;
-    }
-    bool operator<(NullStruct) const {
-        return false;
-    }
+    bool operator==(NullStruct) const { return true; }
+    bool operator<(NullStruct) const { return false; }
 };
 
 /* * * * * * * * * * * * * * * * * * * *
@@ -171,66 +167,42 @@ protected:
     }
 
     const T m_value;
-    void dump(string &out) const override {
-        json11::dump(m_value, out);
-    }
+    void dump(string &out) const override { json11::dump(m_value, out); }
 };
 
 class JsonDouble final : public Value<Json::NUMBER, double> {
-    double number_value() const override {
-        return m_value;
-    }
-    int int_value() const override {
-        return static_cast<int>(m_value);
-    }
-    bool equals(const JsonValue * other) const override {
-        return m_value == other->number_value();
-    }
-    bool less(const JsonValue * other)   const override {
-        return m_value <  other->number_value();
-    }
+    double number_value() const override { return m_value; }
+    int int_value() const override { return static_cast<int>(m_value); }
+    bool equals(const JsonValue * other) const override { return m_value == other->number_value(); }
+    bool less(const JsonValue * other)   const override { return m_value <  other->number_value(); }
 public:
     explicit JsonDouble(double value) : Value(value) {}
 };
 
 class JsonInt final : public Value<Json::NUMBER, int> {
-    double number_value() const override {
-        return m_value;
-    }
-    int int_value() const override {
-        return m_value;
-    }
-    bool equals(const JsonValue * other) const override {
-        return m_value == other->number_value();
-    }
-    bool less(const JsonValue * other)   const override {
-        return m_value <  other->number_value();
-    }
+    double number_value() const override { return m_value; }
+    int int_value() const override { return m_value; }
+    bool equals(const JsonValue * other) const override { return m_value == other->number_value(); }
+    bool less(const JsonValue * other)   const override { return m_value <  other->number_value(); }
 public:
     explicit JsonInt(int value) : Value(value) {}
 };
 
 class JsonBoolean final : public Value<Json::BOOL, bool> {
-    bool bool_value() const override {
-        return m_value;
-    }
+    bool bool_value() const override { return m_value; }
 public:
     explicit JsonBoolean(bool value) : Value(value) {}
 };
 
 class JsonString final : public Value<Json::STRING, string> {
-    const string &string_value() const override {
-        return m_value;
-    }
+    const string &string_value() const override { return m_value; }
 public:
     explicit JsonString(const string &value) : Value(value) {}
     explicit JsonString(string &&value)      : Value(move(value)) {}
 };
 
 class JsonArray final : public Value<Json::ARRAY, Json::array> {
-    const Json::array &array_items() const override {
-        return m_value;
-    }
+    const Json::array &array_items() const override { return m_value; }
     const Json & operator[](size_t i) const override;
 public:
     explicit JsonArray(const Json::array &value) : Value(value) {}
@@ -238,9 +210,7 @@ public:
 };
 
 class JsonObject final : public Value<Json::OBJECT, Json::object> {
-    const Json::object &object_items() const override {
-        return m_value;
-    }
+    const Json::object &object_items() const override { return m_value; }
     const Json & operator[](const string &key) const override;
 public:
     explicit JsonObject(const Json::object &value) : Value(value) {}
@@ -249,7 +219,7 @@ public:
 
 class JsonNull final : public Value<Json::NUL, NullStruct> {
 public:
-    JsonNull() : Value( {}) {}
+    JsonNull() : Value({}) {}
 };
 
 /* * * * * * * * * * * * * * * * * * * *
@@ -297,58 +267,24 @@ Json::Json(Json::object &&values)      : m_ptr(make_shared<JsonObject>(move(valu
  * Accessors
  */
 
-Json::Type Json::type()                           const {
-    return m_ptr->type();
-}
-double Json::number_value()                       const {
-    return m_ptr->number_value();
-}
-int Json::int_value()                             const {
-    return m_ptr->int_value();
-}
-bool Json::bool_value()                           const {
-    return m_ptr->bool_value();
-}
-const string & Json::string_value()               const {
-    return m_ptr->string_value();
-}
-const vector<Json> & Json::array_items()          const {
-    return m_ptr->array_items();
-}
-const map<string, Json> & Json::object_items()    const {
-    return m_ptr->object_items();
-}
-const Json & Json::operator[] (size_t i)          const {
-    return (*m_ptr)[i];
-}
-const Json & Json::operator[] (const string &key) const {
-    return (*m_ptr)[key];
-}
+Json::Type Json::type()                           const { return m_ptr->type();         }
+double Json::number_value()                       const { return m_ptr->number_value(); }
+int Json::int_value()                             const { return m_ptr->int_value();    }
+bool Json::bool_value()                           const { return m_ptr->bool_value();   }
+const string & Json::string_value()               const { return m_ptr->string_value(); }
+const vector<Json> & Json::array_items()          const { return m_ptr->array_items();  }
+const map<string, Json> & Json::object_items()    const { return m_ptr->object_items(); }
+const Json & Json::operator[] (size_t i)          const { return (*m_ptr)[i];           }
+const Json & Json::operator[] (const string &key) const { return (*m_ptr)[key];         }
 
-double                    JsonValue::number_value()              const {
-    return 0;
-}
-int                       JsonValue::int_value()                 const {
-    return 0;
-}
-bool                      JsonValue::bool_value()                const {
-    return false;
-}
-const string &            JsonValue::string_value()              const {
-    return statics().empty_string;
-}
-const vector<Json> &      JsonValue::array_items()               const {
-    return statics().empty_vector;
-}
-const map<string, Json> & JsonValue::object_items()              const {
-    return statics().empty_map;
-}
-const Json &              JsonValue::operator[] (size_t)         const {
-    return static_null();
-}
-const Json &              JsonValue::operator[] (const string &) const {
-    return static_null();
-}
+double                    JsonValue::number_value()              const { return 0; }
+int                       JsonValue::int_value()                 const { return 0; }
+bool                      JsonValue::bool_value()                const { return false; }
+const string &            JsonValue::string_value()              const { return statics().empty_string; }
+const vector<Json> &      JsonValue::array_items()               const { return statics().empty_vector; }
+const map<string, Json> & JsonValue::object_items()              const { return statics().empty_map; }
+const Json &              JsonValue::operator[] (size_t)         const { return static_null(); }
+const Json &              JsonValue::operator[] (const string &) const { return static_null(); }
 
 const Json & JsonObject::operator[] (const string &key) const {
     auto iter = m_value.find(key);
@@ -448,37 +384,37 @@ struct JsonParser final {
      * Advance comments (c-style inline and multiline).
      */
     bool consume_comment() {
-        bool comment_found = false;
-        if (str[i] == '/') {
+      bool comment_found = false;
+      if (str[i] == '/') {
+        i++;
+        if (i == str.size())
+          return fail("unexpected end of input after start of comment", false);
+        if (str[i] == '/') { // inline comment
+          i++;
+          // advance until next line, or end of input
+          while (i < str.size() && str[i] != '\n') {
             i++;
-            if (i == str.size())
-                return fail("unexpected end of input after start of comment", false);
-            if (str[i] == '/') { // inline comment
-                i++;
-                // advance until next line, or end of input
-                while (i < str.size() && str[i] != '\n') {
-                    i++;
-                }
-                comment_found = true;
-            }
-            else if (str[i] == '*') { // multiline comment
-                i++;
-                if (i > str.size()-2)
-                    return fail("unexpected end of input inside multi-line comment", false);
-                // advance until closing tokens
-                while (!(str[i] == '*' && str[i+1] == '/')) {
-                    i++;
-                    if (i > str.size()-2)
-                        return fail(
-                                   "unexpected end of input inside multi-line comment", false);
-                }
-                i += 2;
-                comment_found = true;
-            }
-            else
-                return fail("malformed comment", false);
+          }
+          comment_found = true;
         }
-        return comment_found;
+        else if (str[i] == '*') { // multiline comment
+          i++;
+          if (i > str.size()-2)
+            return fail("unexpected end of input inside multi-line comment", false);
+          // advance until closing tokens
+          while (!(str[i] == '*' && str[i+1] == '/')) {
+            i++;
+            if (i > str.size()-2)
+              return fail(
+                "unexpected end of input inside multi-line comment", false);
+          }
+          i += 2;
+          comment_found = true;
+        }
+        else
+          return fail("malformed comment", false);
+      }
+      return comment_found;
     }
 
     /* consume_garbage()
@@ -486,16 +422,16 @@ struct JsonParser final {
      * Advance until the current character is non-whitespace and non-comment.
      */
     void consume_garbage() {
-        consume_whitespace();
-        if(strategy == JsonParse::COMMENTS) {
-            bool comment_found = false;
-            do {
-                comment_found = consume_comment();
-                if (failed) return;
-                consume_whitespace();
-            }
-            while(comment_found);
+      consume_whitespace();
+      if(strategy == JsonParse::COMMENTS) {
+        bool comment_found = false;
+        do {
+          comment_found = consume_comment();
+          if (failed) return;
+          consume_whitespace();
         }
+        while(comment_found);
+      }
     }
 
     /* get_next_token()

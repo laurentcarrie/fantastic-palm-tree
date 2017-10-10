@@ -7,7 +7,9 @@
 #include <ctime>
 #include <iomanip>
 #include <numeric>
-
+#ifdef WINDOWS
+#include <Windows.h>
+#endif
 #include "song.h"
 #include "datamodel.h"
 #include "read_util.h"
@@ -164,7 +166,13 @@ void write_preamble(std::ofstream& fout) {
 " ;
 
   std::time_t t = std::time(nullptr) ;
+#ifdef WIN32
+  std::tm tm2 ;
+  std::tm* tm = &tm2; 
+  localtime_s(tm,&t);
+#else
   std::tm* tm = std::localtime(&t) ;
+#endif
   fout << "\\fancyfoot[L]{généré le " 
        << std::setw(2) << std::setfill('0') << tm->tm_mday << "/" 
        << std::setw(2) << std::setfill('0') << (tm->tm_mon+1) << "/" 

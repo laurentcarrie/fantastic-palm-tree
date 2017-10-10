@@ -76,7 +76,7 @@ void Song::read(const Datamodel::Conf& la_conf,const std::string& filename) {
   // std::ifstream fin(la_conf.srcdir_ + "/" + filename,std::ios::binary) ;
   std::ifstream fin(filename_) ;
   if (!fin.good()) {
-    std::cout << "BAD file : " << filename_ << std::endl ;
+    std::cout << "xxBAD file : '" << filename_ << "'" << std::endl ;
     return ;
   }
   r(fin) ;
