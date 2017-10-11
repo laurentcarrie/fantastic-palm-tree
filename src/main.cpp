@@ -79,6 +79,39 @@ Datamodel::Conf read_conf(const std::string& in) {
 
 
 
+void test() {
+	try {
+		WIN32_FIND_DATA ffd;
+		HANDLE hFind = INVALID_HANDLE_VALUE;
+		DWORD dwError = 0;
+
+		std::string s = "d:\\users\\t0005634\\Documents\\work\\fantastic-palm-tree\\songs\\*";
+
+		hFind = FindFirstFile(s.c_str(), &ffd);
+		if (hFind == INVALID_HANDLE_VALUE) {
+			throw std::runtime_error("bad file " + s);
+		}
+
+		for (;;) {
+			if (FindNextFile(hFind, &ffd) == 0) { break; }
+			std::cout << "found '" << ffd.cFileName << "'" << std::endl;
+			if (ffd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)   {
+				std::cout << "------- is a directory " << std::endl;
+			}
+			else {
+				std::cout << "------- is a file " << std::endl;
+			}
+		}
+	}
+	catch (std::exception& e) {
+		std::cout << "caught " << e.what() << std::endl ;
+	}
+	catch (...) {
+		std::cout << "caught unknown exception" << std::endl;
+	}
+};
+
+
 
 
 
@@ -86,6 +119,9 @@ int main(int argc,char** argv) {
   try {
     std::cout << __FILE__ << ":" << __LINE__ << std::endl ;
     //  rude::Socket socket ;
+
+	//test();
+	//exit(1);
 
     assert(argc>0) ;
     std::ifstream file(argv[1],std::ios::binary) ;

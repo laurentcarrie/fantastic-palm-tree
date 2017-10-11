@@ -53,6 +53,8 @@ template<class T> T walk_tree(const std::string& root_dir,
 }
 #else
 // version windows
+#define ValidDir(data) strcmp(data.cFileName,".")&&strcmp(data.cFileName,"..")
+
 template<class T> T walk_tree(const std::string& root_dir,
 			      T& acc,
 			      std::function<void (T&,const std::string&,bool is_dir)>& accumulator) {
@@ -61,31 +63,38 @@ template<class T> T walk_tree(const std::string& root_dir,
     
    WIN32_FIND_DATA ffd;
    //int filesize;
-   char szDir[MAX_PATH];
+   //char szDir[MAX_PATH];
    //size_t length_of_arg;
    HANDLE hFind = INVALID_HANDLE_VALUE;
    DWORD dwError=0;
       
-
 	std::cout << __FILE__ << ":" << __LINE__ << std::endl ;
 	std::cout << "root dir '" << root_dir << "'" << std::endl ;
 
-    hFind = FindFirstFile(szDir, &ffd);
-	if (INVALID_HANDLE_VALUE == hFind) {
-		throw std::runtime_error("bad file") ;
-	}
-	 
-	do {
-	std::cout << "found '" << ffd.cFileName << "''" << std::endl ;
-	if (ffd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)   {
-		  accumulator(acc,root_dir + "\\" + std::string(ffd.cFileName),true) ;
-		  r(acc,root_dir + "\\" + std::string(ffd.cFileName)) ;
-	}
-	else {
-	  accumulator(acc,root_dir + "\\" + std::string(ffd.cFileName),false) ;
+	std::string s = root_dir + "\\*" ;
+    hFind = FindFirstFile(s.c_str(), &ffd);
+	if (hFind == INVALID_HANDLE_VALUE ) {
+		throw std::runtime_error("bad file " + root_dir ) ;
 	}
 
-	}    while (FindNextFile(hFind, &ffd) != 0);
+	do {
+		std::cout << "found '" << ffd.cFileName << "'" << std::endl ;
+		if (!strcmp(ffd.cFileName,".")) {
+			std::cout << "skip" << ffd.cFileName << std::endl ;
+		}
+		else if (!strcmp(ffd.cFileName,"..")) {
+			std::cout << "skip" << ffd.cFileName << std::endl ;
+		}
+		else if (ffd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)   {
+				std::cout << "------- is a directory " << std::endl ;   
+			    // accumulator(acc,root_dir + "\\" + std::string(ffd.cFileName),true) ;
+			    r(acc,root_dir + "\\" + std::string(ffd.cFileName)) ;
+		}
+		else {
+			std::cout << "------- is a file " << std::endl ;   
+			//  accumulator(acc,root_dir + "\\" + std::string(ffd.cFileName),false) ;
+		}
+	} while (FindNextFile(hFind, &ffd) != 0);
   } ;
   r(acc,root_dir) ;
   return acc ;

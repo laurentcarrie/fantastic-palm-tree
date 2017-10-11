@@ -222,6 +222,7 @@ std::string normalize_path(const std::string& path) {
   if (path[path.length()] == '/') {
     return path.substr(0,path.length()-1) ;
   }
+  return path;
 }
 
 		     

@@ -101,8 +101,8 @@ drawunboxed(" << pid << "_7) ;\n\
 
 
 
-  std::function<void (const std::string& pid,int i,const Datamodel::Accord& a,int nb)> e_of_chord_with_position =
-    [&fout,index,bar,&e_of_chord_with_position,&e_of_chord_without_position,&has_position]  (const std::string& pid,int i,const Datamodel::Accord& a,int nb) {
+  std::function<void (const std::string& pid,int i,const Datamodel::Accord& a,double nb)> e_of_chord_with_position =
+    [&fout,index,bar,&e_of_chord_with_position,&e_of_chord_without_position,&has_position]  (const std::string& pid,int i,const Datamodel::Accord& a,double nb) {
   std::string bid ;
   { std::ostringstream oss ; oss << pid << "_" << i ; bid = oss.str() ; }
   assert(false) ;
