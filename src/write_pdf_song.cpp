@@ -67,9 +67,7 @@ std::string replace_chord(const std::string& line) {
     r(line) ;
   } ;
   std::string ret(line) ;
-  std::cout << "BBBBBBBBBBefore : " << line << std::endl ;
   r(ret) ;
-  std::cout << "AAAAAAAAAAAAAafter : " << ret << std::endl ;
   return ret ;
 }
   

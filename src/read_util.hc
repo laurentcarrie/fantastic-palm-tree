@@ -87,12 +87,12 @@ template<class T> T walk_tree(const std::string& root_dir,
 		}
 		else if (ffd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)   {
 				std::cout << "------- is a directory " << std::endl ;   
-			    // accumulator(acc,root_dir + "\\" + std::string(ffd.cFileName),true) ;
-			    r(acc,root_dir + "\\" + std::string(ffd.cFileName)) ;
+			    accumulator(acc,root_dir + "/" + std::string(ffd.cFileName),true) ;
+			    r(acc,root_dir + "/" + std::string(ffd.cFileName)) ;
 		}
 		else {
 			std::cout << "------- is a file " << std::endl ;   
-			//  accumulator(acc,root_dir + "\\" + std::string(ffd.cFileName),false) ;
+			accumulator(acc,root_dir + "/" + std::string(ffd.cFileName),false) ;
 		}
 	} while (FindNextFile(hFind, &ffd) != 0);
   } ;
