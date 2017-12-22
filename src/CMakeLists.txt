@@ -20,3 +20,10 @@ add_executable(f4242 main.cpp song.cpp json11.cpp
 			 song.h
 			 tablature.h
 		     )
+
+
+add_custom_target(
+	run
+	DEPENDS f4242
+	COMMAND Debug/f4242.exe info.json
+)
