@@ -101,11 +101,11 @@ drawunboxed(" << pid << "_7) ;\n\
 
 
 
-  std::function<void (const std::string& pid,int i,const Datamodel::Accord& a,double nb)> e_of_chord_with_position =
-    [&fout,index,bar,&e_of_chord_with_position,&e_of_chord_without_position,&has_position]  (const std::string& pid,int i,const Datamodel::Accord& a,double nb) {
+  std::function<void (const std::string& pid,int i,const Datamodel::Accord& a,int nb)> e_of_chord_with_position =
+    [&fout,index,bar,&e_of_chord_with_position,&e_of_chord_without_position,&has_position]  (const std::string& pid,int i,const Datamodel::Accord& a,int nb) {
   std::string bid ;
   { std::ostringstream oss ; oss << pid << "_" << i ; bid = oss.str() ; }
-  assert(false) ;
+  // assert(false) ;
   if ( a.t_.has_chord_ ) {
     fout << "\n\
 %% " __FILE__ << ":" << __LINE__ << "\n\
@@ -162,12 +162,13 @@ drawboxed(b" << index << ") ;\n\
 " ;
 
   // if (a.t_.has_position_) {
-  if (has_position) {
+  if (false) {
     double nb = 4.5  ;
     int count=0 ;
     for (auto c : bar.chords_) {
-      assert(false) ;
+      //assert(false) ;
       int pos = c.t_.position_ ;
+	  pos = 0;
       std::string bid ; {
 	std::ostringstream oss ; oss << "b" << index << "_" << count ;
 	bid = oss.str() ;
@@ -194,6 +195,7 @@ boxit." << bid << "() ;\n\
 drawunboxed(" << bid << ") ;\n\
 " ;
       count++ ;
+
       e_of_chord_with_position(bid,count,c,nb) ;
     } 
   } else {

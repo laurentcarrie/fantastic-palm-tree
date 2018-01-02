@@ -68,8 +68,7 @@ template<class T> T walk_tree(const std::string& root_dir,
    HANDLE hFind = INVALID_HANDLE_VALUE;
    DWORD dwError=0;
       
-	std::cout << __FILE__ << ":" << __LINE__ << std::endl ;
-	std::cout << "root dir '" << root_dir << "'" << std::endl ;
+	// std::cout << "root dir '" << root_dir << "'" << std::endl ;
 
 	std::string s = root_dir + "\\*" ;
     hFind = FindFirstFile(s.c_str(), &ffd);
@@ -78,20 +77,20 @@ template<class T> T walk_tree(const std::string& root_dir,
 	}
 
 	do {
-		std::cout << "found '" << ffd.cFileName << "'" << std::endl ;
+		// std::cout << "found '" << ffd.cFileName << "'" << std::endl ;
 		if (!strcmp(ffd.cFileName,".")) {
-			std::cout << "skip" << ffd.cFileName << std::endl ;
+			// std::cout << "skip" << ffd.cFileName << std::endl ;
 		}
 		else if (!strcmp(ffd.cFileName,"..")) {
-			std::cout << "skip" << ffd.cFileName << std::endl ;
+			// std::cout << "skip" << ffd.cFileName << std::endl ;
 		}
 		else if (ffd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)   {
-				std::cout << "------- is a directory " << std::endl ;   
+				// std::cout << "------- is a directory " << std::endl ;   
 			    accumulator(acc,root_dir + "/" + std::string(ffd.cFileName),true) ;
 			    r(acc,root_dir + "/" + std::string(ffd.cFileName)) ;
 		}
 		else {
-			std::cout << "------- is a file " << std::endl ;   
+			// std::cout << "------- is a file " << std::endl ;   
 			accumulator(acc,root_dir + "/" + std::string(ffd.cFileName),false) ;
 		}
 	} while (FindNextFile(hFind, &ffd) != 0);

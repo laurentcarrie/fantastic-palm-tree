@@ -96,7 +96,7 @@ pickup pencircle scaled 0.15bp ;\n\
 		       lowest_note = std::accumulate
 		       (p.notes_.begin(),p.notes_.end(),1,
 			[](int acc,const Tablature::note& n) {
-			 std::cout << "acc = " << acc << " corde = " << n.corde_ << std::endl ;
+			 // std::cout << "acc = " << acc << " corde = " << n.corde_ << std::endl ;
 			 if (acc>n.corde_) { return acc ; }
 			 else { return n.corde_ ; }
 		       }) ;

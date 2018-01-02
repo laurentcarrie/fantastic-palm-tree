@@ -146,7 +146,7 @@ Grille::Grille(std::ifstream& fin,const std::string& titre) {
         char buffer[1001] ;
         try {
             if (fin.eof()) {
-                std::cout << "EOF" << std::endl ;
+                // std::cout << "EOF" << std::endl ;
                 return ;
             }
             if (fin.bad()) return ;

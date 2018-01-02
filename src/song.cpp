@@ -21,13 +21,12 @@ std::string concat_filenames(const std::string& n1,const std::string& n2) {
 
 
 void Song::read(const Datamodel::Conf& la_conf,const std::string& filename) {
-  std::cout << __FILE__ << ":" << __LINE__ << " Song::read '" << filename << "'" << std::endl ;
   std::function<void(std::ifstream&)> r =
     [&r,this](std::ifstream& fin) {
         char line[1001] ;
         try {
             if (fin.eof()) {
-                std::cout << "EOF" << std::endl ;
+                // std::cout << "EOF" << std::endl ;
                 return ;
             }
             if (fin.bad()) return ;
@@ -45,7 +44,7 @@ void Song::read(const Datamodel::Conf& la_conf,const std::string& filename) {
             }
             else if ( word == "\\grille" ) {
 	      grilles_.push_back(Grille(fin,arg)) ;
-	      std::cout << "GGGGGGGGGGGGGGGGGGrilles : " << grilles_.size() << std::endl ;
+	      // std::cout << "GGGGGGGGGGGGGGGGGGrilles : " << grilles_.size() << std::endl ;
             }
             else if ( word == "\\tab" ) {
 	      tablatures_.push_back(Tablature(fin,arg)) ;
@@ -80,7 +79,7 @@ void Song::read(const Datamodel::Conf& la_conf,const std::string& filename) {
     return ;
   }
   r(fin) ;
-  std::cout << "IIIIIIInfos " << grilles_.size() << " grilles ; " << tablatures_.size() << " tablatures ; " << lyrics_.size() << " lyrics " << std::endl ;
+  // std::cout << "IIIIIIInfos " << grilles_.size() << " grilles ; " << tablatures_.size() << " tablatures ; " << lyrics_.size() << " lyrics " << std::endl ;
   return ;
 }
 

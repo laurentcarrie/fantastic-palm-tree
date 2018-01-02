@@ -175,7 +175,7 @@ std::string tex_of_string (const std::string& s) {
   std::string s1(s.substr(0,pos)) ;
   std::string s2(s.substr(pos+1,s.size()-pos-1)) ;
   std::string ret(s1 + "$\\sharp$" + s2) ;
-  std::cout << "tex_of_string \n'" << s << "'\n'" << ret << "'" << std::endl ;
+  // std::cout << "tex_of_string \n'" << s << "'\n'" << ret << "'" << std::endl ;
   return (tex_of_string(ret)) ;
 }
 
