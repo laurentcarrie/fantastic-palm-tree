@@ -189,6 +189,81 @@ void write_preamble(std::ofstream& fout) {
 " ;
 }
 
+
+const void Song::write_body(const Datamodel::Conf& la_conf,std::ofstream& fout) {
+	std::string path(replace_extension(filename_, ".tex"));
+	path = replace_path(path, la_conf.srcdir_.c_str(), la_conf.builddir_.c_str());
+
+	std::function<void(std::ofstream&, const std::string&)>write_grilles = [this](std::ofstream&fout, const std::string &file_basename) {
+		int count = 0;
+		fout << "\
+				\\begin{multicols}{2}\n\
+				\n\
+				";
+		for (auto g : this->grilles_) {
+			fout << "\
+					\\begin{tabular}{c}\n\
+					\\\\\n\
+					{\\commentfont \\hl{" << tex_of_string(g.t_.titre_) << "}}\n\
+					\\\\\n\
+					\n\
+					\\includegraphics{" << basename(file_basename) << "-grille-" << count << ".mps}\n\
+					\\end{tabular}\n\
+					";
+			count++;
+		}
+		fout << "\
+				\\end{multicols}\n\
+				";
+	};
+	std::function<void(std::ofstream&, const std::string&)>write_tablatures = [this](std::ofstream&fout, const std::string &file_basename) {
+		int count = 0;
+		fout << "\\begin{multicols}{2}\n";
+		for (auto b : this->tablatures_) {
+			fout << "\
+					\\begin{tabular}{c}\n\
+					\\\\\n\n\
+					{\\commentfont \\hl{" << tex_of_string(b.t_.titre_) << "}}\n\
+					\\\\\n\
+					\n\
+					\\includegraphics{" << basename(file_basename) << "-tab-" << count << ".mps}\n \
+					\\end{tabular}\n\
+					";
+			count++;
+		}
+		fout << "\
+				\\end{multicols}\n\
+				";
+	};
+	std::function<void(std::ofstream&)>write_lyrics = [this](std::ofstream&fout) {
+		// fout << "LLLLLLLLLLLLLL" << this->lyrics_.size() << std::endl; 
+		fout << "\\begin{multicols}{2}\n";
+		for (auto l : this->lyrics_) {
+			fout << "\\begin{lyricsfont}\n";
+			fout << "\\begin{verse}\n";
+			fout << "{\\commentfont \\hl{" << tex_of_string(l.title_) << "}} \n";
+			for (auto line : l.data_) {
+				if (line == "\\") {
+					fout << "\n\\end{verse}\n\\begin{verse}\n";
+				}
+				else if (line.size()>2 && line[0] == '{') {
+					fout << "{\\sethlcolor{grey8}\\commentfont \\hl" << line << "}\\\\\n";
+				}
+				else {
+					fout << tex_of_string(replace_chord(line)) << "\\\\" << std::endl;
+				}
+			}
+			fout << "\\end{verse}\n";
+			fout << "\\end{lyricsfont}\n\n";
+		}
+		fout << "\\end{multicols}\n\n";
+	};
+
+	write_grilles(fout, replace_extension(path, ""));
+	write_tablatures(fout, replace_extension(path, ""));
+	write_lyrics(fout);
+}
+
 const void Song::write(const Datamodel::Conf& la_conf) {
 
   std::cout << "Song::write " << filename_ << std::endl ;
@@ -209,103 +284,28 @@ const void Song::write(const Datamodel::Conf& la_conf) {
 		  }) ;
 
 
-  std::function<void(std::ofstream&)> write_1 =
-    [this](std::ofstream&fout) {
-    fout << "\
-\\title{" << this->titre_ << "}\n\
-\\author{" << this->auteur_ << "}\n\
-\\fancyhead[L]{{\\titlefont " << this->titre_ << "} } \n\
-\\fancyhead[R]{{\\authorfont "<<  this->auteur_ << "}} \n\
-\\fancyhead[C]{} \n\
-\n\
-\\begin{document}\n\
-\n\
-"
-    ;
-  } ;
-
-
-
-  std::function<void(std::ofstream&,const std::string&)>write_grilles =
-    [this](std::ofstream&fout,const std::string &file_basename) {
-    int count=0 ;
-    fout << "\
-\\begin{multicols}{2}\n\
-\n\
-" ;
-    for (auto g:this->grilles_) {
-      fout << "\
-\\begin{tabular}{c}\n\
-\\\\\n\
-{\\commentfont \\hl{" << tex_of_string(g.t_.titre_) << "}}\n\
-\\\\\n\
-\n\
-\\includegraphics{" << basename(file_basename) << "-grille-" << count << ".mps}\n\
-\\end{tabular}\n\
-" ;
-      count++ ;
-    }
-    fout << "\
-\\end{multicols}\n\
-" ;
-  } ;
-
-
-  std::function<void(std::ofstream&,const std::string&)>write_tablatures =
-    [this](std::ofstream&fout,const std::string &file_basename) {
-    int count=0 ;
-    fout << "\\begin{multicols}{2}\n" ;
-    for (auto b:this->tablatures_) {
-      fout << "\
-\\begin{tabular}{c}\n\
-\\\\\n\n\
-{\\commentfont \\hl{" << tex_of_string(b.t_.titre_) << "}}\n\
-\\\\\n\
-\n\
-\\includegraphics{" << basename(file_basename) << "-tab-" << count << ".mps}\n \
-\\end{tabular}\n\
-" ;
-      count++ ;
-    }
-    fout << "\
-\\end{multicols}\n\
-" ;
-  } ;
-
-
-  std::function<void(std::ofstream&)>write_lyrics =
-    [this](std::ofstream&fout) {
-    // fout << "LLLLLLLLLLLLLL" << this->lyrics_.size() << std::endl; 
-    fout << "\\begin{multicols}{2}\n" ;
-    for (auto l:this->lyrics_) {
-      fout << "\\begin{lyricsfont}\n" ;
-      fout << "\\begin{verse}\n" ;
-      fout << "{\\commentfont \\hl{" << tex_of_string(l.title_) << "}} \n" ;
-      for (auto line:l.data_) {
-	if (line=="\\") {
-	  fout << "\n\\end{verse}\n\\begin{verse}\n" ;
-	}
-	else if (line.size()>2 && line[0]=='{') {
-	  fout << "{\\sethlcolor{grey8}\\commentfont \\hl" << line << "}\\\\\n" ;
-	}
-	else {
-	  fout << tex_of_string(replace_chord(line)) << "\\\\" << std::endl; 
-	}
-      }
-      fout << "\\end{verse}\n" ;
-      fout << "\\end{lyricsfont}\n\n" ;
-    }
-    fout << "\\end{multicols}\n\n" ;
-  } ;
-
+  
+  
   std::string path (replace_extension(filename_,".tex")) ;
   path = replace_path(path,la_conf.srcdir_.c_str(),la_conf.builddir_.c_str()) ;
   std::cout << "Write tex file '" << path << "'" << std::endl ;
   std::ofstream fout(path) ;
   write_preamble(fout) ;
-  write_1(fout) ;
-  write_grilles(fout,replace_extension(path,"")) ;
-  write_tablatures(fout,replace_extension(path,"")) ;
-  write_lyrics(fout) ;
+  std::function<void(std::ofstream&)> write_1 = [this](std::ofstream&fout) {
+		fout << "\
+				\\title{" << this->titre_ << "}\n\
+				\\author{" << this->auteur_ << "}\n\
+				\\fancyhead[L]{{\\titlefont " << this->titre_ << "} } \n\
+				\\fancyhead[R]{{\\authorfont " << this->auteur_ << "}} \n\
+				\\fancyhead[C]{} \n\
+				\n\
+				\\begin{document}\n\
+				\n\
+				"
+				;
+	};
+
+  write_1(fout);
+  write_body(la_conf,fout);
   fout << "\n\\end{document}\n" ;
 }

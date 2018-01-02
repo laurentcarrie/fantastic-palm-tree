@@ -141,16 +141,90 @@ int main(int argc, char** argv) {
 		if (fout_cmake.bad()) {
 			throw std::runtime_error("bad file " + cmake_filename);
 		}
-		fout_cmake << "\
-					  project(\"songs\")\n\
-					  cmake_minimum_required(VERSION 2.8)\n\
-					  #set(CMAKE_VERION 3.5)\n\
-					  include(UseLATEX.cmake)\n\
-					  ";
+		fout_cmake << "project(\"songs\")" << std::endl;
+		fout_cmake << "cmake_minimum_required(VERSION 2.8)" << std::endl;
+		fout_cmake << "#set(CMAKE_VERION 3.5)" << std::endl;
+		fout_cmake << "include(UseLATEX.cmake)" << std::endl;
+		fout_cmake << "set(LATEX_OUTPUT_PATH xxx-pdf/" << ")" << std::endl;
 
 
-		std::function<void(bool& acc, const std::string& filename, bool)> walk =
-			[&la_conf, &fout_cmake](bool& acc, const std::string& filename, bool is_dir) {
+		std::function<void(const std::string&)> write_song_entry_in_makefile = [&la_conf,&fout_cmake](const std::string& filename){
+				Song song;
+				song.read(la_conf, filename);
+				song.write(la_conf);
+				std::string name(replace_path(filename, (la_conf.srcdir_ + "/").c_str(), ""));
+				name = replace_extension(name, "");
+
+				fout_cmake << "#================= song " << std::endl;
+				// fout_cmake << "set(LATEX_OUTPUT_PATH xxx-pdf/" << basename(dirname(filename)) << ")" << std::endl;
+				fout_cmake << "latex_get_output_path(output_dir)" << std::endl;
+				fout_cmake << "add_custom_target(" << std::endl;
+				fout_cmake << "  install_" << basename(dirname(filename)) << "_" << basename(name) << std::endl;
+				fout_cmake << "  DEPENDS ${output_dir}/" << basename(name) << ".pdf" << std::endl;
+				fout_cmake << "  COMMAND mkdir -p install/" << dirname(name) << std::endl;
+				fout_cmake << "  COMMAND cp ${output_dir}/" << basename(name) << ".pdf install/" << dirname(name) << "/." << std::endl;
+				fout_cmake << ")" << std::endl;
+				fout_cmake << "add_latex_document(" << std::endl;
+				fout_cmake << "  " << name << ".tex" << std::endl;
+				fout_cmake << "  FORCE_PDF" << std::endl;
+				fout_cmake << "  DEPENDS" << std::endl;
+
+
+				for (unsigned int count = 0; count < song.grilles_.size(); ++count) {
+					fout_cmake << "    ${output_dir}/" << basename(name) << "-grille-" << count << ".mps\n";
+				}
+				for (unsigned int count = 0; count < song.tablatures_.size(); ++count) {
+					fout_cmake << "    ${output_dir}/" << basename(name) << "-tab-" << count << ".mps\n";
+				}
+				fout_cmake << ")\n";
+
+				for (unsigned int count = 0; count < song.grilles_.size(); ++count) {
+					fout_cmake << "add_custom_command(\n\  OUTPUT ${output_dir}/" << basename(name) << "-grille-" << count << ".mps" << std::endl;
+					fout_cmake << "  DEPENDS " << name << "-grille-" << count << ".mp" << std::endl;
+					fout_cmake << "  WORKING_DIRECTORY " << basename(dirname(filename)) << std::endl;
+					fout_cmake << "  COMMAND mpost " << basename(name) << "-grille-" << count << std::endl;
+					fout_cmake << "  COMMAND cp " << basename(name) << "-grille-" << count << ".1  ${output_dir}/" << basename(name) << "-grille-" << count << ".mps" << std::endl ;
+					fout_cmake << ")" << std::endl;
+				}
+				for (unsigned int count = 0; count < song.tablatures_.size(); ++count) {
+					fout_cmake << "add_custom_command(" << std::endl;
+					fout_cmake << "  OUTPUT ${output_dir}/" << basename(name) << "-tab-" << count << ".mps" << std::endl;
+					fout_cmake << "  DEPENDS " << name << "-tab-" << count << ".mp" << std::endl;
+					fout_cmake << "  WORKING_DIRECTORY " << basename(dirname(filename)) << std::endl;
+					fout_cmake << "  COMMAND mpost " << basename(name) << "-tab-" << count << std::endl;
+					fout_cmake << "  COMMAND cp " << basename(name) << "-tab-" << count << ".1  ${output_dir}/" << basename(name) << "-tab-" << count << ".mps" << std::endl;
+					fout_cmake << ") " << std::endl;
+				}
+
+		};
+		std::function<void(const std::string&)> write_book_entry_in_makefile = [&la_conf,&fout_cmake](const std::string& filename){
+			Book book;
+			book.read(la_conf, filename);
+			book.write(la_conf);
+			std::string name(replace_path(filename, (la_conf.srcdir_ + "/").c_str(), ""));
+			name = replace_extension(name, "");
+			fout_cmake << "#================= book " << std::endl;
+
+			// fout_cmake << "set(LATEX_OUTPUT_PATH xxx-pdf/" << basename(dirname(filename)) << ")" << std::endl;
+			fout_cmake << "latex_get_output_path(output_dir)" << std::endl;
+			fout_cmake << "add_custom_target(" << std::endl;
+			fout_cmake << "  install_book_" << basename(name) << std::endl;
+			fout_cmake << "  DEPENDS ${output_dir}/" << basename(name) << ".pdf" << std::endl;
+			fout_cmake << "  COMMAND mkdir -p install/" << dirname(name) << std::endl;
+			fout_cmake << "  COMMAND cp ${output_dir}/" << basename(name) << ".pdf install/" << dirname(name) << "/." << std::endl;
+			fout_cmake << ")" << std::endl;
+			fout_cmake << "add_latex_document(" << std::endl;
+			fout_cmake << "  " << name << ".tex" << std::endl;
+			fout_cmake << "  FORCE_PDF" << std::endl;
+			fout_cmake << "  DEPENDS" << std::endl;
+			std::for_each(book.songs_.begin(), book.songs_.end(), [&fout_cmake](Book::song_info& info) {
+				if (info.found_) {
+					fout_cmake << "    install_" << basename(dirname(info.filename_)) << "_" << basename(replace_extension(info.filename_,"")) << std::endl;
+				}
+			});
+			fout_cmake << ")" << std::endl;
+		};
+		std::function<void(bool& acc, const std::string& filename, bool)> walk = [&la_conf, &fout_cmake,&write_song_entry_in_makefile,&write_book_entry_in_makefile](bool& acc, const std::string& filename, bool is_dir) {
 			if (is_dir) {
 				std::string builddir(replace_path(filename, la_conf.srcdir_.c_str(), la_conf.builddir_.c_str()));
 				std::cout << "mkdir '" << builddir << "'" << std::endl;
@@ -163,59 +237,10 @@ int main(int argc, char** argv) {
 
 			}
 			else if (extension(filename) == "song") {
-				Song song;
-				song.read(la_conf, filename);
-				song.write(la_conf);
-				std::string name(replace_path(filename, (la_conf.srcdir_ + "/").c_str(), ""));
-				name = replace_extension(name, "");
-				fout_cmake << "\n\
-							  \n\
-							  set(LATEX_OUTPUT_PATH xxx-pdf/" << basename(dirname(filename)) << ")\n\
-							  latex_get_output_path(output_dir)\n\
-							  \n\
-							  add_custom_target(\n\
-							  install_" << basename(name) << " ALL\n\
-							  DEPENDS ${output_dir}/" << basename(name) << ".pdf\n\
-							  COMMAND mkdir -p install/" << dirname(name) << "\n\
-							  COMMAND cp ${output_dir}/" << basename(name) << ".pdf install/" << dirname(name) << "/.\n\
-							  )\n\
-							  \n\
-							  add_latex_document(\n\
-							  " << name << ".tex \n\
-							  FORCE_PDF \n\
-							  DEPENDS \n\
-							  ";
-
-
-				for (unsigned int count = 0; count < song.grilles_.size(); ++count) {
-					fout_cmake << "${output_dir}/" << basename(name) << "-grille-" << count << ".mps\n";
-				}
-				for (unsigned int count = 0; count < song.tablatures_.size(); ++count) {
-					fout_cmake << "${output_dir}/" << basename(name) << "-tab-" << count << ".mps\n";
-				}
-				fout_cmake << ")\n";
-
-				for (unsigned int count = 0; count < song.grilles_.size(); ++count) {
-					fout_cmake << "\n\
-								  add_custom_command(\n\
-								  OUTPUT ${output_dir}/" << basename(name) << "-grille-" << count << ".mps\n\
-								  DEPENDS " << name << "-grille-" << count << ".mp\n\
-								  WORKING_DIRECTORY " << basename(dirname(filename)) << "\n\
-								  COMMAND mpost " << basename(name) << "-grille-" << count << "\n\
-								  COMMAND cp " << basename(name) << "-grille-" << count << ".1  ${output_dir}/" << basename(name) << "-grille-" << count << ".mps \n \
-								  )\n ";
-				}
-				for (unsigned int count = 0; count < song.tablatures_.size(); ++count) {
-					fout_cmake << "\n\
-								  add_custom_command(\n\
-								  OUTPUT ${output_dir}/" << basename(name) << "-tab-" << count << ".mps\n\
-								  DEPENDS " << name << "-tab-" << count << ".mp\n\
-								  WORKING_DIRECTORY " << basename(dirname(filename)) << "\n\
-								  COMMAND mpost " << basename(name) << "-tab-" << count << "\n\
-								  COMMAND cp " << basename(name) << "-tab-" << count << ".1  ${output_dir}/" << basename(name) << "-tab-" << count << ".mps \n \
-								  )\n ";
-				}
-
+				write_song_entry_in_makefile(filename);
+			}
+			else if (extension(filename) == "book") {
+				write_book_entry_in_makefile(filename);
 			}
 			else {
 				std::cout << "unknown file : '" << filename << "'" << std::endl;
@@ -225,6 +250,18 @@ int main(int argc, char** argv) {
 
 		bool ret;
 		walk_tree(la_conf.srcdir_, ret, walk);
+
+		fout_cmake << "add_custom_target(\n  install_book\n";
+		std::function<void(bool& acc, const std::string& filename, bool)> walk_book_target = [&fout_cmake,&la_conf](bool& acc, const std::string&filename, bool is_dir){
+			if (!is_dir && (extension(filename) == "book")) {
+				std::string name(replace_path(filename, (la_conf.srcdir_ + "/books/").c_str(), ""));
+				name = replace_extension(name, "");
+				fout_cmake << "  DEPENDS install_book_" << name << std::endl;
+			}
+			return;
+		} ;
+		walk_tree(la_conf.srcdir_, ret, walk_book_target) ;
+		fout_cmake << ")" << std::endl;
 
 		std::cout << "DONE !" << std::endl;
 		return 0;

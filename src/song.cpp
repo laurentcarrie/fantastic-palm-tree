@@ -20,7 +20,7 @@ std::string concat_filenames(const std::string& n1,const std::string& n2) {
 }
 
 
-void Song::read(const Datamodel::Conf& la_conf,const std::string& filename) {
+bool Song::read(const Datamodel::Conf& la_conf,const std::string& filename) {
   std::function<void(std::ifstream&)> r =
     [&r,this](std::ifstream& fin) {
         char line[1001] ;
@@ -33,7 +33,7 @@ void Song::read(const Datamodel::Conf& la_conf,const std::string& filename) {
             if (fin.fail()) return ;
             fin.getline(line,1000) ;
             auto t=my_split(line) ;
-            std::string word = std::get<0>(t) ;
+			std::string word = std::get<0>(t);
 	    // std:: cout << "word : '" << word << "'" << std::endl ;
             std::string arg = std::get<1>(t) ;
             if ( word == "\\titre" ) {
@@ -75,11 +75,60 @@ void Song::read(const Datamodel::Conf& la_conf,const std::string& filename) {
   // std::ifstream fin(la_conf.srcdir_ + "/" + filename,std::ios::binary) ;
   std::ifstream fin(filename_) ;
   if (!fin.good()) {
-    std::cout << "xxBAD file : '" << filename_ << "'" << std::endl ;
-    return ;
+    std::cout << "BAD file : '" << filename_ << "'" << std::endl ;
+    return false ;
   }
   r(fin) ;
   // std::cout << "IIIIIIInfos " << grilles_.size() << " grilles ; " << tablatures_.size() << " tablatures ; " << lyrics_.size() << " lyrics " << std::endl ;
-  return ;
+  return true ;
+}
+
+void Book::read(const Datamodel::Conf& la_conf,const std::string& filename) {
+	print_index_ = false;
+	filename_ = filename;
+
+	std::cout << "read book '" << filename << "'" << std::endl;
+
+	std::function<void(std::ifstream&)> r = [&r, this, &la_conf
+	](std::ifstream& fin) {
+		char line[1001];
+		try {
+			if (fin.eof()) {
+				// std::cout << "EOF" << std::endl ;
+				return;
+			}
+			if (fin.bad()) return;
+			if (fin.fail()) return;
+			fin.getline(line, 1000);
+			std::string word = strip_string(line) ;
+
+			if (word == "\\print_index") {
+				this->print_index_ = true;
+			}
+			else if (word == " " || word == "" ) {
+
+			}
+			else {
+				song_info info;
+				info.filename_ = word;
+				info.song_ = new Song;
+				info.found_ = info.song_->read(la_conf, la_conf.srcdir_ + "/" + word);
+				this->songs_.push_back(info);
+			}
+			r(fin);
+		}
+		catch (std::runtime_error& err) {
+			std::cout << err.what() << std::endl;
+		}
+	};
+
+	std::ifstream fin(filename_);
+	if (!fin.good()) {
+		std::cout << "BAD file : '" << filename_ << "'" << std::endl;
+		return;
+	}
+	r(fin);
+	// std::cout << "IIIIIIInfos " << grilles_.size() << " grilles ; " << tablatures_.size() << " tablatures ; " << lyrics_.size() << " lyrics " << std::endl ;
+	return;
 }
 

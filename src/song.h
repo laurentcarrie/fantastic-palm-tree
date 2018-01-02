@@ -23,9 +23,29 @@ public:
   std::vector<Tablature> tablatures_ ;
   std::vector<Lyrics> lyrics_ ;
   int nb_croches_ ;
-  void read (const Datamodel::Conf&,const std::string&) ;
-  const void write (const Datamodel::Conf&) ;
+  bool read (const Datamodel::Conf&,const std::string&) ;
+  const void write_body(const Datamodel::Conf&,std::ofstream&);
+  const void write(const Datamodel::Conf&);
 } ;
 
+
+class Book {
+public:
+	struct song_info {
+		Song* song_;
+		bool found_;
+		std::string filename_;
+	};
+
+	std::string filename_;
+	std::string title_;
+	std::string author_;
+	std::vector<song_info> songs_;
+	bool print_index_ ;
+
+	void read(const Datamodel::Conf&, const std::string&);
+	const void write(const Datamodel::Conf&);
+	void print_deps();
+};
 
 #endif
