@@ -12,6 +12,7 @@ add_executable(f4242 main.cpp song.cpp json11.cpp
 		     write_mp_grille.cpp 
 		     write_mp_tab.cpp
 		     tablature.cpp
+			 write_cmakefile.cpp
 			 chord.h
 			 datamodel.h
 			 grille.h
@@ -25,6 +26,12 @@ add_executable(f4242 main.cpp song.cpp json11.cpp
 
 add_custom_target(
 	run
-	DEPENDS f4242
+	DEPENDS f4242 info.json
 	COMMAND Debug/f4242.exe info.json
+)
+
+add_custom_target(
+	run2
+	DEPENDS f4242 info2.json
+	COMMAND Debug/f4242.exe info2.json
 )

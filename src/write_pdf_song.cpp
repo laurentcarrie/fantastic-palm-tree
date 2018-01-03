@@ -269,16 +269,12 @@ const void Song::write(const Datamodel::Conf& la_conf) {
   std::cout << "Song::write " << filename_ << std::endl ;
 
 
-  std::accumulate(
-		  grilles_.begin(),grilles_.end(),0,
-		  [this,&la_conf](int index,const Grille& g) {
+  std::accumulate(grilles_.begin(),grilles_.end(),0,[this,&la_conf](int index,const Grille& g) {
 		    grille_write_mp(mp_grille_filename(la_conf,*this,index),g) ;
 		    return index+1 ;
 		  }) ;
 
-  std::accumulate(
-		  tablatures_.begin(),tablatures_.end(),0,
-		  [this,&la_conf](int index,const Tablature& t) {
+  std::accumulate(tablatures_.begin(),tablatures_.end(),0,[this,&la_conf](int index,const Tablature& t) {
 		    tab_write_mp(*this,mp_tab_filename(la_conf,*this,index),t) ;
 		    return index+1 ;
 		  }) ;

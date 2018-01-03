@@ -11,6 +11,7 @@ public:
     };
     struct ligne {
         std::vector<bar> bars_ ;
+		int repeat_;
     };
     struct t {
         std::string titre_ ;
